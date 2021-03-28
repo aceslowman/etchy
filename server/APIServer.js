@@ -35,11 +35,27 @@ app.get("/api/sphere/info", (request, response) => {
 });
 
 app.get("/api/members", (request, response) => {
+  response.json([{
+     
+  }]);
+});
+
+app.get("/api/member", (request, response) => {
   response.json({
-    
+    // uuid: 
+    // nickname:
+    // address:   // inherit from a 'node' class
   });
 });
 
+app.get("/api/garden", (request, response) => {
+  response.json({
+    // uuid:
+    // nickname:
+    // address:   // inherit from a 'node' class
+    // size:  
+  });
+});
 
 
 // Express port-switching logic
