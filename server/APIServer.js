@@ -7,7 +7,6 @@ const { nanoid } = require('nanoid');
 
 function checkHttps(req, res, next){
   // protocol check, if http, redirect to https
-  
   if(req.get('X-Forwarded-Proto').indexOf("https")!=-1){
     return next()
   } else {
@@ -26,6 +25,22 @@ app.get("/api/data", (request, response) => {
 app.get("/api/shaders", (request, response) => {
   // response.json(shader_collection);
 });
+
+app.get("/api/sphere/info", (request, response) => {
+  response.json({
+    name: 'test sphere',
+    size: 0,
+    
+  });
+});
+
+app.get("/api/members", (request, response) => {
+  response.json({
+    
+  });
+});
+
+
 
 // Express port-switching logic
 let port;
