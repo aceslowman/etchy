@@ -20,7 +20,7 @@ wss.on('connection', function connection(ws) {
 });
 
 function checkHttps(req, res, next){
-  // protocol check, if http, redirect to https
+   // protocol check, if http, redirect to https
   if(req.get('X-Forwarded-Proto').indexOf("https")!=-1){
     return next()
   } else {
