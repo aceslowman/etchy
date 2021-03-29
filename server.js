@@ -7,7 +7,7 @@ const WebSocket = require('ws');
 // https://expressjs.com/en/starter/static-files.html
 app.use(express.static("public")); 
 
-const wss = new WebSocket.Server({ port: 3000 });
+const wss = new WebSocket.Server({ server: app });
 
 wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(data) {
@@ -15,7 +15,7 @@ wss.on('connection', function connection(ws) {
       if (client.readyState === WebSocket.OPEN) {
         client.send(data);
       }
-    });
+    }); 
   });
 });
 
@@ -70,7 +70,7 @@ app.get("/api/garden", (request, response) => {
     // size:  
   });
 });
-// listen for requests :)
-// const listener = app.listen(process.env.PORT, () => {
-//   console.log("Your app is listening on port " + listener.address().port);
-// });
+
+const listener = app.listen(process.env.PORT, () => {
+  console.log("Your app is listening on port " + listener.address().port);
+});
