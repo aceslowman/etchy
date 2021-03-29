@@ -17,7 +17,7 @@ wss.on('connection', function connection(ws) {
   sockets.add(ws);
 
   ws.on('message', function incoming(message) {
-    console.log('received: %s', message);
+    console.log('received: %s', message); 
   });
   
   ws.on('close', function () {
