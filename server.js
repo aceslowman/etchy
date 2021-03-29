@@ -1,11 +1,25 @@
-const WebSocket = require('ws');
+var server = require("http").createServer(),
+  WebSocketServer = require("ws").Server,
+  server = require("http").createServer(),
+  wss = new WebSocketServer({ server: server }),
+  express = require("express"),
+  app = express();
 
-const wss = new WebSocket.Server({ port: process.env.PORT });
+// Client stuff
+app.use(express.static("public"));
+app.get("/", function(request, response) {
+  response.sendFile(__dirname + "/views/index.html");
+});
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
-    console.log('received: %s', message);
+// Server stuff
+wss.on("connection", function connection(ws) {
+  ws.on("message", function incoming(message) {
+    ws.send(message);
   });
+});
 
-  ws.send('something');
+// Listen
+server.on("request", app);
+server.listen(process.env.PORT, function() {
+  console.log("Your app is listening on port " + server.address().port);
 });
