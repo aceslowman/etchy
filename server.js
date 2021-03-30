@@ -1,56 +1,56 @@
-const http = require('http');
+const http = require("http");
 const express = require("express");
-const path = require('path');
-const fs = require('fs').promises
-const WebSocket = require('ws');
-const markdownit = require('markdown-it')()
+const path = require("path");
+const fs = require("fs").promises;
+const WebSocket = require("ws");
+const markdownit = require("markdown-it")();
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server: server });
 
 // Renders the README as HTML
-app.get("/", async (request, response) => {
-  const handle = await fs.open(path.join(__dirname, 'README.md'), 'r')
-  try {
-    const contents = await handle.readFile('utf-8')
-    const html = markdownit.render(contents)
-    response.send(html);
-  } finally {
-    handle.close()
-  }
-});
+// app.get("/", async (request, response) => {
+//   const handle = await fs.open(path.join(__dirname, 'README.md'), 'r')
+//   try {
+//     const contents = await handle.readFile('utf-8')
+//     const html = markdownit.render(contents)
+//     response.send(html);
+//   } finally {
+//     handle.close()
+//   }
+// });
 
-app.get("/client", async (request, response) => {
-  const handle = await fs.open(path.join(__dirname, 'index.html'), 'r')
-  
+app.get("/", async (request, response) => {
+  const handle = await fs.open(path.join(__dirname, "index.html"), "r");
+
   try {
-    const contents = await handle.readFile('utf-8')
+    const contents = await handle.readFile("utf-8");
     response.send(contents);
   } finally {
-    handle.close()
+    handle.close();
   }
 });
 
-app.get("/register", async (request, response) => {
-  console.log('a client wants to connect');
-  
-});
+wss.on("connection", function connection(ws) {
+  function handleRegistration(config) {
+    console.log("handle registration", config);
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(m) {
+    ws.send(JSON.stringify(config);
+  }
+
+  ws.on("message", function incoming(m) {
     let message = JSON.parse(m);
-    console.log('received: %s', message);
-    ws.send('reply: ' + message)
-    
-    switch(message.type) {
-      case 'REGISTER':
-        console.log('handle registration', message)
+    // ws.send('reply: ' + message)
+
+    switch (message.type) {
+      case "REGISTER":
+        handleRegistration(message);
         break;
     }
   });
 
-  ws.send('something');
+  ws.send(JSON.stringify({ message: "something" }));
 });
 
-server.listen(process.env.PORT)
+server.listen(process.env.PORT);

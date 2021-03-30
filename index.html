@@ -6,10 +6,10 @@
       var ws = new WebSocket("wss://public-sphere.glitch.me");
 
       ws.onmessage = function(evt) {
-        var received_msg = evt.data;
+        var received_msg = JSON.parse(evt.data);
         const chat = document.getElementById("chat")
         const li = document.createElement("li")
-        li.appendChild(document.createTextNode(received_msg))
+        li.appendChild(document.createTextNode(received_msg.message))
         chat.appendChild(li)
       };
 
@@ -26,7 +26,7 @@
           type: 'REGISTER',
           nickname: 'aceslowman'
         }
-        ws.send(registration);
+        ws.send(JSON.stringify(registration));
       }
 
     </script>
