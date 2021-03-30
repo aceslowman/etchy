@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import * as THREE from "https://unpkg.com/three@0.126.1/build/three.module.js";
-import Stats from "https://unpkg.com/three@0.126.1/examples/jsm/libs/stats.module.js";      
+import * as THREE from "three";
+import Stats from "three/examples/jsm/libs/stats.module.js";      
 
 const Sphere = () => {
   const container = React.useRef();
@@ -110,6 +110,8 @@ const App = () => {
         </Settings>
         <Sphere />
       </AppWrapper>
-    </ThemeContext.Provider>
+    </ThemeContext.Provider> 
   );
 };
+
+export default App;

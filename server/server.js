@@ -51,7 +51,7 @@ const clients = new Clients();
 app.use(express.static('client'));
 
 app.get("/", async (request, response) => {
-  const handle = await fs.open(path.join(__dirname, "client/index.html"), "r");
+  const handle = await fs.open(path.join(__dirname, "public/index.html"), "r");
 
   try {
     const contents = await handle.readFile("utf-8");
@@ -87,7 +87,7 @@ wss.on("connection", function connection(ws) {
   ws.send(JSON.stringify({ message: "something" }));
 });
 
-// server.listen(process.env.PORT);
+server.listen(process.env.PORT);
 
 // Express port-switching logic
 let port;
