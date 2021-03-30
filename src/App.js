@@ -113,6 +113,3 @@ const App = () => {
     </ThemeContext.Provider>
   );
 };
-
-const domContainer = document.getElementById("APP");
-ReactDOM.render(React.createElement(App), domContainer);
