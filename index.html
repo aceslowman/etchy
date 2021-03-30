@@ -9,7 +9,7 @@
         var received_msg = JSON.parse(evt.data);
         const chat = document.getElementById("chat")
         const li = document.createElement("li")
-        li.appendChild(document.createTextNode(received_msg.message))
+        li.appendChild(document.createTextNode(received_msg.message + " your id is: " + received_msg.uuid))
         chat.appendChild(li)
       };
 

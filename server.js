@@ -4,6 +4,7 @@ const path = require("path");
 const fs = require("fs").promises;
 const WebSocket = require("ws");
 const markdownit = require("markdown-it")();
+const {nanoid} = require("nanoid");
 
 const app = express();
 const server = http.createServer(app);
@@ -21,6 +22,19 @@ const wss = new WebSocket.Server({ server: server });
 //   }
 // });
 
+class Clients {
+  constructor() {
+    this.clientList = {};
+    this.saveClient = this.saveClient.bind(this);
+  }
+  
+  saveClient(username, client){
+    this.clientList[username] = client;
+  }
+}
+
+const 
+
 app.get("/", async (request, response) => {
   const handle = await fs.open(path.join(__dirname, "index.html"), "r");
 
@@ -35,8 +49,11 @@ app.get("/", async (request, response) => {
 wss.on("connection", function connection(ws) {
   function handleRegistration(config) {
     console.log("handle registration", config);
+    
+    // add user to list
+    clients.saveClient(config.username, ws);
 
-    ws.send(JSON.stringify(config);
+    ws.send(JSON.stringify({uuid: nanoid(), message: "you are registering!", ...config}));
   }
 
   ws.on("message", function incoming(m) {
