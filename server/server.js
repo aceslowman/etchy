@@ -87,7 +87,7 @@ wss.on("connection", function connection(ws) {
   ws.send(JSON.stringify({ message: "something" }));
 });
 
-server.listen(process.env.PORT);
+// server.listen(process.env.PORT);
 
 // Express port-switching logic
 let port;

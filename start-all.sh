@@ -1,6 +1,6 @@
 #!/bin/bash                                                                     
 
-npm run production &
+npm run development &
 npm run server &
 
 wait
