@@ -33,7 +33,7 @@ class Clients {
   }
 }
 
-const 
+const clients = new Clients(); 
 
 app.get("/", async (request, response) => {
   const handle = await fs.open(path.join(__dirname, "index.html"), "r");
@@ -51,9 +51,11 @@ wss.on("connection", function connection(ws) {
     console.log("handle registration", config);
     
     // add user to list
-    clients.saveClient(config.username, ws);
+    clients.saveClient(config.nickname, ws);
 
     ws.send(JSON.stringify({uuid: nanoid(), message: "you are registering!", ...config}));
+    
+    console.log('client list:', Object.keys(clients.clientList))
   }
 
   ws.on("message", function incoming(m) {
