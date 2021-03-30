@@ -19,6 +19,15 @@
         ws.send(message);
         textArea.value = "";
       }
+      
+      function register() {
+        console.log('sending a message to the server to register')
+        const registration = {
+          type: 'REGISTER',
+          nickname: 'aceslowman'
+        }
+        ws.send(registration);
+      }
 
     </script>
   </head>

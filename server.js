@@ -33,13 +33,21 @@ app.get("/client", async (request, response) => {
 });
 
 app.get("/register", async (request, response) => {
-  console.log('a client wants to connect')
+  console.log('a client wants to connect');
+  
 });
 
 wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
+  ws.on('message', function incoming(m) {
+    let message = JSON.parse(m);
     console.log('received: %s', message);
     ws.send('reply: ' + message)
+    
+    switch(message.type) {
+      case 'REGISTER':
+        console.log('handle registration', message)
+        break;
+    }
   });
 
   ws.send('something');
