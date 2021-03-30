@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>public sphere</title>
+
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css" />
+
+    <script src="https://unpkg.com/tone@14.7.39/build/Tone.js"></script>
+    <script src="https://unpkg.com/tone@14.7.39/build/Tone.js.map"></script>
+    
+    <!-- remove before 'production', should use precompiled script -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    
+<!--     <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script> -->
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+
+    <!-- shared utilities with my other audio projects -->
+    <script type="text/babel" src="./scripts/UI.js"></script>
+        
+    <script type="text/babel" src="./scripts/App.js" defer></script>
+  </head>
+  <body>
+    <div id="APP"></div>
+    <!-- include the Glitch button to show what the webpage is about and
+          to make it easier for folks to view source and remix 
+    <div class="glitchButton" style="position:fixed;top:20px;right:20px;"></div>
+    <script src="https://button.glitch.me/button.js" defer></script>-->
+  </body>
+</html>
