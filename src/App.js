@@ -1,4 +1,6 @@
-/* global THREE, React, ReactDOM */
+import React, { useEffect, useState, useRef } from "react";
+import * as THREE from "https://unpkg.com/three@0.126.1/build/three.module.js";
+import Stats from "https://unpkg.com/three@0.126.1/examples/jsm/libs/stats.module.js";      
 
 const Sphere = () => {
   const container = React.useRef();
