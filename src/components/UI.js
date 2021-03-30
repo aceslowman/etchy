@@ -1,4 +1,4 @@
-/* global Tone, ReactDOM, React */
+import React, { useEffect, useState, useRef } from "react";
 
 // NOTE-UI version 0.1.0
 // author: Austin Slominski (@aceslowman)
@@ -115,7 +115,7 @@ const AppWrapper = props => {
 const InputPanel = props => {
   const theme = React.useContext(ThemeContext);
   const [expanded, setExpanded] = React.useState(true);
-  
+
   return (
     <div
       style={{
@@ -330,4 +330,20 @@ const MIDILog = props => {
       </div>
     </div>
   );
+};
+
+export {
+  ThemeContext,
+  NumberInput,
+  Checkbox,
+  Select,
+  Button,
+  Label,
+  AppWrapper,
+  InputPanel,
+  InputGroup,
+  InputRow,
+  Credits,
+  Settings,
+  MIDILog
 };

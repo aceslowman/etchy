@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
+import * as UI from "./components/UI.js";
 import * as THREE from "three";
-// import Stats from "three/examples/jsm/libs/stats.module.js";      
+// import Stats from "three/examples/jsm/libs/stats.module.js";
 
 const Sphere = () => {
   const container = React.useRef();
@@ -56,7 +57,7 @@ const Sphere = () => {
     const render = () => {
       sphere.rotation.x += 0.005;
       sphere.rotation.y += 0.01;
-      
+
       wireframe.rotation.x += 0.005;
       wireframe.rotation.y += 0.01;
 
@@ -94,7 +95,7 @@ const Sphere = () => {
 
 const App = () => {
   return (
-    <ThemeContext.Provider
+    <UI.ThemeContext.Provider
       value={{
         text_color: "black",
         background_color: "rgb(248 251 255)",
@@ -102,15 +103,15 @@ const App = () => {
         accent_color: "rgb(95 111 255)"
       }}
     >
-      <AppWrapper>
-        <Settings>
-          <InputPanel title="basic">
-            <Button onClick={() => {}}>register</Button>
-          </InputPanel>
-        </Settings>
+      <UI.AppWrapper>
+        <UI.Settings>
+          <UI.InputPanel title="basic">
+            <UI.Button onClick={() => {}}>register</UI.Button>
+          </UI.InputPanel>
+        </UI.Settings>
         <Sphere />
-      </AppWrapper>
-    </ThemeContext.Provider> 
+      </UI.AppWrapper>
+    </UI.ThemeContext.Provider>
   );
 };
 
