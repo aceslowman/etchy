@@ -1,0 +1,13 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#APP {
+  font-family: monospace;
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+}
