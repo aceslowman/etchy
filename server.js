@@ -22,13 +22,18 @@ app.get("/", async (request, response) => {
 });
 
 app.get("/client", async (request, response) => {
-  const handle = await fs.open(path.join(__dirname, 'client.html'), 'r')
+  const handle = await fs.open(path.join(__dirname, 'index.html'), 'r')
+  
   try {
     const contents = await handle.readFile('utf-8')
     response.send(contents);
   } finally {
     handle.close()
   }
+});
+
+app.get("/register", async (request, response) => {
+  console.log('a client wants to connect')
 });
 
 wss.on('connection', function connection(ws) {
