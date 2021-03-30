@@ -50,16 +50,16 @@ const clients = new Clients();
  
 app.use(express.static('client'));
 
-app.get("/", async (request, response) => {
-  const handle = await fs.open(path.join(__dirname, "public/index.html"), "r");
+// app.get("/", async (request, response) => {
+//   const handle = await fs.open(path.join(__dirname, "public/index.html"), "r");
 
-  try {
-    const contents = await handle.readFile("utf-8");
-    response.send(contents);
-  } finally {
-    handle.close();
-  }
-});
+//   try {
+//     const contents = await handle.readFile("utf-8");
+//     response.send(contents);
+//   } finally {
+//     handle.close();
+//   }
+// });
 
 wss.on("connection", function connection(ws) {
   function handleRegistration(config) {

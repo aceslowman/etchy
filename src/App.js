@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as THREE from "three";
-import Stats from "three/examples/jsm/libs/stats.module.js";      
+// import Stats from "three/examples/jsm/libs/stats.module.js";      
 
 const Sphere = () => {
   const container = React.useRef();
