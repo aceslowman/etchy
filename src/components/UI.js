@@ -10,6 +10,24 @@ const ThemeContext = React.createContext({
   // accent_color: "green"
 });
 
+const TextInput = props => {
+  const theme = React.useContext(ThemeContext);
+  return (
+    <input
+      onChange={props.onChange}
+      type="text"
+      value={props.value}
+      style={{
+        backgroundColor: "#fff",
+        color: theme.text_color,
+        border: "1px dotted " + theme.text_color,
+        minWidth: "0px",
+        ...props.style
+      }}
+    />
+  );
+}
+
 const NumberInput = props => {
   const theme = React.useContext(ThemeContext);
   return (
@@ -334,6 +352,7 @@ const MIDILog = props => {
 
 export {
   ThemeContext,
+  TextInput,
   NumberInput,
   Checkbox,
   Select,

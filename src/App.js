@@ -23,6 +23,10 @@ const App = () => {
       <UI.AppWrapper>
         <UI.Settings>
           <UI.InputPanel title="basic">
+            <UI.InputPanel title="about you">
+              address: {}
+            </UI.InputPanel>
+            <UI.TextInput></UI.TextInput>
             <UI.Button onClick={() => {}}>register</UI.Button>
           </UI.InputPanel>
         </UI.Settings>

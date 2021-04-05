@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as THREE from "three";
 import Sphere from "./Sphere";
-import OrbitControls from "three/examples/jsm/controls/OrbitControls.js";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls.js";
 
 // import Stats from "three/examples/jsm/libs/stats.module.js";
 
@@ -28,7 +28,7 @@ const ThreeCanvas = () => {
 
       sphere = new Sphere();
 
-      // scene.add(sphere.mesh);
+      scene.add(sphere.mesh);
       scene.add(sphere.wireframe);
 
       renderer = new THREE.WebGLRenderer({ alpha: true, antialiasing: true });
