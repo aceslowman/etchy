@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as THREE from "three";
 import Sphere from "./Sphere";
+import OrbitControls from "three/examples/jsm/controls/OrbitControls.js";
+
 // import Stats from "three/examples/jsm/libs/stats.module.js";
 
 const ThreeCanvas = () => {
@@ -23,18 +25,23 @@ const ThreeCanvas = () => {
       cameraPerspective.position.z = 400;
 
       scene = new THREE.Scene();
-      
+
       sphere = new Sphere();
-      
-      scene.add(sphere.mesh);
+
+      // scene.add(sphere.mesh);
       scene.add(sphere.wireframe);
 
-      renderer = new THREE.WebGLRenderer( { alpha: true } );
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialiasing: true });
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(bounds.width, bounds.height);
       renderer.setClearColor(0x000000, 0);
-      
+
       container.current.appendChild(renderer.domElement);
+
+      const controls = new OrbitControls(
+        cameraPerspective,
+        renderer.domElement
+      );
 
       // stats = new Stats();
       // container.appendChild(stats.dom);
@@ -49,17 +56,13 @@ const ThreeCanvas = () => {
     };
 
     const render = () => {
-      sphere.mesh.rotation.x += 0.005;
-      sphere.mesh.rotation.y += 0.01;
-
-      sphere.wireframe.rotation.x += 0.005;
-      sphere.wireframe.rotation.y += 0.01;
+      sphere.update();
 
       renderer.render(scene, cameraPerspective);
     };
 
     init();
-    animate();    
+    animate();
   }, []);
 
   return (
@@ -80,9 +83,7 @@ const ThreeCanvas = () => {
           justifyContent: "center"
         }}
         ref={container}
-      >
-        
-      </div>
+      ></div>
     </div>
   );
 };
