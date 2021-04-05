@@ -24,7 +24,7 @@ const App = () => {
         <UI.Settings>
           <UI.InputPanel title="basic">
             <UI.InputPanel title="about you">
-              address: {} yeah I am about to focus but yeah11m
+              address: {}
             </UI.InputPanel>
             <UI.TextInput> </UI.TextInput>
             <UI.Button onClick={() => {}}>register</UI.Button>
