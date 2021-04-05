@@ -37,7 +37,7 @@ module.exports = {
     liveReload: false,
     disableHostCheck: true,
     port: process.env.PORT,
-    public: "public-sphere.glitch.me",
+    public: process.env.PROJECT_DOMAIN,
     // https: true,
     proxy: {
       "/api": "http://localhost:3001"
