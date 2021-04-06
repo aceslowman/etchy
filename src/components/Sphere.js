@@ -6,11 +6,16 @@ class Marker {
     this.label = _label;
     this.position = _position;
     this.metadata = _metadata;
+
+    this.geometry = new THREE.SphereGeometry(18, 8, 8);
+    this.material = new THREE.MeshBasicMaterial({ color: "orange" });
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
   }
 }
 
 class Sphere {
-  constructor() {
+  constructor(scene) {
+    this.scene = scene;
     this.solid_geo = new THREE.SphereGeometry(150, 32, 32);
     this.solid_mat = new THREE.MeshBasicMaterial();
     // this.mesh = new THREE.Mesh(this.solid_geo, this.solid_mat);
@@ -21,17 +26,23 @@ class Sphere {
     this.wire_geo = new THREE.EdgesGeometry(this.solid_geo); // or WireframeGeometry( geometry )
     this.wire_mat = new THREE.LineBasicMaterial({ color: "#5F6FFF" });
     this.wireframe = new THREE.LineSegments(this.wire_geo, this.wire_mat);
+
+    // this.scene.add(this.mesh);
+    this.scene.add(this.wireframe);
   }
 
   update() {
-    //     this.mesh.rotation.x += 0.005;
-    //     this.mesh.rotation.y += 0.01;
-    //     this.wireframe.rotation.x += 0.005;
-    //     this.wireframe.rotation.y += 0.01;
+    this.mesh.rotation.x += 0.001;
+    this.mesh.rotation.y += 0.005;
+    this.wireframe.rotation.x += 0.001;
+    this.wireframe.rotation.y += 0.005;
   }
 
   addMarker() {
-    this.markers.push(new Marker("test"));
+    let marker = new Marker("test");
+    this.markers.push(marker);
+    //     add marker to sphere and scene
+    this.scene.add(marker.mesh);
   }
 }
 

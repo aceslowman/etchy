@@ -26,10 +26,7 @@ const ThreeCanvas = () => {
 
       scene = new THREE.Scene();
 
-      sphere = new Sphere();
-
-      scene.add(sphere.mesh);
-      scene.add(sphere.wireframe);
+      sphere = new Sphere(scene);
 
       renderer = new THREE.WebGLRenderer({ alpha: true, antialiasing: true });
       renderer.setPixelRatio(window.devicePixelRatio);
