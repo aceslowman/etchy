@@ -7,9 +7,15 @@ class Marker {
     this.position = _position;
     this.metadata = _metadata;
 
-    this.geometry = new THREE.SphereGeometry(18, 8, 8);
+    this.geometry = new THREE.SphereGeometry(10, 8, 8);
     this.material = new THREE.MeshBasicMaterial({ color: "orange" });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
+    
+    // random position on sphere
+    let pos = THREE.Vector3().random().normalize();
+    pos.normalize();
+    
+    this.mesh.position.set(150,0,0);
   }
 }
 
@@ -29,13 +35,17 @@ class Sphere {
 
     // this.scene.add(this.mesh);
     this.scene.add(this.wireframe);
+    
+    this.markers = [];
+    
+    this.addMarker(); // temp
   }
 
   update() {
-    this.mesh.rotation.x += 0.001;
-    this.mesh.rotation.y += 0.005;
-    this.wireframe.rotation.x += 0.001;
-    this.wireframe.rotation.y += 0.005;
+    // this.mesh.rotation.x += 0.001;
+    // this.mesh.rotation.y += 0.005;
+    // this.wireframe.rotation.x += 0.001;
+    // this.wireframe.rotation.y += 0.005;
   }
 
   addMarker() {

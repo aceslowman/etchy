@@ -9,7 +9,7 @@ const ThreeCanvas = () => {
   const container = React.useRef();
 
   React.useEffect(() => {
-    let renderer, scene, cameraPerspective, sphere, wireframe;
+    let renderer, scene, cameraPerspective, sphere, wireframe, controls;
 
     const init = () => {
       // let container = document.getElementById("glcontainer");
@@ -35,10 +35,12 @@ const ThreeCanvas = () => {
 
       container.current.appendChild(renderer.domElement);
 
-      const controls = new OrbitControls(
+      controls = new OrbitControls(
         cameraPerspective,
         renderer.domElement
       );
+      
+      controls.autoRotate = true;
 
       // stats = new Stats();
       // container.appendChild(stats.dom);
@@ -53,6 +55,7 @@ const ThreeCanvas = () => {
     };
 
     const render = () => {
+      controls.update();
       sphere.update();
 
       renderer.render(scene, cameraPerspective);
