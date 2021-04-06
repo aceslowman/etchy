@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as THREE from "three";
 import Sphere from "./Sphere";
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 // import Stats from "three/examples/jsm/libs/stats.module.js";
 
@@ -68,23 +68,15 @@ const ThreeCanvas = () => {
   return (
     <div
       style={{
-        flexGrow: 2,
-        position: "relative",
-        overflow: "overlay"
+        width: "100%",
+        height: "100%",
+        position: "absolute",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
       }}
-    >
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          position: "absolute",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-        ref={container}
-      ></div>
-    </div>
+      ref={container}
+    ></div>
   );
 };
 

@@ -10,6 +10,7 @@ dependencies:
   html-webpack-plugin: 4.5.2
   markdown-it: 12.0.4
   nanoid: 3.1.22
+  note-ui: 0.1.1
   prop-types: 15.7.2
   react: 17.0.2
   react-dom: 17.0.2
@@ -3536,6 +3537,14 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
+  /note-ui/0.1.1:
+    dev: false
+    engines:
+      node: '>=10'
+    peerDependencies:
+      react: ^16.0.0
+    resolution:
+      integrity: sha512-qbwXN3y+9ywdj5O29dptYGkQ7Qn5/UGE3wXFtApCoIk/NEdTXeGqkAGrrMExWWXRRqINzCWw5fIEP2KnXbiODA==
   /npm-run-path/2.0.2:
     dependencies:
       path-key: 2.0.1
@@ -5262,6 +5271,7 @@ specifiers:
   html-webpack-plugin: ^4.5.0
   markdown-it: ^12.0.4
   nanoid: ^3.1.19
+  note-ui: ^0.1.1
   prop-types: ^15.7.2
   react: ^17.0.1
   react-dom: ^17.0.1
