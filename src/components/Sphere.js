@@ -10,12 +10,16 @@ class Marker {
     this.geometry = new THREE.SphereGeometry(10, 8, 8);
     this.material = new THREE.MeshBasicMaterial({ color: "orange" });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
-    
+
     // random position on sphere
-    let pos = THREE.Vector3().random().normalize();
-    pos.normalize();
-    
-    this.mesh.position.set(150,0,0);
+    let pos = new THREE.Vector3(
+      Math.random() * 2 - 1,
+      Math.random() * 2 - 1,
+      Math.random() * 2 - 1
+    ).normalize();
+    pos.multiplyScalar(150);
+
+    this.mesh.position.set(pos.x, pos.y, pos.z);
   }
 }
 
@@ -33,11 +37,16 @@ class Sphere {
     this.wire_mat = new THREE.LineBasicMaterial({ color: "#5F6FFF" });
     this.wireframe = new THREE.LineSegments(this.wire_geo, this.wire_mat);
 
-    // this.scene.add(this.mesh);
+    this.scene.add(this.mesh);
     this.scene.add(this.wireframe);
-    
+
     this.markers = [];
-    
+
+    this.addMarker(); // temp
+    this.addMarker(); // temp
+    this.addMarker(); // temp
+    this.addMarker(); // temp
+    this.addMarker(); // temp
     this.addMarker(); // temp
   }
 
