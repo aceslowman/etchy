@@ -29,8 +29,10 @@
       console.log('something')
       let websocket = new FriendlyWebSocket({path: '/'});
       
-      websocket.on("connection", data => {
+      websocket.on("connect", data => {
         console.log('data',data)
+        
+      websocket.send("hellllloo")
       })
 
       websocket.on("message", data => {
@@ -47,7 +49,6 @@
         }
       });
       
-      websocket.send("hellllloo")
     </script>
   </body>
 </html>

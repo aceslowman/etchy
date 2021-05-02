@@ -1,91 +1,52 @@
-const http = require("http");
-const express = require("express");
-const path = require("path");
-const { createProxyMiddleware } = require("http-proxy-middleware");
-const fs = require("fs").promises;
-const WebSocket = require("ws");
-const { nanoid } = require("nanoid");
+const http = require('http');
+const express = require('express');
+const ws = require('ws');
 
 const app = express();
+
+// we need to create our own http server so express and ws can share it.
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server: server });
+// pass the created server to ws
+const wss = new ws.Server({ server });
 
-function checkHttps(req, res, next) {
-  // protocol check, if http, redirect to https
+// we're using an ES2015 Set to keep track of every client that's connected
+let sockets = new Set();
 
-  if (req.get("X-Forwarded-Proto").indexOf("https") != -1) {
-    return next();
-  } else {
-    res.redirect("https://" + req.hostname + req.url);
-  }
-}
+// based on https://www.npmjs.com/package/ws#simple-server
+wss.on('connection', function connection(ws) {
+  sockets.add(ws);
 
-app.all("*", checkHttps);
-
-class Clients {
-  constructor() {
-    this.clientList = {};
-    this.saveClient = this.saveClient.bind(this);
-  }
-
-  saveClient(username, client) {
-    this.clientList[username] = client;
-  }
-}
-
-const clients = new Clients();
-
-app.use(express.static("client"));
-
-wss.on("connection", function connection(ws) {
-  function handleRegistration(config) {
-    console.log("handle registration", config);
-
-    // add user to list
-    clients.saveClient(config.nickname, ws);
-
-    ws.send(
-      JSON.stringify({
-        uuid: nanoid(),
-        message: "you are registering!",
-        ...config
-      })
-    );
-
-    console.log("client list:", Object.keys(clients.clientList));
-  }
-
-  ws.on("message", function incoming(m) {
-    let message = JSON.parse(m);
-    ws.send('reply: ' + message);
-    console.log(message)
-
-    switch (message.type) {
-      case "REGISTER":
-        handleRegistration(message);
-        break;
-    }
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
   });
-
-  ws.send(JSON.stringify({ message: "something" }));
+  
+  ws.on('close', function () {
+    sockets.delete(ws);
+    // tell everyone a client left
+    update();
+  });
+  
+  // tell everyone a client joined
+  update();
 });
 
-// server.listen(process.env.PORT);
-
-// Express port-switching logic
-let port;
-console.log("❇️ NODE_ENV is", process.env.NODE_ENV);
-if (process.env.NODE_ENV === "production") {
-  port = process.env.PORT || 3000;
-  app.use(express.static(path.join(__dirname, "../build")));
-  app.use(express.static(path.join(__dirname, "../public")));
-  app.get("*", (request, response) => {
-    response.sendFile(path.join(__dirname, "../build", "index.html"));
-  });
-} else {
-  port = 3001;
+function update() {
+  // send an updated client count to every open socket.
+  sockets.forEach(ws => ws.send(JSON.stringify({
+    type: 'count',
+    count: sockets.size
+  })));
 }
+ 
+// http://expressjs.com/en/starter/static-files.html
+app.use(express.static('public'));
 
-const listener = app.listen(port, () => {
-  console.log("❇️ Express server is running on port", listener.address().port);
+// http://expressjs.com/en/starter/basic-routing.html
+app.get('/', function(request, response) {
+  response.sendFile(__dirname + '/views/index.html');
+});
+
+// listen for requests!
+const listener = server.listen(process.env.PORT, function() {
+  console.log('Your app is listening on port ' + listener.address().port);
 });
