@@ -107,10 +107,12 @@
             console.log("Model Loaded!");
           }
 
-          pitch.getPitch(function(err, frequency) {
+          
+          
+          setInterval(() => pitch.getPitch(function(err, frequency) {
             console.log('pitch',frequency);
             console.log('err', err)
-          });
+          }), 200)
         }
 
         if (!navigator.getUserMedia) {
