@@ -9,56 +9,87 @@
     <link rel="manifest" href="manifest.json" />
 
     <title>perennial</title>
-  
+
     <style>
       html {
         background-color: black;
         color: white;
       }
     </style>
-    
+
     <script src="/websocket.js"></script>
   </head>
   <body>
     <h1>
       PERENNIAL
     </h1>
+    <p class="count"></p>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    
+
     <script type="text/javascript">
       // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
       function guidGenerator() {
-          var S4 = function() {
-             return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-          };
-          return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+        var S4 = function() {
+          return (((1 + Math.random()) * 0x10000) | 0)
+            .toString(16)
+            .substring(1);
+        };
+        return (
+          S4() +
+          S4() +
+          "-" +
+          S4() +
+          "-" +
+          S4() +
+          "-" +
+          S4() +
+          "-" +
+          S4() +
+          S4() +
+          S4()
+        );
       }
-      
-      let websocket = new FriendlyWebSocket({path: '/'});
+
+      async function getMedia(constraints) {
+        let stream = null;
+
+        try {
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+          console.log('stream',stream)
+          /* use the stream */
+        } catch (err) {
+          /* handle the error */
+        }
+      }
+
+      let websocket = new FriendlyWebSocket({ path: "/" });
       let user_id;
-      
+
       websocket.on("open", data => {
-        console.log('data',data)
+        console.log("data", data);
         // assign user id
         user_id = guidGenerator();
-        
-        websocket.send(user_id)
-      })
+
+        websocket.send(user_id);
+      });
 
       websocket.on("message", data => {
         console.log("message:", data);
+
         try {
-          // this example expects every message to be in JSON format.
           data = JSON.parse(event.data);
         } catch (e) {
           console.warn("invalid message from server", data);
         }
-        // if it's a message about the client count, update the elements
+
         if (data.type === "count") {
-          document.querySelector(".count").innerText = data.count;
+          document.querySelector(
+            ".count"
+          ).innerText = `currently online: ${data.count}`;
         }
       });
       
+      getMedia({audio: true, video: false});
     </script>
   </body>
 </html>
