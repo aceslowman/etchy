@@ -1,54 +1,42 @@
-1const http = require("http");
+const http = require("http");
 const express = require("express");
 const path = require("path");
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { createProxyMiddleware } = require("http-proxy-middleware");
 const fs = require("fs").promises;
 const WebSocket = require("ws");
 const markdownit = require("markdown-it")();
-const {nanoid} = require("nanoid");
+const { nanoid } = require("nanoid");
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server: server });
 
-function checkHttps(req, res, next){
+function checkHttps(req, res, next) {
   // protocol check, if http, redirect to https
-  
-  if(req.get('X-Forwarded-Proto').indexOf("https")!=-1){
-    return next()
+
+  if (req.get("X-Forwarded-Proto").indexOf("https") != -1) {
+    return next();
   } else {
-    res.redirect('https://' + req.hostname + req.url);
+    res.redirect("https://" + req.hostname + req.url);
   }
 }
 
 app.all("*", checkHttps);
-
-// Renders the README as HTML
-// app.get("/", async (request, response) => {
-//   const handle = await fs.open(path.join(__dirname, 'README.md'), 'r')
-//   try {
-//     const contents = await handle.readFile('utf-8')
-//     const html = markdownit.render(contents)
-//     response.send(html);
-//   } finally {
-//     handle.close()
-//   }
-// });
 
 class Clients {
   constructor() {
     this.clientList = {};
     this.saveClient = this.saveClient.bind(this);
   }
-  
-  saveClient(username, client){
+
+  saveClient(username, client) {
     this.clientList[username] = client;
   }
 }
 
-const clients = new Clients(); 
- 
-app.use(express.static('client'));
+const clients = new Clients();
+
+app.use(express.static("client"));
 
 // app.get("/", async (request, response) => {
 //   const handle = await fs.open(path.join(__dirname, "public/index.html"), "r");
@@ -64,13 +52,19 @@ app.use(express.static('client'));
 wss.on("connection", function connection(ws) {
   function handleRegistration(config) {
     console.log("handle registration", config);
-    
+
     // add user to list
     clients.saveClient(config.nickname, ws);
 
-    ws.send(JSON.stringify({uuid: nanoid(), message: "you are registering!", ...config}));
-    
-    console.log('client list:', Object.keys(clients.clientList))
+    ws.send(
+      JSON.stringify({
+        uuid: nanoid(),
+        message: "you are registering!",
+        ...config
+      })
+    );
+
+    console.log("client list:", Object.keys(clients.clientList));
   }
 
   ws.on("message", function incoming(m) {
