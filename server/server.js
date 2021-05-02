@@ -57,7 +57,8 @@ wss.on("connection", function connection(ws) {
 
   ws.on("message", function incoming(m) {
     let message = JSON.parse(m);
-    // ws.send('reply: ' + message)
+    ws.send('reply: ' + message);
+    console.log(message)
 
     switch (message.type) {
       case "REGISTER":

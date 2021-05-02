@@ -16,6 +16,8 @@
         color: white;
       }
     </style>
+    
+    <script src="/websocket.js"></script>
   </head>
   <body>
     <h1>
@@ -25,9 +27,27 @@
     
     <script type="text/javascript">
       console.log('something')
-      let websocket = new WebSocket("wss://perennial.glitch.me/api");
+      let websocket = new FriendlyWebSocket({path: '/'});
       
-      websocket.send('test message')
+      websocket.on("connection", data => {
+        console.log('data',data)
+      })
+
+      websocket.on("message", data => {
+        console.log("message:", data);
+        try {
+          // this example expects every message to be in JSON format.
+          data = JSON.parse(event.data);
+        } catch (e) {
+          console.warn("invalid message from server", data);
+        }
+        // if it's a message about the client count, update the elements
+        if (data.type === "count") {
+          document.querySelector(".count").innerText = data.count;
+        }
+      });
+      
+      websocket.send("hellllloo")
     </script>
   </body>
 </html>
