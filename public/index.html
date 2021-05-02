@@ -95,9 +95,10 @@
 
           // setup up pitch detection!
           const pitch = ml5.pitchDetection(
-            "./model/",
+            "./model/pitch-detection/crepe/",
             audioContext,
-            microphone_stream,
+            stream,
+            // microphone_stream,
             modelLoaded
           );
 
@@ -107,7 +108,8 @@
           }
 
           pitch.getPitch(function(err, frequency) {
-            console.log(frequency);
+            console.log('pitch',frequency);
+            console.log('err', err)
           });
         }
 
