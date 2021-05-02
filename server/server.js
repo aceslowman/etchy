@@ -4,7 +4,6 @@ const path = require("path");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const fs = require("fs").promises;
 const WebSocket = require("ws");
-const markdownit = require("markdown-it")();
 const { nanoid } = require("nanoid");
 
 const app = express();
@@ -37,17 +36,6 @@ class Clients {
 const clients = new Clients();
 
 app.use(express.static("client"));
-
-// app.get("/", async (request, response) => {
-//   const handle = await fs.open(path.join(__dirname, "public/index.html"), "r");
-
-//   try {
-//     const contents = await handle.readFile("utf-8");
-//     response.send(contents);
-//   } finally {
-//     handle.close();
-//   }
-// });
 
 wss.on("connection", function connection(ws) {
   function handleRegistration(config) {
