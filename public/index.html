@@ -26,13 +26,23 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
     <script type="text/javascript">
-      console.log('something')
-      let websocket = new FriendlyWebSocket({path: '/'});
+      // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
+      function guidGenerator() {
+          var S4 = function() {
+             return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+          };
+          return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+      }
       
-      websocket.on("connect", data => {
+      let websocket = new FriendlyWebSocket({path: '/'});
+      let user_id;
+      
+      websocket.on("open", data => {
         console.log('data',data)
+        // assign user id
+        user_id = guidGenerator();
         
-      websocket.send("hellllloo")
+        websocket.send(user_id)
       })
 
       websocket.on("message", data => {
