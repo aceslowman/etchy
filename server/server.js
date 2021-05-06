@@ -16,7 +16,19 @@ wss.on('connection', function connection(ws) {
 
   ws.on('message', function incoming(m) {
     let message = JSON.parse(m); 
-    console.log('received: %s', message);
+    
+    
+    switch(message.type) {
+      case 'PITCH':
+        console.log('pitch', message);
+        break;
+      case 'REGISTER':
+        console.log('register', message);
+        break;
+      default:
+        console.log('message received without TYPE')
+        break;
+    }
     
     // console.log(sockets)
   });
