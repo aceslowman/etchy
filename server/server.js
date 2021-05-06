@@ -61,7 +61,7 @@ wss.on("connection", function connection(ws) {
   });
 
   ws.on("close", function() {
-    // connections.delete(ws);
+    connections.delete(id);
     // tell everyone a client left
     updateCount();
   });
@@ -77,7 +77,7 @@ function updateCount() {
   //   count: sockets.size
   // })));
   connections.forEach(con => {
-    con.ws.send(
+    con.socket.send(
       JSON.stringify({
         type: "COUNT",
         count: connections.size
