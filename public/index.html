@@ -21,7 +21,7 @@
     <script src="/websocket.js"></script>
   </head>
   <body>
-    <h1>
+    <h1 style="color:black;">
       PERENNIAL
     </h1>
     <p class="count"></p>
@@ -90,6 +90,9 @@
           gain_node = audioContext.createGain(0.0);
           gain_node.connect(audioContext.destination);
 
+              gain_node.gain.setValueAtTime(0, audioContext.currentTime);
+
+          
           microphone_stream = audioContext.createMediaStreamSource(stream);
           microphone_stream.connect(gain_node);
 
