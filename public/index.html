@@ -87,7 +87,7 @@
 
         function startMicrophone(stream) {
           console.log("starting microphone");
-          gain_node = audioContext.createGain(0.1);
+          gain_node = audioContext.createGain(0.0);
           gain_node.connect(audioContext.destination);
 
           microphone_stream = audioContext.createMediaStreamSource(stream);
