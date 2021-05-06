@@ -49,7 +49,7 @@ wss.on("connection", function connection(ws) {
         let con = connections.get(id);
         connections.set(message.uuid, { ...con, pitch: message.pitch });
         break;
-      case "REGISTER":
+      case "REGISTER": 
         console.log("register", message);
         break;
       default:
