@@ -60,8 +60,8 @@ wss.on("connection", function connection(ws) {
     // console.log(sockets)
   });
 
-  ws.on("close", function() {
-    connections.delete(id);
+  ws.on("close", function() { 
+    connections.delete(id); 
     // tell everyone a client left
     updateCount();
   });
