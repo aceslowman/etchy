@@ -38,7 +38,7 @@ wss.on('connection', function connection(ws) {
   });
   
   ws.on('close', function () {
-    sockets.delete(ws);
+    // connections.delete(ws);
     // tell everyone a client left
     updateCount();
   });
