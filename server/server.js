@@ -4,33 +4,33 @@ const ws = require('ws');
 
 const app = express();
 
-// we need to create our own http server so express and ws can share it.
 const server = http.createServer(app);
-// pass the created server to ws
 const wss = new ws.Server({ server });
 
 // we're using an ES2015 Set to keep track of every client that's connected
 let sockets = new Set();
 
-// based on https://www.npmjs.com/package/ws#simple-server
 wss.on('connection', function connection(ws) {
+  console.log('ws', ws)
   sockets.add(ws);
 
   ws.on('message', function incoming(message) {
     console.log('received: %s', message);
+    
+    // console.log(sockets)
   });
   
   ws.on('close', function () {
     sockets.delete(ws);
     // tell everyone a client left
-    update();
+    updateCount();
   });
   
   // tell everyone a client joined
-  update();
+  updateCount();
 });
 
-function update() {
+function updateCount() {
   // send an updated client count to every open socket.
   sockets.forEach(ws => ws.send(JSON.stringify({
     type: 'count',

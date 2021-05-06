@@ -24,7 +24,8 @@
     <h1>
       PERENNIAL
     </h1>
-    <p class="count"></p>
+    <p class="count"></p>         
+    <p class="pitch"></p>
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
     <script type="text/javascript">
@@ -107,12 +108,13 @@
             console.log("Model Loaded!");
           }
 
-          
-          
-          setInterval(() => pitch.getPitch(function(err, frequency) {
-            console.log('pitch',frequency);
-            console.log('err', err)
-          }), 200)
+          setInterval(
+            () =>
+              pitch.getPitch(function(err, frequency) {
+                document.querySelector('.pitch').innerText = frequency;
+              }),
+            200
+          );
         }
 
         if (!navigator.getUserMedia) {
