@@ -11,10 +11,11 @@ const wss = new ws.Server({ server });
 let sockets = new Set();
 
 wss.on('connection', function connection(ws) {
-  console.log('ws', ws)
+  // console.log('ws', ws)
   sockets.add(ws);
 
-  ws.on('message', function incoming(message) {
+  ws.on('message', function incoming(m) {
+    let message = JSON.parse(m); 
     console.log('received: %s', message);
     
     // console.log(sockets)

@@ -63,7 +63,7 @@
         // assign user id
         user_id = guidGenerator();
 
-        websocket.send(user_id);
+        websocket.send(JSON.stringify({uuid: user_id}));
       });
 
       websocket.on("message", data => {
