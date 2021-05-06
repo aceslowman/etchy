@@ -112,7 +112,7 @@
               pitch.getPitch(function(err, frequency) {
                 document.querySelector(".pitch").innerText = frequency;
                 if(frequency)
-                  websocket.send(JSON.stringify({ type: "PITCH", pitch: frequency }));
+                  websocket.send(JSON.stringify({ user_id: user_id, type: "PITCH", pitch: frequency }));
               }),
             200
           );

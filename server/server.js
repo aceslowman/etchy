@@ -8,11 +8,14 @@ const server = http.createServer(app);
 const wss = new ws.Server({ server });
 
 // we're using an ES2015 Set to keep track of every client that's connected
-let sockets = new Set();
+// let sockets = new Set();
+let connections = new Map();
 
 wss.on('connection', function connection(ws) {
   // console.log('ws', ws)
-  sockets.add(ws);
+  // sockets.add({
+  //   socket: ws
+  // });
 
   ws.on('message', function incoming(m) {
     let message = JSON.parse(m); 
@@ -21,6 +24,7 @@ wss.on('connection', function connection(ws) {
     switch(message.type) {
       case 'PITCH':
         console.log('pitch', message);
+        
         break;
       case 'REGISTER':
         console.log('register', message);
@@ -45,10 +49,10 @@ wss.on('connection', function connection(ws) {
 
 function updateCount() {
   // send an updated client count to every open socket.
-  sockets.forEach(ws => ws.send(JSON.stringify({
-    type: 'COUNT',
-    count: sockets.size
-  })));
+  // sockets.forEach(ws => ws.send(JSON.stringify({
+  //   type: 'COUNT',
+  //   count: sockets.size
+  // })));
 }
  
 // http://expressjs.com/en/starter/static-files.html
