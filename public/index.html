@@ -24,7 +24,7 @@
     <h1>
       PERENNIAL
     </h1>
-    <p class="count"></p>         
+    <p class="count"></p>
     <p class="pitch"></p>
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
@@ -58,14 +58,13 @@
       let audioContext;
       let audioInput, microphoneStream, gainNode;
 
+      // when connection opens
       websocket.on("open", data => {
-        console.log("data", data);
-        // assign user id
         user_id = guidGenerator();
-
-        websocket.send(JSON.stringify({uuid: user_id}));
+        websocket.send(JSON.stringify({ type: "REGISTER", uuid: user_id }));
       });
 
+      // when server sends a message
       websocket.on("message", data => {
         console.log("message:", data);
 
@@ -75,7 +74,7 @@
           console.warn("invalid message from server", data);
         }
 
-        if (data.type === "count") {
+        if (data.type === "COUNT") {
           document.querySelector(
             ".count"
           ).innerText = `currently online: ${data.count}`;
@@ -94,12 +93,11 @@
           microphone_stream = audioContext.createMediaStreamSource(stream);
           microphone_stream.connect(gain_node);
 
-          // setup up pitch detection!
+          // set up pitch detection!
           const pitch = ml5.pitchDetection(
             "./model/pitch-detection/crepe/",
             audioContext,
             stream,
-            // microphone_stream,
             modelLoaded
           );
 
@@ -108,10 +106,13 @@
             console.log("Model Loaded!");
           }
 
+          // as pitches come in...
           setInterval(
             () =>
               pitch.getPitch(function(err, frequency) {
-                document.querySelector('.pitch').innerText = frequency;
+                document.querySelector(".pitch").innerText = frequency;
+                if(frequency)
+                  websocket.send(JSON.stringify({ type: "PITCH", pitch: frequency }));
               }),
             200
           );

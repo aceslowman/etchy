@@ -34,7 +34,7 @@ wss.on('connection', function connection(ws) {
 function updateCount() {
   // send an updated client count to every open socket.
   sockets.forEach(ws => ws.send(JSON.stringify({
-    type: 'count',
+    type: 'COUNT',
     count: sockets.size
   })));
 }
