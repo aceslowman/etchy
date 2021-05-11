@@ -25,7 +25,10 @@
       PERENNIAL
     </h1>
     <p class="count"></p>
+    <p class="microphone"></p>
+    <p class="modelloaded"></p>    
     <p class="pitch"></p>
+    
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
     <script type="text/javascript">
@@ -96,6 +99,7 @@
 
         function startMicrophone(stream) {
           console.log("starting microphone");
+          
           gain_node = audioContext.createGain(0.0);
           gain_node.connect(audioContext.destination);
 
@@ -115,6 +119,7 @@
           // When the model is loaded
           function modelLoaded() {
             console.log("Model Loaded!");
+            document.querySelector('.modelloaded').innerText = "model loaded!";
           }
 
           // as pitches come in...
@@ -150,6 +155,7 @@
             { audio: true },
             function(stream) {
               startMicrophone(stream);
+              document.querySelector('.microphone').innerText = "mic enabled!";
             },
             function(e) {
               alert("Error capturing audio.");
@@ -161,6 +167,7 @@
       }
 
       document.addEventListener("click", init, false);
+      document.addEventListener("touchstart", init, false);
     </script>
   </body>
 </html>

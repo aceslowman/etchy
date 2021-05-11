@@ -72,12 +72,6 @@ wss.on("connection", function connection(ws) {
 function checkForPairing() {
   let tolerance = 50;
 
-  //   for (let i = 0; i < connections.size; i++) {
-  //     for (let j = 0; j < connections.size; j++) {
-
-  //     }
-  //   }
-
   connections.forEach(con => {
     let a = con.pitch;
     connections.forEach(_con => {
