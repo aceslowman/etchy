@@ -33,190 +33,194 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
     <script type="text/javascript">
-      // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
-      function guidGenerator() {
-        var S4 = function() {
-          return (((1 + Math.random()) * 0x10000) | 0)
-            .toString(16)
-            .substring(1);
-        };
-        return (
-          S4() +
-          S4() +
-          "-" +
-          S4() +
-          "-" +
-          S4() +
-          "-" +
-          S4() +
-          "-" +
-          S4() +
-          S4() +
-          S4()
-        );
-      }
-
-      let user_id;
-      let audioContext;
-      let audioInput, microphoneStream, gainNode;
-      let started = false;
-
-      // ------------------------------------------------------------
-      // setting up WebRTC
-      let rtcConn = new RTCPeerConnection({
-        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
-      });
-
-//       rtcConn.onmessage = message => {
-//         console.log("Got message", message.data);
-//         var data = JSON.parse(message.data);
-
-//         switch (data.type) {
-//           case "login":            
-//             console.log('data success?', data.success)
-//             break;
-//           case "offer":
-            
-//             break;
-//           case "answer":
-            
-//             break;
-//           case "candidate":
-            
-//             break;
-//           default:
-//             break;
-//         }
-//       };
-
-      rtcConn.onopen = () => {
-        console.log("Connected WEBRTC");
-      };
-
-      rtcConn.onerror = err => {
-        console.log("Got error", err);
-      };
-
-      rtcConn.onaddstream = stream => {
-        console.log("adding stream");
-        document.querySelector(".RTClog").innerText = "adding rtc stream...";
-      };
-
-      rtcConn.onicecandidate = event => {
-        if (event.candidate) {
-          console.log("sending candidate?");
-          document.querySelector(".RTClog").innerText = "sending candidate?";
-          rtcConn.send({
-            type: "candidate",
-            candidate: event.candidate
-          });
-        }
-      };
-
-      // ------------------------------------------------------------
-      // setting up websocket
-      let websocket = new FriendlyWebSocket({ path: "/" });
-
-      // when connection opens
-      websocket.on("open", data => {
-        user_id = guidGenerator();
-        websocket.send(JSON.stringify({ type: "REGISTER", uuid: user_id }));
-      });
-
-      // when server sends a message
-      websocket.on("message", data => {
-        console.log("message:", data);
-
-        try {
-          data = JSON.parse(event.data);
-        } catch (e) {
-          console.warn("invalid message from server", data);
-        }
-        
-        rtcConn.createOffer();
-
-        switch (data.type) {
-          case "COUNT":
-            document.querySelector(
-              ".count"
-            ).innerText = `currently online: ${data.count}`;
-            break;
-          case "PAIRED":
-            console.log("WE HAVE A PAIRING", data.pair);
-            // rtcConn.createOffer();
-            break;
-          default:
-            break;
-        }
-      });
-
-      function init() {
-        if (started) return;
-
-        console.log("initializing...");
-        document.querySelector(".microphone").innerText =
-          "about to set audio context...";
-
-        var AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioContext = new AudioContext();
-
-        function startMicrophone(stream) {
-          console.log("starting microphone");
-
-          gain_node = audioContext.createGain(0.0);
-          gain_node.connect(audioContext.destination);
-
-          gain_node.gain.setValueAtTime(0, audioContext.currentTime);
-
-          microphone_stream = audioContext.createMediaStreamSource(stream);
-          microphone_stream.connect(gain_node);
-
-          // set up pitch detection!
-          const pitch = ml5.pitchDetection(
-            "./model/pitch-detection/crepe/",
-            audioContext,
-            stream,
-            () => {
-              console.log("Model Loaded!");
-              document.querySelector(".modelloaded").innerText =
-                "model loaded!";
+            // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
+            function guidGenerator() {
+              var S4 = function() {
+                return (((1 + Math.random()) * 0x10000) | 0)
+                  .toString(16)
+                  .substring(1);
+              };
+              return (
+                S4() +
+                S4() +
+                "-" +
+                S4() +
+                "-" +
+                S4() +
+                "-" +
+                S4() +
+                "-" +
+                S4() +
+                S4() +
+                S4()
+              );
             }
-          );
 
-          // as pitches come in...
-          setInterval(
-            () =>
-              pitch.getPitch(function(err, frequency) {
-                document.querySelector(".pitch").innerText = frequency;
-                if (frequency)
-                  websocket.send(
-                    JSON.stringify({
-                      uuid: user_id,
-                      type: "PITCH",
-                      pitch: frequency
-                    })
-                  );
-              }),
-            200
-          );
+            let user_id;
+            let audioContext;
+            let audioInput, microphoneStream, gainNode;
+            let started = false;
 
-          console.log("RTCCONN", rtcConn);
+            // ------------------------------------------------------------
+            // setting up WebRTC
+            let rtcConn = new RTCPeerConnection({
+              iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+            });
 
-          started = true;
-        }
+      //       rtcConn.onmessage = message => {
+      //         console.log("Got message", message.data);
+      //         var data = JSON.parse(message.data);
 
-        navigator.mediaDevices
-          .getUserMedia({ audio: true })
-          .then(function(stream) {
-            startMicrophone(stream);
-            document.querySelector(".microphone").innerText = "mic enabled!";
-          })
-          .catch(function(err) {
-            alert("Error capturing audio.");
-          });
-      }
+      //         switch (data.type) {
+      //           case "login":
+      //             console.log('data success?', data.success)
+      //             break;
+      //           case "offer":
 
-      document.addEventListener("click", init, false);
+      //             break;
+      //           case "answer":
+
+      //             break;
+      //           case "candidate":
+
+      //             break;
+      //           default:
+      //             break;
+      //         }
+      //       };
+
+            rtcConn.onopen = () => {
+              console.log("Connected WEBRTC");
+            };
+
+            rtcConn.onerror = err => {
+              console.log("Got error", err);
+            };
+
+            rtcConn.onaddstream = stream => {
+              console.log("adding stream");
+              document.querySelector(".RTClog").innerText = "adding rtc stream...";
+            };
+
+            rtcConn.onicecandidate = event => {
+              if (event.candidate) {
+                console.log("sending candidate?");
+                document.querySelector(".RTClog").innerText = "sending candidate?";
+                rtcConn.send({
+                  type: "candidate",
+                  candidate: event.candidate
+                });
+              }
+            };
+
+            // ------------------------------------------------------------
+            // setting up websocket
+            let websocket = new FriendlyWebSocket({ path: "/" });
+
+            // when connection opens
+            websocket.on("open", data => {
+              user_id = guidGenerator();
+              websocket.send(JSON.stringify({ type: "REGISTER", uuid: user_id }));
+            });
+
+            // when server sends a message
+            websocket.on("message", data => {
+              console.log("message:", data);
+
+              try {
+                data = JSON.parse(event.data);
+              } catch (e) {
+                console.warn("invalid message from server", data);
+              }
+
+              switch (data.type) {
+                case "COUNT":
+                  document.querySelector(
+                    ".count"
+                  ).innerText = `currently online: ${data.count}`;
+                  break;
+                case "PAIRED":
+                  console.log("WE HAVE A PAIRING", data.pair);
+                  // rtcConn.createOffer();
+                  break;
+                default:
+                  break;
+              }
+            });
+
+            function init() {
+              if (started) return;
+
+              console.log("initializing...");
+              document.querySelector(".microphone").innerText =
+                "about to set audio context...";
+
+              var AudioContext = window.AudioContext || window.webkitAudioContext;
+              audioContext = new AudioContext();
+
+              function startMicrophone(stream) {
+                console.log("starting microphone");
+
+                gain_node = audioContext.createGain(0.0);
+                gain_node.connect(audioContext.destination);
+
+                gain_node.gain.setValueAtTime(0, audioContext.currentTime);
+
+                microphone_stream = audioContext.createMediaStreamSource(stream);
+                microphone_stream.connect(gain_node);
+
+                // set up pitch detection!
+                const pitch = ml5.pitchDetection(
+                  "./model/pitch-detection/crepe/",
+                  audioContext,
+                  stream,
+                  () => {
+                    console.log("Model Loaded!");
+                    document.querySelector(".modelloaded").innerText =
+                      "model loaded!";
+                  }
+                );
+
+                // as pitches come in...
+                setInterval(
+                  () =>
+                    pitch.getPitch(function(err, frequency) {
+                      document.querySelector(".pitch").innerText = frequency;
+                      if (frequency)
+                        websocket.send(
+                          JSON.stringify({
+                            uuid: user_id,
+                            type: "PITCH",
+                            pitch: frequency
+                          })
+                        );
+                    }),
+                  200
+                );
+
+                console.log("RTCCONN", rtcConn);
+
+                rtcConn.createOffer();
+                websocket.send(JSON.stringify({
+                  uuid: user_id,
+                  type: "OFFER"
+                }));
+
+                started = true;
+              }
+
+              navigator.mediaDevices
+                .getUserMedia({ audio: true })
+                .then(function(stream) {
+                  startMicrophone(stream);
+                  document.querySelector(".microphone").innerText = "mic enabled!";
+                })
+                .catch(function(err) {
+                  alert("Error capturing audio.");
+                });
+            }
+
+            document.addEventListener("click", init, false);
     </script>
   </body>
 </html>

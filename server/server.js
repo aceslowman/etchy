@@ -49,9 +49,15 @@ wss.on("connection", ws => {
         updateCount();
         break;
       case "PITCH":
-        console.log("pitch", message);
+        // console.log("pitch", message);
         let con = connections.get(id);
         connections.set(id, { ...con, pitch: message.pitch });
+        break;
+      case "OFFER":
+        console.log('OFFER');
+        break;
+      case "ANSWER":
+        console.log('ANSWER');
         break;
       default:
         console.log("message received without TYPE");
@@ -107,7 +113,6 @@ function checkForPairing() {
 
 function updateCount() {
   connections.forEach(con => {
-    console.log('sending updated user count')
     con.socket.send(
       JSON.stringify({
         type: "COUNT",
