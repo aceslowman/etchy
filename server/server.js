@@ -35,21 +35,22 @@ const wss = new ws.Server({ server });
 
 let connections = new Map();
 
-wss.on("connection", function connection(ws) {
-  let id = guidGenerator();
-  connections.set(id, { uuid: id, socket: ws });
+wss.on("connection", ws => {
+  let id;
 
-  ws.on("message", function incoming(m) {
+  ws.on("message", m => {
     let message = JSON.parse(m);
 
     switch (message.type) {
+      case "REGISTER":
+        console.log("register", message);
+        id = message.uuid;
+        connections.set(id, { uuid: id, socket: ws });        
+        break;
       case "PITCH":
         console.log("pitch", message);
         let con = connections.get(id);
-        connections.set(message.uuid, { ...con, pitch: message.pitch });
-        break;
-      case "REGISTER":
-        console.log("register", message);
+        connections.set(id, { ...con, pitch: message.pitch });
         break;
       default:
         console.log("message received without TYPE");
@@ -60,8 +61,8 @@ wss.on("connection", function connection(ws) {
     checkForPairing();
   });
 
-  ws.on("close", function() {
-    console.log("deleting connection");
+  ws.on("close", () => {
+    console.log("deleting connection", id);
     connections.delete(id);
     updateCount();
   });
