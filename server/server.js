@@ -54,7 +54,8 @@ wss.on("connection", ws => {
         connections.set(id, { ...con, pitch: message.pitch });
         break;
       case "OFFER":
-        console.log('OFFER');
+        console.log('OFFER', message.sdp);
+        
         break;
       case "ANSWER":
         console.log('ANSWER');
