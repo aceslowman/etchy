@@ -26,9 +26,9 @@
     </h1>
     <p class="count"></p>
     <p class="microphone"></p>
-    <p class="modelloaded"></p>    
+    <p class="modelloaded"></p>
     <p class="pitch"></p>
-    
+
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
     <script type="text/javascript">
@@ -95,17 +95,18 @@
       function init() {
         if (started) return;
         console.log("initializing...");
-        document.querySelector('.microphone').innerText = "about to set audio context...";
-        var AudioContext = window.AudioContext || window.webkitAudioContext;  
+        document.querySelector(".microphone").innerText =
+          "about to set audio context...";
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
-        
-//         if('webkitAudioContext' in window) {
-//     var myAudioContext = new webkitAudioContext();
-// }
+
+        //         if('webkitAudioContext' in window) {
+        //     var myAudioContext = new webkitAudioContext();
+        // }
 
         function startMicrophone(stream) {
           console.log("starting microphone");
-          
+
           gain_node = audioContext.createGain(0.0);
           gain_node.connect(audioContext.destination);
 
@@ -125,7 +126,7 @@
           // When the model is loaded
           function modelLoaded() {
             console.log("Model Loaded!");
-            document.querySelector('.modelloaded').innerText = "model loaded!";
+            document.querySelector(".modelloaded").innerText = "model loaded!";
           }
 
           // as pitches come in...
@@ -148,35 +149,47 @@
           started = true;
         }
 
-        if (!navigator.getUserMedia) {
-          navigator.getUserMedia =
-            navigator.getUserMedia ||
-            navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia ||
-            navigator.msGetUserMedia;
-        }
+        // if (!navigator.getUserMedia) {
+        //   navigator.getUserMedia =
+        //     navigator.getUserMedia ||
+        //     navigator.webkitGetUserMedia ||
+        //     navigator.mozGetUserMedia ||
+        //     navigator.msGetUserMedia;
+        // }
 
-        document.querySelector('.microphone').innerText = "about to get user media...";
-        if (navigator.getUserMedia) {
-          console.log('trying to get user media...')
-          document.querySelector('.microphone').innerText = "trying to get user media...";
-          navigator.getUserMedia(
-            { audio: true },
-            function(stream) {
-              startMicrophone(stream);
-              document.querySelector('.microphone').innerText = "mic enabled!";
-            },
-            function(e) {
-              alert("Error capturing audio.");
-            }
-          );
-        } else {
-          alert("getUserMedia not supported in this browser.");
-        }
+        // document.querySelector('.microphone').innerText = "about to get user media...";
+        // if (navigator.getUserMedia) {
+        //   console.log('trying to get user media...')
+        //   document.querySelector('.microphone').innerText = "trying to get user media...";
+        //   navigator.getUserMedia(
+        //     { audio: true },
+        //     function(stream) {
+        //       startMicrophone(stream);
+        //       document.querySelector('.microphone').innerText = "mic enabled!";
+        //     },
+        //     function(e) {
+        //       alert("Error capturing audio.");
+        //     }
+        //   );
+        // } else {
+        //   alert("getUserMedia not supported in this browser.");
+        // }
+
+        navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then(function(stream) {
+            /* use the stream */
+            startMicrophone(stream);
+            document.querySelector(".microphone").innerText = "mic enabled!";
+          })
+          .catch(function(err) {
+            /* handle the error */
+            alert("Error capturing audio.");
+          });
       }
 
       document.addEventListener("click", init, false);
-      document.addEventListener("touchstart", init, false);
+      // document.addEventListener("touchstart", init, false);
     </script>
   </body>
 </html>
