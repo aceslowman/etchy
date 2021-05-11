@@ -74,27 +74,32 @@ function checkForPairing() {
 
   connections.forEach(con => {
     let a = con.pitch;
-    connections.forEach(_con => {
-      if (_con.uuid !== con.uuid) {
-        // check against all others
-        let b = _con.pitch;
-        console.log("b", b);
-        let diff = Math.abs(b - a);
-        console.log("diff", diff);
-        let match = diff < tolerance;
 
-        if (match) {
-          connections.forEach(con => {
-            con.socket.send(
-              JSON.stringify({
-                type: "PAIRED",
-                pair: [a, b]
-              })
-            );
-          });
+    if (con.pitch) {
+      connections.forEach(_con => {
+        if (_con.uuid !== con.uuid) {
+          // check against all others
+          if (_con.pitch) {
+            let b = _con.pitch;
+            console.log("b", b);
+            let diff = Math.abs(b - a);
+            console.log("diff", diff);
+            let match = diff < tolerance;
+
+            if (match) {
+              connections.forEach(con => {
+                con.socket.send(
+                  JSON.stringify({
+                    type: "PAIRED",
+                    pair: [a, b]
+                  })
+                );
+              });
+            }
+          }
         }
-      }
-    });
+      });
+    }
   });
 }
 
