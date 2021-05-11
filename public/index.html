@@ -63,31 +63,11 @@
 
       // ------------------------------------------------------------
       // setting up WebRTC
+      
+      // PUBLIC STUN SERVERS: https://gist.github.com/zziuni/3741933
       let rtcConn = new RTCPeerConnection({
         iceServers: [{ url: "stun:stun.1.google.com:19302" }]
       });
-
-      //       rtcConn.onmessage = message => {
-      //         console.log("Got message", message.data);
-      //         var data = JSON.parse(message.data);
-
-      //         switch (data.type) {
-      //           case "login":
-      //             console.log('data success?', data.success)
-      //             break;
-      //           case "offer":
-
-      //             break;
-      //           case "answer":
-
-      //             break;
-      //           case "candidate":
-
-      //             break;
-      //           default:
-      //             break;
-      //         }
-      //       };
 
       rtcConn.onopen = () => {
         console.log("Connected WEBRTC");
