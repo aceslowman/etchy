@@ -28,6 +28,7 @@
     <p class="microphone"></p>
     <p class="modelloaded"></p>
     <p class="pitch"></p>
+    <p class="RTClog"></p>
 
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
@@ -55,13 +56,22 @@
         );
       }
 
-      let websocket = new FriendlyWebSocket({ path: "/" });
       let user_id;
-
       let audioContext;
       let audioInput, microphoneStream, gainNode;
       let started = false;
 
+      // setting up WebRTC
+      let rtcConn = new RTCPeerConnection(conf); 
+      
+      rtcConn.onaddstream = stream => {
+        console.log('adding stream')
+        document.querySelector(".RTClog").innerText = "adding rtc stream...";
+      }
+      
+      // setting up websocket
+      let websocket = new FriendlyWebSocket({ path: "/" });
+      
       // when connection opens
       websocket.on("open", data => {
         user_id = guidGenerator();

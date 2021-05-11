@@ -45,7 +45,8 @@ wss.on("connection", ws => {
       case "REGISTER":
         console.log("register", message);
         id = message.uuid;
-        connections.set(id, { uuid: id, socket: ws });        
+        connections.set(id, { uuid: id, socket: ws });  
+        updateCount();
         break;
       case "PITCH":
         console.log("pitch", message);
@@ -106,6 +107,7 @@ function checkForPairing() {
 
 function updateCount() {
   connections.forEach(con => {
+    console.log('sending updated user count')
     con.socket.send(
       JSON.stringify({
         type: "COUNT",
