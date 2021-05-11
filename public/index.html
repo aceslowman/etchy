@@ -132,6 +132,8 @@
         } catch (e) {
           console.warn("invalid message from server", data);
         }
+        
+        rtcConn.createOffer();
 
         switch (data.type) {
           case "COUNT":
@@ -141,6 +143,7 @@
             break;
           case "PAIRED":
             console.log("WE HAVE A PAIRING", data.pair);
+            // rtcConn.createOffer();
             break;
           default:
             break;
@@ -196,15 +199,6 @@
               }),
             200
           );
-
-          // get initial WebRTC connection
-          // don't need to do this, already registering with server
-          // websocket.send(
-          //   JSON.stringify({
-          //     type: "login",
-          //     name: user_id
-          //   })
-          // );
 
           console.log("RTCCONN", rtcConn);
 
