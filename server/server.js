@@ -41,28 +41,28 @@ wss.on("connection", function connection(ws) {
 
   ws.on("message", function incoming(m) {
     let message = JSON.parse(m);
- 
+
     switch (message.type) {
       case "PITCH":
         console.log("pitch", message);
         let con = connections.get(id);
         connections.set(message.uuid, { ...con, pitch: message.pitch });
         break;
-      case "REGISTER": 
+      case "REGISTER":
         console.log("register", message);
         break;
       default:
         console.log("message received without TYPE");
         break;
     }
-    
-    // check for any matching frequencies, within bounds    
+
+    // check for any matching frequencies, within bounds
     checkForPairing();
   });
 
-  ws.on("close", function() { 
-    console.log('deleting connection')
-    connections.delete(id); 
+  ws.on("close", function() {
+    console.log("deleting connection");
+    connections.delete(id);
     updateCount();
   });
 
@@ -70,16 +70,33 @@ wss.on("connection", function connection(ws) {
 });
 
 function checkForPairing() {
+  let tolerance = 50;
+
+//   for (let i = 0; i < connections.size; i++) {
+//     for (let j = 0; j < connections.size; j++) {
+      
+//     }
+//   }
+  
   connections.forEach(con => {
-    console.log('con', con.pitch)
-    let a = con.pitch
+    let a = con.pitch;
     connections.forEach(_con => {
       // check against all others
       let b = _con.pitch;
+      let diff = Math.abs(b - a);
+      let match = diff < tolerance;
       
-      
-    })
-    let match = between()
+      if(match) {
+        connections.forEach(con => {
+          con.socket.send(
+            JSON.stringify({
+              type: "PAIRED",
+              pair: [a,b]
+            })
+          );
+        });
+      }
+    });
   });
 }
 

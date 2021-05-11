@@ -75,15 +75,22 @@
           console.warn("invalid message from server", data);
         }
 
-        if (data.type === "COUNT") {
-          document.querySelector(
-            ".count"
-          ).innerText = `currently online: ${data.count}`;
+        switch (data.type) {
+          case "COUNT":
+            document.querySelector(
+              ".count"
+            ).innerText = `currently online: ${data.count}`;
+            break;
+          case "PAIRED":
+            console.log("WE HAVE A PAIRING", data.pair);
+            break;
+          default:
+            break;
         }
       });
 
       function init() {
-        if(started) return 
+        if (started) return;
         console.log("initializing...");
         audioContext = new AudioContext();
 
@@ -126,7 +133,7 @@
               }),
             200
           );
-          
+
           started = true;
         }
 
