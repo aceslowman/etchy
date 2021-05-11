@@ -47,18 +47,20 @@ wss.on("connection", ws => {
         id = message.uuid;
         connections.set(id, { uuid: id, socket: ws });  
         updateCount();
-        break;
+        break; 
       case "PITCH":
         // console.log("pitch", message);
         let con = connections.get(id);
         connections.set(id, { ...con, pitch: message.pitch });
         break;
       case "OFFER":
-        console.log('OFFER', message.sdp);
-        
+        console.log('OFFER', message.sdp);        
         break;
-      case "ANSWER":
+      case "ANSWER": 
         console.log('ANSWER');
+        break;
+      case "CANDIDATE":
+        console.log('CANDIDATE', message.candidate)
         break;
       default:
         console.log("message received without TYPE");
@@ -80,6 +82,8 @@ wss.on("connection", ws => {
 
 function checkForPairing() {
   let tolerance = 50;
+  // TODO: min pitch
+  // TODO: max pitch
 
   connections.forEach(con => {
     let a = con.pitch;

@@ -65,10 +65,10 @@
       // setting up WebRTC
 
       // PUBLIC STUN SERVERS: https://gist.github.com/zziuni/3741933
-      // chrome specific OfferToReceiveAudio flag 
+      // chrome specific OfferToReceiveAudio flag
       // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
       let rtcConn = new RTCPeerConnection({
-        iceServers: [{ url: "stun:stun.1.google.com:19302" }],
+        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
         // mandatory: { OfferToReceiveAudio: true }
       });
 
@@ -86,14 +86,15 @@
       };
 
       rtcConn.onicecandidate = event => {
-        console.log('really want to see this message.....l')
         if (event.candidate) {
-          console.log("sending candidate?");
-          document.querySelector(".RTClog").innerText = "sending candidate?";
-          rtcConn.send({
-            type: "candidate",
-            candidate: event.candidate
-          });
+          console.log("found ice candidate");
+          document.querySelector(".RTClog").innerText = "got candidate";
+          websocket.send(
+            JSON.stringify({
+              type: "CANDIDATE",
+              candidate: event.candidate
+            })
+          );
         }
       };
 
@@ -126,6 +127,32 @@
           case "PAIRED":
             console.log("WE HAVE A PAIRING", data.pair);
             // rtcConn.createOffer();
+            break;
+          case "OFFER":
+            // console.log("OFFER", message.sdp);
+            // you are receiving an offer
+            // connectedUser = name;
+            rtcConn.setRemoteDescription(new RTCSessionDescription(message.offer));
+
+            rtcConn.createAnswer(
+              function(answer) {
+                myConnection.setLocalDescription(answer);
+
+                send({
+                  type: "answer",
+                  answer: answer
+                });
+              },
+              function(error) {
+                alert("oops...error");
+              }
+            );
+            break;
+          case "ANSWER":
+            console.log("ANSWER");
+            break;
+          case "CANDIDATE":
+            console.log("CANDIDATE", message.candidate);
             break;
           default:
             break;
@@ -185,7 +212,7 @@
           console.log("RTCCONN", rtcConn);
 
           rtcConn
-            .createOffer({offerToReceiveAudio: true})
+            .createOffer({ offerToReceiveAudio: true })
             .then(offer => {
               console.log("offer", offer);
               return rtcConn.setLocalDescription(offer);
