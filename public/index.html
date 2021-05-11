@@ -61,17 +61,40 @@
       let audioInput, microphoneStream, gainNode;
       let started = false;
 
+      // ------------------------------------------------------------
       // setting up WebRTC
-      let rtcConn = new RTCPeerConnection(); 
-      
+      let rtcConn = new RTCPeerConnection({
+        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+      });
+
+      rtcConn.onopen = () => {
+        console.log("Connected WEBRTC");
+      };
+
+      rtcConn.onerror = err => {
+        console.log("Got error", err);
+      };
+
       rtcConn.onaddstream = stream => {
-        console.log('adding stream')
+        console.log("adding stream");
         document.querySelector(".RTClog").innerText = "adding rtc stream...";
-      }
-      
+      };
+
+      rtcConn.onicecandidate = event => {
+        if (event.candidate) {
+          console.log("sending candidate?");
+          document.querySelector(".RTClog").innerText = "sending candidate?";
+          rtcConn.send({
+            type: "candidate",
+            candidate: event.candidate
+          });
+        }
+      };
+
+      // ------------------------------------------------------------
       // setting up websocket
       let websocket = new FriendlyWebSocket({ path: "/" });
-      
+
       // when connection opens
       websocket.on("open", data => {
         user_id = guidGenerator();
@@ -104,9 +127,11 @@
 
       function init() {
         if (started) return;
+        
         console.log("initializing...");
         document.querySelector(".microphone").innerText =
           "about to set audio context...";
+        
         var AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
 
@@ -126,14 +151,12 @@
             "./model/pitch-detection/crepe/",
             audioContext,
             stream,
-            modelLoaded
+            () => {
+              console.log("Model Loaded!");
+              document.querySelector(".modelloaded").innerText =
+                "model loaded!";
+            }
           );
-
-          // When the model is loaded
-          function modelLoaded() {
-            console.log("Model Loaded!");
-            document.querySelector(".modelloaded").innerText = "model loaded!";
-          }
 
           // as pitches come in...
           setInterval(
@@ -151,6 +174,12 @@
               }),
             200
           );
+          
+          // get initial WebRTC connection
+          rtcConn.send({
+            type: "login",
+            name: user_id
+          });
 
           started = true;
         }
