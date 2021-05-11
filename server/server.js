@@ -72,29 +72,33 @@ wss.on("connection", function connection(ws) {
 function checkForPairing() {
   let tolerance = 50;
 
-//   for (let i = 0; i < connections.size; i++) {
-//     for (let j = 0; j < connections.size; j++) {
-      
-//     }
-//   }
-  
+  //   for (let i = 0; i < connections.size; i++) {
+  //     for (let j = 0; j < connections.size; j++) {
+
+  //     }
+  //   }
+
   connections.forEach(con => {
     let a = con.pitch;
     connections.forEach(_con => {
-      // check against all others
-      let b = _con.pitch;
-      let diff = Math.abs(b - a);
-      let match = diff < tolerance;
-      
-      if(match) {
-        connections.forEach(con => {
-          con.socket.send(
-            JSON.stringify({
-              type: "PAIRED",
-              pair: [a,b]
-            })
-          );
-        });
+      if (_con.uuid !== con.uuid) {
+        // check against all others
+        let b = _con.pitch;
+        console.log("b", b);
+        let diff = Math.abs(b - a);
+        console.log("diff", diff);
+        let match = diff < tolerance;
+
+        if (match) {
+          connections.forEach(con => {
+            con.socket.send(
+              JSON.stringify({
+                type: "PAIRED",
+                pair: [a, b]
+              })
+            );
+          });
+        }
       }
     });
   });
