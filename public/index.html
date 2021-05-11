@@ -102,7 +102,7 @@
 
         //         if('webkitAudioContext' in window) {
         //     var myAudioContext = new webkitAudioContext();
-        // }
+        // }0
 
         function startMicrophone(stream) {
           console.log("starting microphone");
@@ -149,47 +149,18 @@
           started = true;
         }
 
-        // if (!navigator.getUserMedia) {
-        //   navigator.getUserMedia =
-        //     navigator.getUserMedia ||
-        //     navigator.webkitGetUserMedia ||
-        //     navigator.mozGetUserMedia ||
-        //     navigator.msGetUserMedia;
-        // }
-
-        // document.querySelector('.microphone').innerText = "about to get user media...";
-        // if (navigator.getUserMedia) {
-        //   console.log('trying to get user media...')
-        //   document.querySelector('.microphone').innerText = "trying to get user media...";
-        //   navigator.getUserMedia(
-        //     { audio: true },
-        //     function(stream) {
-        //       startMicrophone(stream);
-        //       document.querySelector('.microphone').innerText = "mic enabled!";
-        //     },
-        //     function(e) {
-        //       alert("Error capturing audio.");
-        //     }
-        //   );
-        // } else {
-        //   alert("getUserMedia not supported in this browser.");
-        // }
-
         navigator.mediaDevices
           .getUserMedia({ audio: true })
           .then(function(stream) {
-            /* use the stream */
             startMicrophone(stream);
             document.querySelector(".microphone").innerText = "mic enabled!";
           })
           .catch(function(err) {
-            /* handle the error */
             alert("Error capturing audio.");
           });
       }
 
       document.addEventListener("click", init, false);
-      // document.addEventListener("touchstart", init, false);
     </script>
   </body>
 </html>
