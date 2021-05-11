@@ -21,7 +21,7 @@
     <script src="/websocket.js"></script>
   </head>
   <body>
-    <h1 style="color:black;">
+    <h1>
       PERENNIAL
     </h1>
     <p class="count"></p>
@@ -66,6 +66,28 @@
       let rtcConn = new RTCPeerConnection({
         iceServers: [{ url: "stun:stun.1.google.com:19302" }]
       });
+
+//       rtcConn.onmessage = message => {
+//         console.log("Got message", message.data);
+//         var data = JSON.parse(message.data);
+
+//         switch (data.type) {
+//           case "login":            
+//             console.log('data success?', data.success)
+//             break;
+//           case "offer":
+            
+//             break;
+//           case "answer":
+            
+//             break;
+//           case "candidate":
+            
+//             break;
+//           default:
+//             break;
+//         }
+//       };
 
       rtcConn.onopen = () => {
         console.log("Connected WEBRTC");
@@ -127,11 +149,11 @@
 
       function init() {
         if (started) return;
-        
+
         console.log("initializing...");
         document.querySelector(".microphone").innerText =
           "about to set audio context...";
-        
+
         var AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
 
@@ -174,12 +196,17 @@
               }),
             200
           );
-          
+
           // get initial WebRTC connection
-          rtcConn.send({
-            type: "login",
-            name: user_id
-          });
+          // don't need to do this, already registering with server
+          // websocket.send(
+          //   JSON.stringify({
+          //     type: "login",
+          //     name: user_id
+          //   })
+          // );
+
+          console.log("RTCCONN", rtcConn);
 
           started = true;
         }
