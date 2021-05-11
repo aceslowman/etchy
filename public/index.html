@@ -129,29 +129,29 @@
             // rtcConn.createOffer();
             break;
           case "OFFER":
-            // console.log("OFFER", message.sdp);
-            // you are receiving an offer
-            // connectedUser = name;
+            // ANOTHER USER HAS SENT AN OFFER
             rtcConn.setRemoteDescription(new RTCSessionDescription(message.offer));
 
             rtcConn.createAnswer(
-              function(answer) {
-                myConnection.setLocalDescription(answer);
+              answer => {
+                rtcConn.setLocalDescription(answer);
 
-                send({
+                websocket.send(JSON.stringify({
                   type: "answer",
                   answer: answer
-                });
+                }));
               },
-              function(error) {
+              error => {
                 alert("oops...error");
               }
             );
             break;
           case "ANSWER":
+            // ANOTHER USER HAS ANSWERED YOUR OFFER
             console.log("ANSWER");
             break;
           case "CANDIDATE":
+            // ANOTHER USER HAS SENT AN ICE CANDIDATE
             console.log("CANDIDATE", message.candidate);
             break;
           default:
