@@ -63,10 +63,13 @@
 
       // ------------------------------------------------------------
       // setting up WebRTC
-      
+
       // PUBLIC STUN SERVERS: https://gist.github.com/zziuni/3741933
+      // chrome specific OfferToReceiveAudio flag 
+      // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
       let rtcConn = new RTCPeerConnection({
-        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+        iceServers: [{ url: "stun:stun.1.google.com:19302" }],
+        // mandatory: { OfferToReceiveAudio: true }
       });
 
       rtcConn.onopen = () => {
@@ -83,6 +86,7 @@
       };
 
       rtcConn.onicecandidate = event => {
+        console.log('really want to see this message.....l')
         if (event.candidate) {
           console.log("sending candidate?");
           document.querySelector(".RTClog").innerText = "sending candidate?";
@@ -181,7 +185,7 @@
           console.log("RTCCONN", rtcConn);
 
           rtcConn
-            .createOffer()
+            .createOffer({offerToReceiveAudio: true})
             .then(offer => {
               console.log("offer", offer);
               return rtcConn.setLocalDescription(offer);
