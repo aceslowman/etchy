@@ -95,7 +95,13 @@
       function init() {
         if (started) return;
         console.log("initializing...");
+        document.querySelector('.microphone').innerText = "about to set audio context...";
+        var AudioContext = window.AudioContext || window.webkitAudioContext;  
         audioContext = new AudioContext();
+        
+//         if('webkitAudioContext' in window) {
+//     var myAudioContext = new webkitAudioContext();
+// }
 
         function startMicrophone(stream) {
           console.log("starting microphone");
@@ -150,7 +156,10 @@
             navigator.msGetUserMedia;
         }
 
+        document.querySelector('.microphone').innerText = "about to get user media...";
         if (navigator.getUserMedia) {
+          console.log('trying to get user media...')
+          document.querySelector('.microphone').innerText = "trying to get user media...";
           navigator.getUserMedia(
             { audio: true },
             function(stream) {
