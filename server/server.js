@@ -19,6 +19,11 @@ function guidGenerator() {
   );
 }
 
+// https://stackoverflow.com/questions/6454198/check-if-a-value-is-within-a-range-of-numbers
+function between(x, min, max) {
+  return x >= min && x <= max;
+}
+
 const http = require("http");
 const express = require("express");
 const ws = require("ws");
@@ -36,7 +41,7 @@ wss.on("connection", function connection(ws) {
 
   ws.on("message", function incoming(m) {
     let message = JSON.parse(m);
-
+ 
     switch (message.type) {
       case "PITCH":
         console.log("pitch", message);
@@ -50,6 +55,9 @@ wss.on("connection", function connection(ws) {
         console.log("message received without TYPE");
         break;
     }
+    
+    // check for any matching frequencies, within bounds    
+    checkForPairing();
   });
 
   ws.on("close", function() { 
@@ -60,6 +68,20 @@ wss.on("connection", function connection(ws) {
 
   updateCount();
 });
+
+function checkForPairing() {
+  connections.forEach(con => {
+    console.log('con', con.pitch)
+    let a = con.pitch
+    connections.forEach(_con => {
+      // check against all others
+      let b = _con.pitch;
+      
+      
+    })
+    let match = between()
+  });
+}
 
 function updateCount() {
   connections.forEach(con => {
