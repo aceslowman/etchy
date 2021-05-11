@@ -57,6 +57,7 @@
 
       let audioContext;
       let audioInput, microphoneStream, gainNode;
+      let started = false;
 
       // when connection opens
       websocket.on("open", data => {
@@ -82,6 +83,7 @@
       });
 
       function init() {
+        if(started) return 
         console.log("initializing...");
         audioContext = new AudioContext();
 
@@ -124,6 +126,8 @@
               }),
             200
           );
+          
+          started = true;
         }
 
         if (!navigator.getUserMedia) {
