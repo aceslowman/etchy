@@ -62,7 +62,7 @@
       let started = false;
 
       // setting up WebRTC
-      let rtcConn = new RTCPeerConnection(conf); 
+      let rtcConn = new RTCPeerConnection(); 
       
       rtcConn.onaddstream = stream => {
         console.log('adding stream')
