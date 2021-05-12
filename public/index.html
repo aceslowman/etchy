@@ -84,7 +84,8 @@
       let user_id;
       let canvas = document.getElementById("mainCanvas");
       let ctx = canvas.getContext('2d');
-      canvas.width
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
       let audioContext, audioInput, microphoneStream, gainNode;
       let started = false;
 
@@ -287,8 +288,16 @@
             console.log("Error capturing audio.", err);
           });
       }
+      
+      function onWindowResize(e) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        drawOnCanvas()
+      }
 
       document.addEventListener("click", init, false);
+      window.addEventListener("resize", onWindowResize, false);
     </script>
   </body>
 </html>
