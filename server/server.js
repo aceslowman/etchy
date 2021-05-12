@@ -45,22 +45,22 @@ wss.on("connection", ws => {
       case "REGISTER":
         console.log("register", message);
         id = message.uuid;
-        connections.set(id, { uuid: id, socket: ws });  
+        connections.set(id, { uuid: id, socket: ws });
         updateCount();
-        break; 
+        break;
       case "PITCH":
         // console.log("pitch", message);
         let con = connections.get(id);
         connections.set(id, { ...con, pitch: message.pitch });
         break;
       case "OFFER":
-        console.log('OFFER', message.sdp);        
+        console.log("OFFER", message.sdp);
         break;
-      case "ANSWER": 
-        console.log('ANSWER');
+      case "ANSWER":
+        console.log("ANSWER");
         break;
       case "CANDIDATE":
-        console.log('CANDIDATE', message.candidate)
+        console.log("CANDIDATE", message.candidate);
         break;
       default:
         console.log("message received without TYPE");
@@ -105,7 +105,10 @@ function checkForPairing() {
                   JSON.stringify({
                     type: "PAIRED",
                     // pair: [a, b]
-                    pair: [{uuid: con.uuid, pitch: a},{uuid: con.uuid, pitch: b}]
+                    pair: [
+                      { uuid: con.uuid, pitch: a },
+                      { uuid: _con.uuid, pitch: b } 
+                    ]
                   })
                 );
               });
