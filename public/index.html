@@ -22,7 +22,8 @@
         padding: 0px;
         margin: 0px;
         background-color: black;
-        color: white;
+/*         color: white; */
+        color: black;
       }
 
       #APP,
@@ -212,6 +213,8 @@
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.strokeStyle = "white";
         ctx.beginPath();
+        ctx.save();
+        if (!paired) ctx.setLineDash([1, 3]);/*dashes are 5px and spaces are 3px*/
         ctx.ellipse(
           canvas.width / 2,
           canvas.height / 2,
@@ -228,7 +231,8 @@
         ctx.moveTo(canvas.width/2, 0)
         ctx.lineTo(canvas.width/2, (canvas.height/2)-50);
         ctx.stroke();
-
+        ctx.restore();
+        
         if (paired) {
           ctx.fillStyle = "white";
           ctx.beginPath();
@@ -251,7 +255,7 @@
         }
       }
 
-      drawOnCanvas();
+      // drawOnCanvas();
 
       function init() {
         if (started) return;
@@ -283,6 +287,7 @@
               console.log("Model Loaded!");
               document.querySelector(".modelloaded").innerText =
                 "model loaded!";
+              drawOnCanvas();
             }
           );
 
