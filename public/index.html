@@ -194,11 +194,18 @@
         }
       });
       
-      function drawOnCanvas(data) {
+      function drawOnCanvas(paired) {
         ctx.strokeStyle = "white";
         ctx.beginPath();
         ctx.ellipse(canvas.width/2, canvas.height/2, 50, 50, 0, 0, Math.PI * 2);
         ctx.stroke();
+        
+        if(paired) {
+          ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.ellipse(canvas.width/2, canvas.height/2, 50, 50, 0, 0, Math.PI * 2);
+        ctx.fill();
+        }
       }
       
       drawOnCanvas()
