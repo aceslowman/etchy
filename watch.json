@@ -13,7 +13,7 @@
       "^build/"
     ],
     "include": [
-      "^server/",
+      "^server\\.js$",
       "^watch\\.json$",
       "^webpack\\.config\\.js$"
     ]

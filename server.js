@@ -36,7 +36,7 @@ const wss = new ws.Server({ server });
 let connections = new Map();
 
 wss.on("connection", ws => {
-  let id;
+  let id; 
 
   ws.on("message", m => {
     let message = JSON.parse(m);
@@ -51,15 +51,15 @@ wss.on("connection", ws => {
       case "PITCH":
         let con = connections.get(id);
         connections.set(id, { ...con, pitch: message.pitch });
-        break;
+        break; 
       case "OFFER":
-        console.log("OFFER", message.sdp);
+        // console.log("OFFER", message.sdp);
         break;
       case "ANSWER":
         console.log("ANSWER");
         break;
       case "CANDIDATE":
-        console.log("CANDIDATE", message.candidate);
+        // console.log("CANDIDATE", message.candidate);
         break;
       default:
         console.log("message received without TYPE");
@@ -87,15 +87,16 @@ function checkForPairing() {
   connections.forEach(con => {
     let a = con.pitch;
 
-    if (con.pairedWith) {
-      // if it's already paired, check to see if the
-      // pair has broken
+    // if it's already paired, check to see if the
+    // pair has broken
+    if (con.pairedWith) {      
       let conA = con;
       let conB = connections.get(con.pairedWith);
 
       let b = conB.pitch;
       let diff = Math.abs(b - a);
       let match = diff > tolerance; // if NOT within range
+      console.log('diff',diff) 
 
       if (match) {
         // mark both as paired...
@@ -110,16 +111,18 @@ function checkForPairing() {
         );
 
         //B
-        pairedWith.socket.send(
+        conB.socket.send(
           JSON.stringify({
             type: "UNPAIR"
           })
         );
       }
+    
+    // otherwise, check unpaired 
     } else if (con.pitch) {
       connections.forEach(_con => {
-        // only check other connections
-        if (_con.uuid !== con.uuid && _con.pitch) {
+        // only check other connections (that are unpaired)
+        if (_con.uuid !== con.uuid && _con.pitch && _con.pairedWith === null) {
           let b = _con.pitch;
           let diff = Math.abs(b - a);
           let match = diff < tolerance;
