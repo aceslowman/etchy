@@ -121,7 +121,8 @@ function updateCount() {
     con.socket.send(
       JSON.stringify({
         type: "COUNT",
-        count: connections.size
+        count: connections.size,
+        peers: Array.from(connections.values()).map(e => e.uuid)
       })
     );
   });

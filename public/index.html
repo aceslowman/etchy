@@ -29,6 +29,8 @@
     <p class="modelloaded"></p>
     <p class="pitch"></p>
     <p class="RTClog"></p>
+    <p class="yourId"></p>
+    <p class="peers"></p>
 
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
@@ -105,6 +107,7 @@
       // when connection opens
       websocket.on("open", data => {
         user_id = guidGenerator();
+        document.querySelector(".yourId").innerText = `your id: ${user_id}`;
         websocket.send(JSON.stringify({ type: "REGISTER", uuid: user_id }));
       });
 
@@ -123,6 +126,10 @@
             document.querySelector(
               ".count"
             ).innerText = `currently online: ${data.count}`;
+            
+            document.querySelector(
+              ".peers"
+            ).innerText = `currently online: ${data.peers}`;
             break;
           case "PAIRED":
             console.log("WE HAVE A PAIRING", data.pair);
