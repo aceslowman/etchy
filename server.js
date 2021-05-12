@@ -5,14 +5,14 @@ function guidGenerator() {
   };
   return (
     S4() +
-    S4() + 
+    S4() +
+    "-" +
+    S4() +
     "-" +
     S4() +
     "-" +
     S4() +
-    "-" + 
-    S4() + 
-    "-" + 
+    "-" +
     S4() +
     S4() +
     S4()
@@ -36,7 +36,7 @@ const wss = new ws.Server({ server });
 let connections = new Map();
 
 wss.on("connection", ws => {
-  let id; 
+  let id;
 
   ws.on("message", m => {
     let message = JSON.parse(m);
@@ -45,13 +45,13 @@ wss.on("connection", ws => {
       case "REGISTER":
         console.log("registering user", message.uuid);
         id = message.uuid;
-        connections.set(id, { uuid: id, socket: ws });
+        connections.set(id, { uuid: id, socket: ws, pitch: 0, pairedWith: null });
         updateCount();
         break;
       case "PITCH":
         let con = connections.get(id);
         connections.set(id, { ...con, pitch: message.pitch });
-        break;  
+        break;
       case "OFFER":
         // console.log("OFFER", message.sdp);
         break;
@@ -89,14 +89,16 @@ function checkForPairing() {
 
     // if it's already paired, check to see if the
     // pair has broken
-    if (con.pairedWith) {      
+    if (con.pairedWith !== null) {
       let conA = con;
-      let conB = connections.get(con.pairedWith);
+      console.log("pairedWith", conA.pairedWith);
+      let conB = connections.get(conA.pairedWith);
 
+      // if(conB)
       let b = conB.pitch;
       let diff = Math.abs(b - a);
       let match = diff > tolerance; // if NOT within range
-      console.log('diff',diff) 
+      console.log("diff", diff);
 
       if (match) {
         // mark both as paired...
@@ -117,8 +119,8 @@ function checkForPairing() {
           })
         );
       }
-    
-    // otherwise, check unpaired 
+
+      // otherwise, check unpaired
     } else if (con.pitch) {
       connections.forEach(_con => {
         // only check other connections (that are unpaired)
@@ -131,7 +133,7 @@ function checkForPairing() {
             // mark both as paired...
             con.pairedWith = _con.uuid;
             _con.pairedWith = con.uuid;
- 
+
             //A
             con.socket.send(
               JSON.stringify({

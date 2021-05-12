@@ -166,12 +166,12 @@
           case "PAIR":
             console.log("WE HAVE A PAIRING", data.pair);
             document.querySelector(".paired").innerText = `PAIRED! with your new friend: ${data.pairWith}`;
-            drawOnCanvas(data);
+            drawOnCanvas(true);
             break;
           case "UNPAIR":
             console.log("LOST OUR PAIRING", data.pair);
             document.querySelector(".paired").innerText = `UNPAIRED!`;
-            drawOnCanvas();
+            drawOnCanvas(false);
             break;          
           case "OFFER":
             // ANOTHER USER HAS SENT AN OFFER
@@ -209,6 +209,7 @@
       });
 
       function drawOnCanvas(paired) {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.strokeStyle = "white";
         ctx.beginPath();
         ctx.ellipse(
@@ -278,7 +279,7 @@
             () =>
               pitch.getPitch(function(err, frequency) {
                 document.querySelector(".pitch").innerText = frequency;
-                if (frequency)
+                // if (frequency)
                   websocket.send(
                     JSON.stringify({
                       uuid: user_id,
