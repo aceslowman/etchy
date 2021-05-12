@@ -90,42 +90,39 @@ function checkForPairing() {
     if (con.pitch) {
       connections.forEach(_con => {
         // only check other connections
-        if (_con.uuid !== con.uuid) {
-          if (_con.pitch) {
-            let b = _con.pitch;
-            let diff = Math.abs(b - a);
-            let match = diff < tolerance;
+        if (_con.uuid !== con.uuid && _con.pitch) {
+          let b = _con.pitch;
+          let diff = Math.abs(b - a);
+          let match = diff < tolerance;
 
-            if (match) {
-              // connections.forEach(con => {
-                // mark both as paired...
-                con.pairedWith = _con.uuid;
-                _con.pairedWith = con.uuid;
-                
-                con.socket.send(
-                  JSON.stringify({
-                    type: "PAIRED",
-                    pair: [
-                      { uuid: con.uuid, pitch: a },
-                      { uuid: _con.uuid, pitch: b } 
-                    ]
-                  })
-                );
-                
-                _con.socket.send(
-                  JSON.stringify({
-                    type: "PAIRED",
-                    pair: [
-                      { uuid: con.uuid, pitch: a },
-                      { uuid: _con.uuid, pitch: b } 
-                    ]
-                  })
-                );
-              // });
-            }
-            
-            
-            
+          if (match) {
+            // mark both as paired...
+            con.pairedWith = _con.uuid;
+            _con.pairedWith = con.uuid;
+
+            //A
+            con.socket.send(
+              JSON.stringify({
+                type: "PAIRED",
+                pairedWith: _con.uuid,
+                pair: [
+                  { uuid: con.uuid, pitch: a },
+                  { uuid: _con.uuid, pitch: b }
+                ]
+              })
+            );
+
+            //B
+            _con.socket.send(
+              JSON.stringify({
+                type: "PAIRED",
+                pairedWith: con.uuid,
+                pair: [
+                  { uuid: con.uuid, pitch: a },
+                  { uuid: _con.uuid, pitch: b }
+                ]
+              })
+            );
           }
         }
       });

@@ -32,6 +32,10 @@
         position: absolute;
         top: 0px;
       }
+      
+      .paired {
+        font-size: 3em;
+      }
     </style>
 
     <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
@@ -50,6 +54,8 @@
       <p class="yourId"></p>
       <p class="peers"></p>
       <p class="pitch"></p>
+      
+      <p class="paired"></p>
 
       <canvas id="mainCanvas" />
     </div>
@@ -152,12 +158,20 @@
               ".peers"
             ).innerText = `currently online: [${data.peers}]`;
             break;
-          case "PAIRED":
+          case "PAIR":
             console.log("WE HAVE A PAIRING", data.pair);
+            document.querySelector(".paired").innerText = `PAIRED! with your new friend: ${data.pairedWith}`;
 
             drawOnCanvas(data);
             // rtcConn.createOffer();
             break;
+          case "UNPAIR":
+            console.log("WE HAVE A PAIRING", data.pair);
+            document.querySelector(".paired").innerText = `PAIRED! with your new friend: ${data.pairedWith}`;
+
+            drawOnCanvas(data);
+            // rtcConn.createOffer();
+            break;          
           case "OFFER":
             // ANOTHER USER HAS SENT AN OFFER
             rtcConn.setRemoteDescription(
