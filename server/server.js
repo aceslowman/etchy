@@ -104,7 +104,8 @@ function checkForPairing() {
                 con.socket.send(
                   JSON.stringify({
                     type: "PAIRED",
-                    pair: [a, b]
+                    // pair: [a, b]
+                    pair: [{uuid: con.uuid, pitch: a},{uuid: con.uuid, pitch: b}]
                   })
                 );
               });
