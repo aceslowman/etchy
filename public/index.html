@@ -23,39 +23,39 @@
         margin: 0px;
         background-color: black;
         color: white;
-/*         color: black; */
+        /*         color: black; */
       }
 
       #APP,
       #mainCanvas,
-      .center
-      {
+      .center {
         width: 100%;
         height: 100%;
         position: absolute;
         top: 0px;
-        left:0px;
+        left: 0px;
       }
-      
+
       #APP {
-        padding:15px;
+        padding: 15px;
       }
-      
+
       .paired {
         font-size: 3em;
       }
-      
+
       .center {
         display: flex;
         align-items: center;
         justify-content: center;
-        color:white;
+        color: white;
         flex-flow: column;
-        text-align: center;
+        text-align: center;        
       }
-      
-      .center > * {        
+
+      .center > * {
         max-width: 300px;
+        cursor: pointer;
       }
     </style>
 
@@ -64,8 +64,6 @@
   </head>
   <body>
     <div id="APP">
-      
-
       <p class="count"></p>
       <p class="microphone"></p>
       <p class="modelloaded"></p>
@@ -73,36 +71,33 @@
       <p class="yourId"></p>
       <p class="peers"></p>
       <p class="pitch"></p>
-      
+
       <p class="paired"></p>
-      
 
       <canvas id="mainCanvas" />
     </div>
-    
+
     <div class="center">
       <h1>
         <em>PERENNIAL</em>
       </h1>
-      <p class="info">        
-        if you and another visitor are humming / singing / whistling the same tone, you 
-        will make a connection with them. when the tone stops matching, the connection will break.
+      <p class="info">
+        if you and another visitor are humming / singing / whistling the same
+        tone, you will make a connection with them. when the tone stops
+        matching, the connection will break.
       </p>
       <p>
-        you will need a microphone and speakers to use this site
+        (you will need a microphone and speakers to use this site)
       </p>
-      <p class="centerText">        
+      <p class="centerText">
         <em><strong>click or tap anywhere to begin</strong></em>
       </p>
       <p>
-      <small class="credit">
-        <em>austin slominski 2021</em>
-      </small>    
+        <small class="credit">
+          <em>austin slominski 2021</em>
+        </small>
       </p>
-      
     </div>
-      
-
 
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
@@ -204,14 +199,16 @@
             break;
           case "PAIR":
             console.log("WE HAVE A PAIRING", data.pair);
-            document.querySelector(".paired").innerText = `PAIRED! with your new friend: ${data.pairWith}`;
+            document.querySelector(
+              ".paired"
+            ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
             drawOnCanvas(true);
             break;
           case "UNPAIR":
             console.log("LOST OUR PAIRING", data.pair);
             document.querySelector(".paired").innerText = `UNPAIRED!`;
             drawOnCanvas(false);
-            break;          
+            break;
           case "OFFER":
             // ANOTHER USER HAS SENT AN OFFER
             rtcConn.setRemoteDescription(
@@ -248,7 +245,7 @@
       });
 
       function drawOnCanvas(paired) {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = "white";
         ctx.beginPath();
         ctx.save();
@@ -266,11 +263,11 @@
         ctx.strokeStyle = "white";
         // ctx.moveTo(0, canvas.height/2)
         // ctx.lineTo((canvas.width/2)-50, canvas.height/2);
-        ctx.moveTo(canvas.width/2, 0)
-        ctx.lineTo(canvas.width/2, (canvas.height/2)-50);
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height / 2 - 50);
         ctx.stroke();
         ctx.restore();
-        
+
         if (paired) {
           ctx.fillStyle = "white";
           ctx.beginPath();
@@ -287,8 +284,8 @@
           ctx.strokeStyle = "white";
           // ctx.moveTo((canvas.width/2)+50, canvas.height/2)
           // ctx.lineTo(canvas.width, canvas.height/2);
-          ctx.moveTo((canvas.width/2), (canvas.height/2)+50)
-          ctx.lineTo(canvas.width/2, canvas.height);
+          ctx.moveTo(canvas.width / 2, canvas.height / 2 + 50);
+          ctx.lineTo(canvas.width / 2, canvas.height);
           ctx.stroke();
         }
       }
@@ -336,16 +333,18 @@
               pitch.getPitch(function(err, frequency) {
                 document.querySelector(".pitch").innerText = frequency;
                 // if (frequency)
-                  websocket.send(
-                    JSON.stringify({
-                      uuid: user_id,
-                      type: "PITCH",
-                      pitch: frequency
-                    })
-                  );
+                websocket.send(
+                  JSON.stringify({
+                    uuid: user_id,
+                    type: "PITCH",
+                    pitch: frequency
+                  })
+                );
               }),
             200
           );
+          
+          rtcConn.addTrack()
 
           // chrome specific OfferToReceiveAudio flag
           // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
