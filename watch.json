@@ -7,15 +7,11 @@
   },
   "restart": {
     "exclude": [
-      "^public/",
-      "^src/",
-      "^dist/",
-      "^build/"
+      "^public/"
     ],
     "include": [
-      "^server\\.js$",
-      "^watch\\.json$",
-      "^webpack\\.config\\.js$"
+      "\\.js$",
+      "^watch\\.json$"
     ]
   },
   "throttle": 100

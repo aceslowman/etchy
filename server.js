@@ -10,9 +10,9 @@ function guidGenerator() {
     S4() +
     "-" +
     S4() +
-    "-" +
-    S4() +
-    "-" +
+    "-" + 
+    S4() + 
+    "-" + 
     S4() +
     S4() +
     S4()
@@ -51,7 +51,7 @@ wss.on("connection", ws => {
       case "PITCH":
         let con = connections.get(id);
         connections.set(id, { ...con, pitch: message.pitch });
-        break; 
+        break;  
       case "OFFER":
         // console.log("OFFER", message.sdp);
         break;
@@ -131,7 +131,7 @@ function checkForPairing() {
             // mark both as paired...
             con.pairedWith = _con.uuid;
             _con.pairedWith = con.uuid;
-
+ 
             //A
             con.socket.send(
               JSON.stringify({
