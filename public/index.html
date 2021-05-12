@@ -24,9 +24,10 @@
         margin: 0px;
         background-color: black;
         color: white;
-      }      
+      }
 
-      #APP, #mainCanvas {
+      #APP,
+      #mainCanvas {
         width: 100%;
         height: 100%;
         position: absolute;
@@ -81,6 +82,9 @@
       }
 
       let user_id;
+      let canvas = document.getElementById("mainCanvas");
+      let ctx = canvas.getContext('2d');
+      canvas.width
       let audioContext, audioInput, microphoneStream, gainNode;
       let started = false;
 
@@ -144,13 +148,14 @@
             document.querySelector(
               ".count"
             ).innerText = `currently online: ${data.count}`;
-
             document.querySelector(
               ".peers"
             ).innerText = `currently online: ${data.peers}`;
             break;
           case "PAIRED":
             console.log("WE HAVE A PAIRING", data.pair);
+            
+            drawOnCanvas(data);
             // rtcConn.createOffer();
             break;
           case "OFFER":
@@ -187,6 +192,15 @@
             break;
         }
       });
+      
+      function drawOnCanvas(data) {
+        ctx.strokeStyle = "white";
+        ctx.beginPath();
+        ctx.ellipse(canvas.width/2, canvas.height/2, 50, 50, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      
+      drawOnCanvas()
 
       function init() {
         if (started) return;
@@ -238,8 +252,8 @@
             200
           );
 
-          console.log("RTCCONN", rtcConn);
-
+          // chrome specific OfferToReceiveAudio flag
+          // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
           rtcConn
             .createOffer({ offerToReceiveAudio: true })
             .then(offer => {
@@ -256,9 +270,8 @@
                 })
               );
             })
-            .catch(reason => {
-              // An error occurred, so handle the failure to connect
-              console.log("trouble connecting", reason);
+            .catch(err => {
+              console.log("trouble connecting", err);
             });
 
           started = true;
