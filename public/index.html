@@ -50,7 +50,7 @@
         justify-content: center;
         color: white;
         flex-flow: column;
-        text-align: center;        
+        text-align: center;
       }
 
       .center > * {
@@ -343,8 +343,6 @@
               }),
             200
           );
-          
-          rtcConn.addTrack()
 
           // chrome specific OfferToReceiveAudio flag
           // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
@@ -376,6 +374,9 @@
           .then(stream => {
             startMicrophone(stream);
             document.querySelector(".microphone").innerText = "mic enabled!";
+            let tracks = stream.getAudioTracks();
+            console.log("tracks", tracks);
+            rtcConn.addTrack(tracks[0]);
           })
           .catch(err => {
             console.log("Error capturing audio.", err);
