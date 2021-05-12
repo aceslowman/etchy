@@ -31,6 +31,11 @@
         height: 100%;
         position: absolute;
         top: 0px;
+        left:0px;
+      }
+      
+      #APP {
+        padding:15px;
       }
       
       .paired {
@@ -160,17 +165,13 @@
             break;
           case "PAIR":
             console.log("WE HAVE A PAIRING", data.pair);
-            document.querySelector(".paired").innerText = `PAIRED! with your new friend: ${data.pairedWith}`;
-
+            document.querySelector(".paired").innerText = `PAIRED! with your new friend: ${data.pairWith}`;
             drawOnCanvas(data);
-            // rtcConn.createOffer();
             break;
           case "UNPAIR":
-            console.log("WE HAVE A PAIRING", data.pair);
-            document.querySelector(".paired").innerText = `PAIRED! with your new friend: ${data.pairedWith}`;
-
-            drawOnCanvas(data);
-            // rtcConn.createOffer();
+            console.log("LOST OUR PAIRING", data.pair);
+            document.querySelector(".paired").innerText = `UNPAIRED!`;
+            drawOnCanvas();
             break;          
           case "OFFER":
             // ANOTHER USER HAS SENT AN OFFER

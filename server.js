@@ -103,8 +103,8 @@ function checkForPairing() {
             //A
             con.socket.send(
               JSON.stringify({
-                type: "PAIRED",
-                pairedWith: _con.uuid,
+                type: "PAIR",
+                pairWith: _con.uuid,
                 pair: [
                   { uuid: con.uuid, pitch: a },
                   { uuid: _con.uuid, pitch: b }
@@ -115,8 +115,8 @@ function checkForPairing() {
             //B
             _con.socket.send(
               JSON.stringify({
-                type: "PAIRED",
-                pairedWith: con.uuid,
+                type: "PAIR",
+                pairWith: con.uuid,
                 pair: [
                   { uuid: con.uuid, pitch: a },
                   { uuid: _con.uuid, pitch: b }
