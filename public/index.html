@@ -27,7 +27,9 @@
       }
 
       #APP,
-      #mainCanvas {
+      #mainCanvas,
+      .center
+      {
         width: 100%;
         height: 100%;
         position: absolute;
@@ -42,6 +44,15 @@
       .paired {
         font-size: 3em;
       }
+      
+      .center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color:white;
+        font-style: italic;
+        flex-flow: column;
+      }
     </style>
 
     <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
@@ -49,9 +60,7 @@
   </head>
   <body>
     <div id="APP">
-      <h1>
-        PERENNIAL
-      </h1>
+      
 
       <p class="count"></p>
       <p class="microphone"></p>
@@ -62,9 +71,21 @@
       <p class="pitch"></p>
       
       <p class="paired"></p>
+      
 
       <canvas id="mainCanvas" />
     </div>
+    
+    <div class="center">
+      <h1>
+        PERENNIAL
+      </h1>
+      <p class="centerText">        
+        click or tap anywhere
+      </p>
+    </div>
+      
+
 
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
@@ -259,6 +280,7 @@
 
       function init() {
         if (started) return;
+        document.querySelector(".center").innerText = "";
 
         console.log("initializing...");
         document.querySelector(".microphone").innerText =
