@@ -87,7 +87,36 @@ function checkForPairing() {
   connections.forEach(con => {
     let a = con.pitch;
 
-    if (con.pitch) {
+    if (con.pairedWith) {
+      // if it's already paired, check to see if the
+      // pair has broken
+      let conA = con;
+      let conB = connections.get(con.pairedWith);
+
+      let b = conB.pitch;
+      let diff = Math.abs(b - a);
+      let match = diff > tolerance; // if NOT within range
+
+      if (match) {
+        // mark both as paired...
+        conA.pairedWith = null;
+        conB.pairedWith = null;
+
+        //A
+        conA.socket.send(
+          JSON.stringify({
+            type: "UNPAIR"
+          })
+        );
+
+        //B
+        pairedWith.socket.send(
+          JSON.stringify({
+            type: "UNPAIR"
+          })
+        );
+      }
+    } else if (con.pitch) {
       connections.forEach(_con => {
         // only check other connections
         if (_con.uuid !== con.uuid && _con.pitch) {
