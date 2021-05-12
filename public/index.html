@@ -11,9 +11,26 @@
     <title>perennial</title>
 
     <style>
-      html {
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body,
+      #APP {
+        width: 100%;
+        height: 100%;
+        padding: 0px;
+        margin: 0px;
         background-color: black;
         color: white;
+      }      
+
+      #APP, #mainCanvas {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0px;
       }
     </style>
 
@@ -21,17 +38,21 @@
     <script src="/websocket.js"></script>
   </head>
   <body>
-    <h1>
-      PERENNIAL
-    </h1>
-    
-    <p class="count"></p>
-    <p class="microphone"></p>
-    <p class="modelloaded"></p>    
-    <p class="RTClog"></p>
-    <p class="yourId"></p>
-    <p class="peers"></p>
-    <p class="pitch"></p>
+    <div id="APP">
+      <h1>
+        PERENNIAL
+      </h1>
+
+      <p class="count"></p>
+      <p class="microphone"></p>
+      <p class="modelloaded"></p>
+      <p class="RTClog"></p>
+      <p class="yourId"></p>
+      <p class="peers"></p>
+      <p class="pitch"></p>
+
+      <canvas id="mainCanvas" />
+    </div>
 
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
@@ -60,19 +81,15 @@
       }
 
       let user_id;
-      let audioContext;
-      let audioInput, microphoneStream, gainNode;
+      let audioContext, audioInput, microphoneStream, gainNode;
       let started = false;
 
       // ------------------------------------------------------------
       // setting up WebRTC
 
       // PUBLIC STUN SERVERS: https://gist.github.com/zziuni/3741933
-      // chrome specific OfferToReceiveAudio flag
-      // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
       let rtcConn = new RTCPeerConnection({
         iceServers: [{ url: "stun:stun.1.google.com:19302" }]
-        // mandatory: { OfferToReceiveAudio: true }
       });
 
       rtcConn.onopen = () => {
@@ -127,7 +144,7 @@
             document.querySelector(
               ".count"
             ).innerText = `currently online: ${data.count}`;
-            
+
             document.querySelector(
               ".peers"
             ).innerText = `currently online: ${data.peers}`;
@@ -138,16 +155,20 @@
             break;
           case "OFFER":
             // ANOTHER USER HAS SENT AN OFFER
-            rtcConn.setRemoteDescription(new RTCSessionDescription(message.offer));
+            rtcConn.setRemoteDescription(
+              new RTCSessionDescription(message.offer)
+            );
 
             rtcConn.createAnswer(
               answer => {
                 rtcConn.setLocalDescription(answer);
 
-                websocket.send(JSON.stringify({
-                  type: "answer",
-                  answer: answer
-                }));
+                websocket.send(
+                  JSON.stringify({
+                    type: "answer",
+                    answer: answer
+                  })
+                );
               },
               error => {
                 alert("oops...error");
@@ -180,7 +201,7 @@
         function startMicrophone(stream) {
           console.log("starting microphone");
 
-          gain_node = audioContext.createGain(0.0);
+          gain_node = audioContext.createGain(0.0); // TEMP: muted
           gain_node.connect(audioContext.destination);
 
           gain_node.gain.setValueAtTime(0, audioContext.currentTime);
