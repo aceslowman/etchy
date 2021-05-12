@@ -43,13 +43,12 @@ wss.on("connection", ws => {
 
     switch (message.type) {
       case "REGISTER":
-        console.log("register", message);
+        console.log("registering user", message.uuid);
         id = message.uuid;
         connections.set(id, { uuid: id, socket: ws });
         updateCount();
         break;
       case "PITCH":
-        // console.log("pitch", message);
         let con = connections.get(id);
         connections.set(id, { ...con, pitch: message.pitch });
         break;
@@ -90,29 +89,43 @@ function checkForPairing() {
 
     if (con.pitch) {
       connections.forEach(_con => {
+        // only check other connections
         if (_con.uuid !== con.uuid) {
-          // check against all others
           if (_con.pitch) {
             let b = _con.pitch;
-            console.log("b", b);
             let diff = Math.abs(b - a);
-            console.log("diff", diff);
             let match = diff < tolerance;
 
             if (match) {
-              connections.forEach(con => {
+              // connections.forEach(con => {
+                // mark both as paired...
+                con.pairedWith = _con.uuid;
+                _con.pairedWith = con.uuid;
+                
                 con.socket.send(
                   JSON.stringify({
                     type: "PAIRED",
-                    // pair: [a, b]
                     pair: [
                       { uuid: con.uuid, pitch: a },
                       { uuid: _con.uuid, pitch: b } 
                     ]
                   })
                 );
-              });
+                
+                _con.socket.send(
+                  JSON.stringify({
+                    type: "PAIRED",
+                    pair: [
+                      { uuid: con.uuid, pitch: a },
+                      { uuid: _con.uuid, pitch: b } 
+                    ]
+                  })
+                );
+              // });
             }
+            
+            
+            
           }
         }
       });
