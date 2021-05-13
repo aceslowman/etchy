@@ -161,9 +161,11 @@
           websocket.send(
             JSON.stringify({
               type: "CANDIDATE",
-              candidate: event.candidate
+              ice: event.candidate
             })
           );
+        } else {
+          console.log("All ICE candidates have been sent");
         }
       };
 
@@ -210,7 +212,7 @@
             drawOnCanvas(false);
             break;
           case "OFFER":
-            console.log('ANOTHER USER HAS SENT AN OFFER', data)
+            console.log("ANOTHER USER HAS SENT AN OFFER", data);
             // ANOTHER USER HAS SENT AN OFFER
             rtcConn.setRemoteDescription(data.offer);
 
@@ -237,12 +239,17 @@
             rtcConn.setRemoteDescription(
               new RTCSessionDescription(data.answer)
             );
-            
+
             break;
           case "CANDIDATE":
             // ANOTHER USER HAS SENT AN ICE CANDIDATE
-            console.log("CANDIDATE", data);
-            // rtcConn.addIceCandidate(data.candidate)
+            if (rtcConn.localDescription) {
+              console.log("CANDIDATE", data);
+
+              rtcConn.addIceCandidate(data.ice).catch(e => {
+                console.log("Failure during addIceCandidate(): " + e.name, e);
+              });
+            }
             break;
           default:
             break;
@@ -311,10 +318,10 @@
         function startMicrophone(stream) {
           console.log("starting microphone");
 
-          gain_node = audioContext.createGain(); 
+          gain_node = audioContext.createGain();
           gain_node.connect(audioContext.destination);
 
-          gain_node.gain.setValueAtTime(0.0, audioContext.currentTime);// TEMP: muted
+          gain_node.gain.setValueAtTime(0.0, audioContext.currentTime); // TEMP: muted
 
           microphone_stream = audioContext.createMediaStreamSource(stream);
           microphone_stream.connect(gain_node);
@@ -356,19 +363,14 @@
             startMicrophone(stream);
             document.querySelector(".microphone").innerText = "mic enabled!";
             let tracks = stream.getAudioTracks();
-            console.log("tracks", tracks);
             rtcConn.addTrack(tracks[0]);
 
             // chrome specific OfferToReceiveAudio flag
             // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
             rtcConn
               .createOffer({ offerToReceiveAudio: true })
-              .then(offer => {
-                console.log("offer", offer);
-                return rtcConn.setLocalDescription(offer);
-              })
+              .then(offer => rtcConn.setLocalDescription(offer))
               .then(() => {
-                console.log("making webRTC offer");
                 websocket.send(
                   JSON.stringify({
                     uuid: user_id,
