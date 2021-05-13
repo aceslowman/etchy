@@ -190,7 +190,6 @@
             ).innerText = `currently online: [${data.peers}]`;
             break;
           case "PAIR":
-            console.log("WE HAVE A PAIRING", data.pair);
             document.querySelector(
               ".paired"
             ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
@@ -203,7 +202,6 @@
             drawOnCanvas(true);
             break;
           case "UNPAIR":
-            console.log("LOST OUR PAIRING", data.pair);
             document.querySelector(".paired").innerText = `UNPAIRED!`;
             paired = false;
             // mute yourself
@@ -214,8 +212,6 @@
             drawOnCanvas(false);
             break;
           case "OFFER":
-            console.log("ANOTHER USER HAS SENT AN OFFER", data);
-            // ANOTHER USER HAS SENT AN OFFER
             rtcConn.setRemoteDescription(new RTCSessionDescription(data.offer));
 
             rtcConn
@@ -234,15 +230,11 @@
               .catch(err => console.log("ERR", err));
             break;
           case "ANSWER":
-            // ANOTHER USER HAS ANSWERED YOUR OFFER
-            console.log("ANSWER RECEIVED", data);
             rtcConn.setRemoteDescription(
               new RTCSessionDescription(data.answer)
             );
-
             break;
           case "CANDIDATE":
-            // ANOTHER USER HAS SENT AN ICE CANDIDATE
             if (
               data.ice &&
               rtcConn.localDescription &&
