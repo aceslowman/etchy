@@ -75,7 +75,7 @@
       <p class="paired"></p>
 
       <canvas id="mainCanvas"></canvas>
-
+      
       <audio id="remoteAudio"></audio>
     </div>
 
@@ -129,9 +129,7 @@
 
       let user_id;
       let paired = false;
-      1;
       let canvas = document.getElementById("mainCanvas");
-      let localStream;
       let audioelement = document.getElementById("remoteAudio");
       let ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
@@ -147,7 +145,7 @@
         iceServers: [{ url: "stun:stun.1.google.com:19302" }]
       });
 
-      rtcConn.ontrack = data => {
+      rtcConn.ontrack = (data) => {
         window.stream = data.streams[0];
         remoteAudio.srcObject = data.streams[0];
       };
@@ -196,10 +194,6 @@
             ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
             paired = true;
             // make yourself audible
-            // localStream.getTracks().forEach(track => {
-            //   track.enabled = true;
-            // });
-            // audioelement.muted = false;
             drawOnCanvas(true);
             break;
           case "UNPAIR":
@@ -207,10 +201,6 @@
             document.querySelector(".paired").innerText = `UNPAIRED!`;
             paired = false;
             // mute yourself
-            // localStream.getTracks().forEach(track => {
-            //   track.enabled = false;
-            // });
-            // audioelement.muted = true;
             drawOnCanvas(false);
             break;
           case "OFFER":
@@ -264,14 +254,20 @@
         if (started) return;
         document.querySelector(".center").innerText = "";
 
+        console.log("initializing...");
+        document.querySelector(".microphone").innerText =
+          "about to set audio context...";
+
         var AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
 
         function startMicrophone(stream) {
+          console.log("starting microphone");
+
           gain_node = audioContext.createGain();
           gain_node.connect(audioContext.destination);
 
-          gain_node.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gain_node.gain.setValueAtTime(0.3, audioContext.currentTime); // TEMP: muted
 
           microphone_stream = audioContext.createMediaStreamSource(stream);
           microphone_stream.connect(gain_node);
@@ -283,6 +279,8 @@
             stream,
             () => {
               console.log("Model Loaded!");
+              document.querySelector(".modelloaded").innerText =
+                "model loaded!";
               drawOnCanvas();
             }
           );
@@ -308,13 +306,10 @@
         navigator.mediaDevices
           .getUserMedia({ audio: true, video: false })
           .then(stream => {
-            localStream = stream;
             startMicrophone(stream);
             document.querySelector(".microphone").innerText = "mic enabled!";
 
-            audioelement.play();
             stream.getAudioTracks().forEach(track => {
-              // track.enabled = false; // can't mute here, it stops ml5 from pitch detecting
               rtcConn.addTrack(track, stream);
             });
 
@@ -388,6 +383,8 @@
           ctx.stroke();
         }
       }
+
+      // drawOnCanvas();
 
       function onWindowResize(e) {
         canvas.width = window.innerWidth;
