@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="" />
+
+    <title>perennial</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body,
+      #APP {
+        width: 100%;
+        height: 100%;
+        padding: 0px;
+        margin: 0px;
+        background-color: black;
+        color: white;
+        /*         color: black; */
+      }
+
+      #APP,
+      #mainCanvas,
+      .center {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+
+      #APP {
+        padding: 15px;
+      }
+
+      .paired {
+        font-size: 3em;
+      }
+
+      .center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-flow: column;
+        text-align: center;
+      }
+
+      .center > * {
+        max-width: 300px;
+        cursor: pointer;
+      }
+    </style>
+
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    <script src="/websocket.js"></script>
+  </head>
+  <body>
+    <div id="APP">
+      <p class="count"></p>
+      <p class="microphone"></p>
+      <p class="modelloaded"></p>
+      <p class="RTClog"></p>
+      <p class="yourId"></p>
+      <p class="peers"></p>
+      <p class="pitch"></p>
+
+      <p class="paired"></p>
+
+      <canvas id="mainCanvas"></canvas>
+
+      <audio id="remoteAudio" controls autoplay></audio>
+    </div>
+
+    <div class="center">
+      <h1>
+        <em>PERENNIAL</em>
+      </h1>
+      <p class="info">
+        if you and another visitor are humming / singing / whistling the same
+        tone, you will make a connection with them. when the tone stops
+        matching, the connection will break.
+      </p>
+      <p>
+        (you will need a microphone and speakers to use this site)
+      </p>
+      <p class="centerText">
+        <em><strong>click or tap anywhere to begin</strong></em>
+      </p>
+      <p>
+        <small class="credit">
+          <em>austin slominski 2021</em>
+        </small>
+      </p>
+    </div>
+
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+
+    <script type="text/javascript">
+      // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
+      function guidGenerator() {
+        var S4 = function() {
+          return (((1 + Math.random()) * 0x10000) | 0)
+            .toString(16)
+            .substring(1);
+        };
+        return (
+          S4() +
+          S4() +
+          "-" +
+          S4() +
+          "-" +
+          S4() +
+          "-" +
+          S4() +
+          "-" +
+          S4() +
+          S4() +
+          S4()
+        );
+      }
+
+      let user_id;
+      let paired = false;
+      let peerConnections = new Map();
+      let canvas = document.getElementById("mainCanvas");
+      let localStream;
+      let sendTrack;
+      let audioelement = document.getElementById("remoteAudio");
+      let ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let audioContext, audioInput, microphoneStream, gainNode;
+      let started = false;
+
+      let PC_CONFIG = {
+        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+      };
+
+      // ------------------------------------------------------------
+      // setting up WebRTC
+
+      // PUBLIC STUN SERVERS: https://gist.github.com/zziuni/3741933
+
+      let onAddStream = data => {
+        console.log("data", data);
+        window.stream = data.streams[0];
+        remoteAudio.srcObject = data.streams[0];
+      };
+
+      let onIceCandidate = event => {
+        if (event.candidate) {
+          websocket.send(
+            JSON.stringify({
+              type: "CANDIDATE",
+              ice: event.candidate
+            })
+          );
+        } else {
+          console.log("All ICE candidates have been sent");
+        }
+      };
+
+      // let rtcConn = new RTCPeerConnection(conConfig);
+      // rtcConn.ontrack = handleOnTrack;
+      // rtcConn.onicecandidate = handleOnIceCandidate;
+
+      // ------------------------------------------------------------
+      // setting up websocket
+      let websocket = new FriendlyWebSocket({ path: "/" });
+
+      let onReceivePair = data => {
+        document.querySelector(
+          ".paired"
+        ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
+        paired = true;
+        console.log("localStream", localStream);
+
+        if (!sendTrack) {
+          localStream.getAudioTracks().forEach(track => {
+            sendTrack = peerConnections.get(data.pairWith).addTrack(track, localStream);
+          });
+        }
+
+        drawOnCanvas(true);
+      };
+
+      let onReceiveUnpair = data => {
+        document.querySelector(".paired").innerText = `UNPAIRED!`;
+        paired = false;
+        peerConnections.get(data.uuid).removeTrack(sendTrack);
+        sendTrack = undefined;
+        drawOnCanvas(false);
+      };
+
+      let onReceiveOffer = data => {
+        let newCon = createPeerConnection(data.uuid);
+        newCon.setRemoteDescription(new RTCSessionDescription(data.offer));
+        sendAnswer(data.uuid);
+      };
+
+      let onReceiveAnswer = data => {
+        console.log('receiving answer', data)
+        peerConnections.get(user_id).setRemoteDescription(new RTCSessionDescription(data.answer));
+      };
+
+      let sendOffer = sid => {
+        console.log("Sending offer");
+        peerConnections
+          .get(sid)
+          .createOffer({
+            offerToReceiveAudio: true,
+            voiceActivityDetection: false
+          })
+          .then(offer => peerConnections.get(sid).setLocalDescription(offer))
+          .then(() => {
+            websocket.send(
+              JSON.stringify({
+                uuid: user_id,
+                type: "OFFER",
+                offer: peerConnections.get(sid).localDescription
+              })
+            );
+          })
+          .catch(err => {
+            console.log("trouble making offer", err);
+          });
+      };
+
+      let sendAnswer = sid => {
+        console.log("Sending answer");
+        peerConnections
+          .get(sid)
+          .createAnswer()
+          .then(
+            sdp => {
+              peerConnections.get(sid).setLocalDescription(sdp);
+              websocket.send(
+                JSON.stringify({
+                  uuid: sid,
+                  type: "ANSWER",
+                  answer: sdp
+                })
+              );
+            },
+            error => {
+              console.error("Send answer failed: ", error);
+            }
+          );
+      };
+
+      let onReceiveCandidate = data => {
+        if (data.ice && peerConnections.get(user_id).localDescription && peerConnections.get(user_id).remoteDescription) {
+          peerConnections.get(user_id).addIceCandidate(data.ice).catch(e => {
+            console.log("Failure during addIceCandidate(): " + e.name, e);
+          });
+        }
+      };
+
+      let onReceiveCount = data => {
+        document.querySelector(
+          ".count"
+        ).innerText = `currently online: ${data.count}`;
+        document.querySelector(
+          ".peers"
+        ).innerText = `currently online: [${data.peers}]`;
+      };
+
+      // REGISTER when connection opens
+      websocket.on("open", data => {
+        user_id = guidGenerator();
+        document.querySelector(".yourId").innerText = `your id: ${user_id}`;
+        websocket.send(JSON.stringify({ type: "REGISTER", uuid: user_id }));
+      });
+
+      // when signaling server sends a message
+      websocket.on("message", data => {
+        data = JSON.parse(event.data);
+
+        switch (data.type) {
+          case "COUNT":
+            onReceiveCount(data);
+            break;
+          case "PAIR":
+            onReceivePair(data);
+            break;
+          case "UNPAIR":
+            onReceiveUnpair(data);
+            break;
+          case "OFFER":
+            onReceiveOffer(data);
+            break;
+          case "ANSWER":
+            onReceiveAnswer(data);
+            break;
+          case "CANDIDATE":
+            onReceiveCandidate(data);
+            break;
+          default:
+            break;
+        }
+      });
+
+      function init() {
+        if (started) return;
+        document.querySelector(".center").innerText = "";
+
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioContext = new AudioContext();
+
+        function startMicrophone(stream) {
+          gain_node = audioContext.createGain();
+          gain_node.connect(audioContext.destination);
+
+          gain_node.gain.setValueAtTime(0.4, audioContext.currentTime);
+
+          microphone_stream = audioContext.createMediaStreamSource(stream);
+          microphone_stream.connect(gain_node);
+
+          // set up pitch detection!
+          const pitch = ml5.pitchDetection(
+            "./model/pitch-detection/crepe/",
+            audioContext,
+            stream,
+            () => drawOnCanvas()
+          );
+
+          // as pitches come in...
+          setInterval(
+            () =>
+              pitch.getPitch(function(err, frequency) {
+                document.querySelector(".pitch").innerText = frequency;
+                websocket.send(
+                  JSON.stringify({
+                    uuid: user_id,
+                    type: "PITCH",
+                    pitch: frequency
+                  })
+                );
+              }),
+            200
+          );
+        }
+
+        navigator.mediaDevices
+          .getUserMedia({ audio: true, video: false })
+          .then(stream => {
+            startMicrophone(stream);
+            document.querySelector(".microphone").innerText = "mic enabled!";
+
+            localStream = stream;
+          
+          
+            // set up your peer connection
+            let myCon = createPeerConnection(user_id);
+
+            audioelement.play();
+            localStream.getAudioTracks().forEach(track => {
+              // rtcConn.addTrack(track, localStream);
+            });
+
+            sendOffer(user_id);
+
+            started = true;
+          })
+          .catch(err => {
+            console.log("Error capturing audio.", err);
+          });
+      }
+
+      let createPeerConnection = uuid => {
+        const pc = new RTCPeerConnection(PC_CONFIG);
+        pc.onicecandidate = onIceCandidate;
+        pc.onaddstream = onAddStream;
+        pc.addStream(localStream);
+        console.log("PeerConnection created");
+        peerConnections.set(uuid, pc);
+        return pc;
+      };
+
+      function drawOnCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "white";
+        ctx.beginPath();
+        ctx.save();
+        if (!paired) ctx.setLineDash([1, 3]);
+        ctx.ellipse(
+          canvas.width / 2,
+          canvas.height / 2,
+          50,
+          50,
+          0,
+          0,
+          Math.PI * 2
+        );
+        ctx.stroke();
+        ctx.strokeStyle = "white";
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height / 2 - 50);
+        ctx.stroke();
+        ctx.restore();
+
+        if (paired) {
+          ctx.fillStyle = "white";
+          ctx.beginPath();
+          ctx.ellipse(
+            canvas.width / 2,
+            canvas.height / 2,
+            50,
+            50,
+            0,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+          ctx.strokeStyle = "white";
+          ctx.moveTo(canvas.width / 2, canvas.height / 2 + 50);
+          ctx.lineTo(canvas.width / 2, canvas.height);
+          ctx.stroke();
+        }
+      }
+
+      function onWindowResize(e) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        drawOnCanvas();
+      }
+
+      drawOnCanvas();
+
+      document.addEventListener("click", init, false);
+      window.addEventListener("resize", onWindowResize, false);
+    </script>
+  </body>
+</html>
