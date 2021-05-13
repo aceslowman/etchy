@@ -156,8 +156,6 @@
 
       rtcConn.onicecandidate = event => {
         if (event.candidate) {
-          console.log("found ice candidate");
-          document.querySelector(".RTClog").innerText = "got candidate";
           websocket.send(
             JSON.stringify({
               type: "CANDIDATE",
@@ -220,7 +218,7 @@
                   answer: answer
                 });
               })
-              .then(err => console.log("ERR", err));
+              .catch(err => console.log("ERR", err));
             break;
           case "ANSWER":
             // ANOTHER USER HAS ANSWERED YOUR OFFER
@@ -232,7 +230,7 @@
             break;
           case "CANDIDATE":
             // ANOTHER USER HAS SENT AN ICE CANDIDATE
-            if (rtcConn.localDescription && rtcConn.remoteDescription) {
+            if (data.ice && rtcConn.localDescription && rtcConn.remoteDescription) {
               console.log("CANDIDATE", data);
 
               rtcConn.addIceCandidate(data.ice).catch(e => {
