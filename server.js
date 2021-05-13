@@ -45,7 +45,12 @@ wss.on("connection", ws => {
       case "REGISTER":
         console.log("registering user", message.uuid);
         id = message.uuid;
-        connections.set(id, { uuid: id, socket: ws, pitch: 0, pairedWith: null });
+        connections.set(id, {
+          uuid: id,
+          socket: ws,
+          pitch: 0,
+          pairedWith: null
+        });
         updateCount();
         break;
       case "PITCH":
@@ -54,6 +59,17 @@ wss.on("connection", ws => {
         break;
       case "OFFER":
         console.log("OFFER", message.sdp);
+        // send offer to all *other* peers
+        connections.forEach(con => {
+          if (con.uuid !== message.uuid) {
+            con.socket.send(
+              JSON.stringify({
+                type: "OFFER",
+                from: message.uuid
+              })
+            );
+          }
+        });
         break;
       case "ANSWER":
         console.log("ANSWER");
@@ -176,15 +192,15 @@ function updateCount() {
   });
 }
 
-function checkHttps(req, res, next){
-  if(req.get('X-Forwarded-Proto').indexOf("https")!=-1){
-    return next()
+function checkHttps(req, res, next) {
+  if (req.get("X-Forwarded-Proto").indexOf("https") != -1) {
+    return next();
   } else {
-    res.redirect('https://' + req.hostname + req.url);
+    res.redirect("https://" + req.hostname + req.url);
   }
 }
 
-app.all('*', checkHttps)
+app.all("*", checkHttps);
 
 app.use(express.static("public"));
 
