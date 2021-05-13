@@ -148,7 +148,7 @@
       });
 
       rtcConn.ontrack = data => {
-        console.log('data', data)
+        console.log("data", data);
         window.stream = data.streams[0];
         remoteAudio.srcObject = data.streams[0];
       };
@@ -309,7 +309,10 @@
             });
 
             rtcConn
-              .createOffer({ offerToReceiveAudio: true, voiceActivityDetection: false })
+              .createOffer({
+                offerToReceiveAudio: true,
+                voiceActivityDetection: false
+              })
               .then(offer => rtcConn.setLocalDescription(offer))
               .then(() => {
                 websocket.send(
