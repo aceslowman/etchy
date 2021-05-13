@@ -75,6 +75,8 @@
       <p class="paired"></p>
 
       <canvas id="mainCanvas" />
+      
+      <audio id="remoteAudio" controls></audio>
     </div>
 
     <div class="center">
@@ -127,6 +129,7 @@
 
       let user_id;
       let canvas = document.getElementById("mainCanvas");
+      let audioelement = document.getElementById("remoteAudio");
       let ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -140,6 +143,11 @@
       let rtcConn = new RTCPeerConnection({
         iceServers: [{ url: "stun:stun.1.google.com:19302" }]
       });
+
+      rtcConn.ontrack = (data) => {
+        console.log("a track has been added", data);
+        remoteAudio.srcObject = data.stream;
+      };
 
       rtcConn.onopen = () => {
         console.log("Connected WEBRTC");
@@ -181,7 +189,6 @@
       // when server sends a message
       websocket.on("message", data => {
         data = JSON.parse(event.data);
-        console.log('message', data)
 
         switch (data.type) {
           case "COUNT":
@@ -212,13 +219,15 @@
             rtcConn
               .createAnswer()
               .then(answer => {
-                console.log('an answer is being sent in response...')
+                console.log("an answer is being sent in response...");
                 rtcConn.setLocalDescription(answer);
-                websocket.send(JSON.stringify({
-                  uuid: user_id,
-                  type: "ANSWER",
-                  answer: answer
-                }));
+                websocket.send(
+                  JSON.stringify({
+                    uuid: user_id,
+                    type: "ANSWER",
+                    answer: answer
+                  })
+                );
               })
               .catch(err => console.log("ERR", err));
             break;
@@ -307,11 +316,11 @@
           .then(stream => {
             startMicrophone(stream);
             document.querySelector(".microphone").innerText = "mic enabled!";
-            
+
             stream.getAudioTracks().forEach(track => {
-              rtcConn.addTrack(track);
+              rtcConn.addTrack(track, stream);
             });
-            
+
             // chrome specific OfferToReceiveAudio flag
             // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
             rtcConn
@@ -336,8 +345,8 @@
             console.log("Error capturing audio.", err);
           });
       }
-      
-            function drawOnCanvas(paired) {
+
+      function drawOnCanvas(paired) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = "white";
         ctx.beginPath();
