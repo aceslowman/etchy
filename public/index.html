@@ -180,7 +180,7 @@
 
       // when server sends a message
       websocket.on("message", data => {
-        console.log("message:", data);
+        // console.log("message:", data);
 
         try {
           data = JSON.parse(event.data);
@@ -235,13 +235,14 @@
             // ANOTHER USER HAS ANSWERED YOUR OFFER
             console.log("ANSWER", data);
             rtcConn.setRemoteDescription(
-              new RTCSessionDescription(data.sdp)
+              new RTCSessionDescription(data.answer)
             );
             
             break;
           case "CANDIDATE":
             // ANOTHER USER HAS SENT AN ICE CANDIDATE
-            console.log("CANDIDATE", message.candidate);
+            console.log("CANDIDATE", data);
+            // rtcConn.addIceCandidate(data.candidate)
             break;
           default:
             break;
@@ -310,10 +311,10 @@
         function startMicrophone(stream) {
           console.log("starting microphone");
 
-          gain_node = audioContext.createGain(0.0); // TEMP: muted
+          gain_node = audioContext.createGain(); 
           gain_node.connect(audioContext.destination);
 
-          gain_node.gain.setValueAtTime(0, audioContext.currentTime);
+          gain_node.gain.setValueAtTime(0.0, audioContext.currentTime);// TEMP: muted
 
           microphone_stream = audioContext.createMediaStreamSource(stream);
           microphone_stream.connect(gain_node);

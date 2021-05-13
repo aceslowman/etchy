@@ -80,7 +80,15 @@ wss.on("connection", ws => {
         });        
         break;
       case "CANDIDATE":
-        // console.log("CANDIDATE", message.candidate);
+        console.log("CANDIDATE", message);
+        // send answer to all *other* peers
+        connections.forEach(con => {
+          if (con.uuid !== message.uuid) {
+            con.socket.send(
+              JSON.stringify(message)
+            );
+          }
+        });
         break;
       default:
         console.log("message received without TYPE");
