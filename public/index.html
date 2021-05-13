@@ -129,7 +129,7 @@
 
       let user_id;
       let paired = false;
-      let peerConnections = new Map();
+      let peerConnections = [];
       let canvas = document.getElementById("mainCanvas");
       let localStream;
       let sendTrack;
@@ -144,32 +144,56 @@
       // setting up WebRTC
 
       // PUBLIC STUN SERVERS: https://gist.github.com/zziuni/3741933
-      //       let rtcConn = new RTCPeerConnection({
-      //         iceServers: [{ url: "stun:stun.1.google.com:19302" }]
-      //       });
+      let rtcConn = new RTCPeerConnection({
+        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+      });
 
-      //       rtcConn.ontrack = data => {
-      //         console.log("data", data);
-      //         window.stream = data.streams[0];
-      //         remoteAudio.srcObject = data.streams[0];
-      //       };
+      rtcConn.ontrack = data => {
+        console.log("data", data);
+        window.stream = data.streams[0];
+        remoteAudio.srcObject = data.streams[0];
+      };
 
-      //       rtcConn.onicecandidate = event => {
-      //         if (event.candidate) {
-      //           websocket.send(
-      //             JSON.stringify({
-      //               type: "CANDIDATE",
-      //               ice: event.candidate
-      //             })
-      //           );
-      //         } else {
-      //           console.log("All ICE candidates have been sent");
-      //         }
-      //       };
+      rtcConn.onicecandidate = event => {
+        if (event.candidate) {
+          websocket.send(
+            JSON.stringify({
+              type: "CANDIDATE",
+              ice: event.candidate
+            })
+          );
+        } else {
+          console.log("All ICE candidates have been sent");
+        }
+      };
 
       // ------------------------------------------------------------
       // setting up websocket
       let websocket = new FriendlyWebSocket({ path: "/" });
+
+      let onReceivePair = data => {
+        document.querySelector(
+          ".paired"
+        ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
+        paired = true;
+        console.log("localStream", localStream);
+
+        if (!sendTrack) {
+          localStream.getAudioTracks().forEach(track => {
+            sendTrack = rtcConn.addTrack(track, localStream);
+          });
+        }
+
+        drawOnCanvas(true);
+      };
+
+      let onReceiveUnpair = data => {
+        document.querySelector(".paired").innerText = `UNPAIRED!`;
+        paired = false;
+        rtcConn.removeTrack(sendTrack);
+        sendTrack = undefined;
+        drawOnCanvas(false);
+      };
 
       // when connection opens
       websocket.on("open", data => {
@@ -192,55 +216,17 @@
             ).innerText = `currently online: [${data.peers}]`;
             break;
           case "PAIR":
-            document.querySelector(
-              ".paired"
-            ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
-
-            paired = true;
-
-            localStream.getAudioTracks().forEach(track => {
-              sendTrack = rtcConn.addTrack(track, localStream);
-            });
-
-            drawOnCanvas(true);
+            onReceivePair(data);
             break;
           case "UNPAIR":
-            document.querySelector(".paired").innerText = `UNPAIRED!`;
-            paired = false;
-            rtcConn.removeTrack(sendTrack);
-            sendTrack = undefined;
-            drawOnCanvas(false);
+            onReceiveUnpair(data);
             break;
           case "OFFER":
-            // add new peer
-            let newCon = new RTCPeerConnection({
-              iceServers: [{ url: "stun:stun.1.google.com:19302" }]
-            });
-
-            newCon.ontrack = data => {
-              console.log("data", data);
-              window.stream = data.streams[0];
-              remoteAudio.srcObject = data.streams[0];
-            };
-
-            newCon.onicecandidate = event => {
-              if (event.candidate) {
-                websocket.send(
-                  JSON.stringify({
-                    type: "CANDIDATE",
-                    ice: event.candidate
-                  })
-                );
-              } else {
-                console.log("All ICE candidates have been sent");
-              }
-            };
-
-            newCon.setRemoteDescription(new RTCSessionDescription(data.offer));
-            newCon
+            rtcConn.setRemoteDescription(new RTCSessionDescription(data.offer));
+            rtcConn
               .createAnswer()
               .then(answer => {
-                newCon.setLocalDescription(answer);
+                rtcConn.setLocalDescription(answer);
                 websocket.send(
                   JSON.stringify({
                     uuid: user_id,
@@ -250,9 +236,6 @@
                 );
               })
               .catch(err => console.log("ERR", err));
-
-            peerConnections.set(data.uuid, newCon);
-
             break;
           case "ANSWER":
             rtcConn.setRemoteDescription(
@@ -328,29 +311,6 @@
               // rtcConn.addTrack(track, localStream);
             });
 
-            let rtcConn = new RTCPeerConnection({
-              iceServers: [{ url: "stun:stun.1.google.com:19302" }]
-            });
-
-            rtcConn.ontrack = data => {
-              console.log("data", data);
-              window.stream = data.streams[0];
-              remoteAudio.srcObject = data.streams[0];
-            };
-
-            rtcConn.onicecandidate = event => {
-              if (event.candidate) {
-                websocket.send(
-                  JSON.stringify({
-                    type: "CANDIDATE",
-                    ice: event.candidate
-                  })
-                );
-              } else {
-                console.log("All ICE candidates have been sent");
-              }
-            };
-
             rtcConn
               .createOffer({
                 offerToReceiveAudio: true,
@@ -369,8 +329,6 @@
               .catch(err => {
                 console.log("trouble making offer", err);
               });
-          
-            peerConnections.set(user_id, )
 
             started = true;
           })
