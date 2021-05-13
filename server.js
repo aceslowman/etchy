@@ -63,16 +63,31 @@ wss.on("connection", ws => {
         connections.forEach(con => {
           if (con.uuid !== message.uuid) {
             con.socket.send(
-              JSON.stringify({
-                type: "OFFER",
-                from: message.uuid
-              })
+              // JSON.stringify({
+              //   type: "OFFER",
+              //   from: message.uuid,
+              //   sdp: message.
+              // })
+              JSON.stringify(message)
             );
           }
         });
         break;
       case "ANSWER":
         console.log("ANSWER");
+        // send answer to all *other* peers
+        connections.forEach(con => {
+          if (con.uuid !== message.uuid) {
+            con.socket.send(
+              // JSON.stringify({
+              //   type: "OFFER",
+              //   from: message.uuid,
+              //   sdp: message.
+              // })
+              JSON.stringify(message)
+            );
+          }
+        });        
         break;
       case "CANDIDATE":
         // console.log("CANDIDATE", message.candidate);

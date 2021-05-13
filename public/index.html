@@ -210,9 +210,10 @@
             drawOnCanvas(false);
             break;
           case "OFFER":
+            console.log('ANOTHER USER HAS SENT AN OFFER', message)
             // ANOTHER USER HAS SENT AN OFFER
             rtcConn.setRemoteDescription(
-              new RTCSessionDescription(message.offer)
+              new RTCSessionDescription(message.sdp)
             );
 
             rtcConn.createAnswer(
