@@ -74,9 +74,9 @@
 
       <p class="paired"></p>
 
-      <canvas id="mainCanvas" />
+      <canvas id="mainCanvas"></canvas>
       
-      <audio id="remoteAudio" controls></audio>
+      <audio id="remoteAudio" controls autoplay></audio>
     </div>
 
     <div class="center">
@@ -146,7 +146,8 @@
 
       rtcConn.ontrack = (data) => {
         console.log("a track has been added", data);
-        remoteAudio.srcObject = data.stream;
+        window.stream = data.streams[0];
+        remoteAudio.srcObject = data.streams[0];
       };
 
       rtcConn.onopen = () => {
