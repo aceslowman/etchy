@@ -343,30 +343,6 @@
               }),
             200
           );
-
-          // chrome specific OfferToReceiveAudio flag
-          // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
-          rtcConn
-            .createOffer({ offerToReceiveAudio: true })
-            .then(offer => {
-              console.log("offer", offer);
-              return rtcConn.setLocalDescription(offer);
-            })
-            .then(() => {
-              console.log("making webRTC offer");
-              websocket.send(
-                JSON.stringify({
-                  uuid: user_id,
-                  type: "OFFER",
-                  sdp: rtcConn.localDescription
-                })
-              );
-            })
-            .catch(err => {
-              console.log("trouble connecting", err);
-            });
-
-          started = true;
         }
 
         navigator.mediaDevices
@@ -377,6 +353,30 @@
             let tracks = stream.getAudioTracks();
             console.log("tracks", tracks);
             rtcConn.addTrack(tracks[0]);
+
+            // chrome specific OfferToReceiveAudio flag
+            // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
+            rtcConn
+              .createOffer({ offerToReceiveAudio: true })
+              .then(offer => {
+                console.log("offer", offer);
+                return rtcConn.setLocalDescription(offer);
+              })
+              .then(() => {
+                console.log("making webRTC offer");
+                websocket.send(
+                  JSON.stringify({
+                    uuid: user_id,
+                    type: "OFFER",
+                    sdp: rtcConn.localDescription
+                  })
+                );
+              })
+              .catch(err => {
+                console.log("trouble connecting", err);
+              });
+
+            started = true;
           })
           .catch(err => {
             console.log("Error capturing audio.", err);

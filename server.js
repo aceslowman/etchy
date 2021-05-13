@@ -53,7 +53,7 @@ wss.on("connection", ws => {
         connections.set(id, { ...con, pitch: message.pitch });
         break;
       case "OFFER":
-        // console.log("OFFER", message.sdp);
+        console.log("OFFER", message.sdp);
         break;
       case "ANSWER":
         console.log("ANSWER");
@@ -177,13 +177,9 @@ function updateCount() {
 }
 
 function checkHttps(req, res, next){
-  // protocol check, if http, redirect to https
-  
   if(req.get('X-Forwarded-Proto').indexOf("https")!=-1){
-    console.log("https, yo")
     return next()
   } else {
-    console.log("just http")
     res.redirect('https://' + req.hostname + req.url);
   }
 }
