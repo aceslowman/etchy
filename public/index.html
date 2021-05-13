@@ -76,7 +76,7 @@
 
       <canvas id="mainCanvas"></canvas>
 
-      <audio id="remoteAudio"></audio>
+      <audio id="remoteAudio" controls autoplay></audio>
     </div>
 
     <div class="center">
@@ -196,19 +196,21 @@
               ".paired"
             ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
             paired = true;
-            console.log('localStream', localStream)
-            localStream.getAudioTracks().forEach(track => {
-              console.log('sending track', track)
-              // sendTrack = rtcConn.addTrack(track, localStream);
-              
-              rtcConn.addTrack(track, localStream);
-            });
+            console.log("localStream", localStream);
+
+            if (!sendTrack) {
+              localStream.getAudioTracks().forEach(track => {
+                sendTrack = rtcConn.addTrack(track, localStream);
+              });
+            }
+
             drawOnCanvas(true);
             break;
           case "UNPAIR":
             document.querySelector(".paired").innerText = `UNPAIRED!`;
             paired = false;
             rtcConn.removeTrack(sendTrack);
+            sendTrack = undefined;
             drawOnCanvas(false);
             break;
           case "OFFER":
@@ -259,7 +261,7 @@
           gain_node = audioContext.createGain();
           gain_node.connect(audioContext.destination);
 
-          gain_node.gain.setValueAtTime(0.0, audioContext.currentTime);
+          gain_node.gain.setValueAtTime(0.4, audioContext.currentTime);
 
           microphone_stream = audioContext.createMediaStreamSource(stream);
           microphone_stream.connect(gain_node);
@@ -269,9 +271,7 @@
             "./model/pitch-detection/crepe/",
             audioContext,
             stream,
-            () => {
-              drawOnCanvas();
-            }
+            () => drawOnCanvas()
           );
 
           // as pitches come in...
@@ -279,7 +279,6 @@
             () =>
               pitch.getPitch(function(err, frequency) {
                 document.querySelector(".pitch").innerText = frequency;
-                // if (frequency)
                 websocket.send(
                   JSON.stringify({
                     uuid: user_id,
@@ -297,12 +296,11 @@
           .then(stream => {
             startMicrophone(stream);
             document.querySelector(".microphone").innerText = "mic enabled!";
-          
+
             localStream = stream;
             audioelement.play();
-            stream.getAudioTracks().forEach(track => {
-              // track.enabled = false; // can't mute here, it stops ml5 from pitch detecting
-              // rtcConn.addTrack(track, stream);
+            localStream.getAudioTracks().forEach(track => {
+              sendTrack = rtcConn.addTrack(track, localStream);
             });
 
             rtcConn
