@@ -210,10 +210,10 @@
             drawOnCanvas(false);
             break;
           case "OFFER":
-            console.log('ANOTHER USER HAS SENT AN OFFER', message)
+            console.log('ANOTHER USER HAS SENT AN OFFER', data)
             // ANOTHER USER HAS SENT AN OFFER
             rtcConn.setRemoteDescription(
-              new RTCSessionDescription(message.sdp)
+              new RTCSessionDescription(data.sdp)
             );
 
             rtcConn.createAnswer(
@@ -222,7 +222,7 @@
 
                 websocket.send(
                   JSON.stringify({
-                    type: "answer",
+                    type: "ANSWER",
                     answer: answer
                   })
                 );
@@ -235,6 +235,10 @@
           case "ANSWER":
             // ANOTHER USER HAS ANSWERED YOUR OFFER
             console.log("ANSWER");
+            rtcConn.setRemoteDescription(
+              new RTCSessionDescription(data.sdp)
+            );
+            
             break;
           case "CANDIDATE":
             // ANOTHER USER HAS SENT AN ICE CANDIDATE

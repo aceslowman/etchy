@@ -58,32 +58,22 @@ wss.on("connection", ws => {
         connections.set(id, { ...con, pitch: message.pitch });
         break;
       case "OFFER":
-        console.log("OFFER", message.sdp);
+        console.log("OFFER", message);
         // send offer to all *other* peers
-        connections.forEach(con => {
-          if (con.uuid !== message.uuid) {
+        connections.forEach(con => {          
+          if (con.uuid !== message.uuid) {            
             con.socket.send(
-              // JSON.stringify({
-              //   type: "OFFER",
-              //   from: message.uuid,
-              //   sdp: message.
-              // })
               JSON.stringify(message)
             );
           }
         });
         break;
       case "ANSWER":
-        console.log("ANSWER");
+        console.log("ANSWER", message);
         // send answer to all *other* peers
         connections.forEach(con => {
           if (con.uuid !== message.uuid) {
             con.socket.send(
-              // JSON.stringify({
-              //   type: "OFFER",
-              //   from: message.uuid,
-              //   sdp: message.
-              // })
               JSON.stringify(message)
             );
           }
