@@ -212,9 +212,7 @@
           case "OFFER":
             console.log('ANOTHER USER HAS SENT AN OFFER', data)
             // ANOTHER USER HAS SENT AN OFFER
-            rtcConn.setRemoteDescription(
-              new RTCSessionDescription(data.sdp)
-            );
+            rtcConn.setRemoteDescription(data.offer);
 
             rtcConn.createAnswer(
               answer => {
@@ -222,6 +220,7 @@
 
                 websocket.send(
                   JSON.stringify({
+                    uuid: user_id,
                     type: "ANSWER",
                     answer: answer
                   })
@@ -234,7 +233,7 @@
             break;
           case "ANSWER":
             // ANOTHER USER HAS ANSWERED YOUR OFFER
-            console.log("ANSWER");
+            console.log("ANSWER", data);
             rtcConn.setRemoteDescription(
               new RTCSessionDescription(data.sdp)
             );
@@ -373,7 +372,7 @@
                   JSON.stringify({
                     uuid: user_id,
                     type: "OFFER",
-                    sdp: rtcConn.localDescription
+                    offer: rtcConn.localDescription
                   })
                 );
               })
