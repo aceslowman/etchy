@@ -139,22 +139,23 @@
       canvas.height = window.innerHeight;
       let audioContext, audioInput, microphoneStream, gainNode;
       let started = false;
+      
+      let conConfig = {
+        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+      };
 
       // ------------------------------------------------------------
       // setting up WebRTC
 
       // PUBLIC STUN SERVERS: https://gist.github.com/zziuni/3741933
-      let rtcConn = new RTCPeerConnection({
-        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
-      });
-
-      rtcConn.ontrack = data => {
+      
+      let handleOnTrack = data => {
         console.log("data", data);
         window.stream = data.streams[0];
         remoteAudio.srcObject = data.streams[0];
       };
-
-      rtcConn.onicecandidate = event => {
+      
+      let handleOnIceCandidate = event => {
         if (event.candidate) {
           websocket.send(
             JSON.stringify({
@@ -167,83 +168,105 @@
         }
       };
 
+      let rtcConn = new RTCPeerConnection(conConfig);
+      rtcConn.ontrack = handleOnTrack;
+      rtcConn.onicecandidate = handleOnIceCandidate;
+
       // ------------------------------------------------------------
       // setting up websocket
       let websocket = new FriendlyWebSocket({ path: "/" });
 
-      // when connection opens
+      let onReceivePair = data => {
+        document.querySelector(
+          ".paired"
+        ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
+        paired = true;
+        console.log("localStream", localStream);
+
+        if (!sendTrack) {
+          localStream.getAudioTracks().forEach(track => {
+            sendTrack = rtcConn.addTrack(track, localStream);
+          });
+        }
+
+        drawOnCanvas(true);
+      };
+
+      let onReceiveUnpair = data => {
+        document.querySelector(".paired").innerText = `UNPAIRED!`;
+        paired = false;
+        rtcConn.removeTrack(sendTrack);
+        sendTrack = undefined;
+        drawOnCanvas(false);
+      };
+
+      let onReceiveOffer = data => {
+        rtcConn.setRemoteDescription(new RTCSessionDescription(data.offer));
+        rtcConn
+          .createAnswer()
+          .then(answer => {
+            rtcConn.setLocalDescription(answer);
+            websocket.send(
+              JSON.stringify({
+                uuid: user_id,
+                type: "ANSWER",
+                answer: answer
+              })
+            );
+          })
+          .catch(err => console.log("ERR", err));
+      };
+
+      let onReceiveAnswer = data => {
+        rtcConn.setRemoteDescription(new RTCSessionDescription(data.answer));
+      };
+
+      let onReceiveCandidate = data => {
+        if (data.ice && rtcConn.localDescription && rtcConn.remoteDescription) {
+          rtcConn.addIceCandidate(data.ice).catch(e => {
+            console.log("Failure during addIceCandidate(): " + e.name, e);
+          });
+        }
+      };
+
+      let onReceiveCount = data => {
+        document.querySelector(
+          ".count"
+        ).innerText = `currently online: ${data.count}`;
+        document.querySelector(
+          ".peers"
+        ).innerText = `currently online: [${data.peers}]`;
+      };
+
+      // REGISTER when connection opens
       websocket.on("open", data => {
         user_id = guidGenerator();
         document.querySelector(".yourId").innerText = `your id: ${user_id}`;
         websocket.send(JSON.stringify({ type: "REGISTER", uuid: user_id }));
       });
 
-      // when server sends a message
+      // when signaling server sends a message
       websocket.on("message", data => {
         data = JSON.parse(event.data);
 
         switch (data.type) {
           case "COUNT":
-            document.querySelector(
-              ".count"
-            ).innerText = `currently online: ${data.count}`;
-            document.querySelector(
-              ".peers"
-            ).innerText = `currently online: [${data.peers}]`;
+            onReceiveCount(data);
             break;
           case "PAIR":
-            document.querySelector(
-              ".paired"
-            ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
-            paired = true;
-            console.log("localStream", localStream);
-
-            if (!sendTrack) {
-              localStream.getAudioTracks().forEach(track => {
-                sendTrack = rtcConn.addTrack(track, localStream);
-              });
-            }
-
-            drawOnCanvas(true);
+            onReceivePair(data);
             break;
           case "UNPAIR":
-            document.querySelector(".paired").innerText = `UNPAIRED!`;
-            paired = false;
-            rtcConn.removeTrack(sendTrack);
-            sendTrack = undefined;
-            drawOnCanvas(false);
+            onReceiveUnpair(data);
             break;
           case "OFFER":
-            rtcConn.setRemoteDescription(new RTCSessionDescription(data.offer));
-            rtcConn
-              .createAnswer()
-              .then(answer => {
-                rtcConn.setLocalDescription(answer);
-                websocket.send(
-                  JSON.stringify({
-                    uuid: user_id,
-                    type: "ANSWER",
-                    answer: answer
-                  })
-                );
-              })
-              .catch(err => console.log("ERR", err));
+            onReceiveOffer(data);
             break;
           case "ANSWER":
-            rtcConn.setRemoteDescription(
-              new RTCSessionDescription(data.answer)
-            );
+            onReceiveAnswer(data);
             break;
           case "CANDIDATE":
-            if (
-              data.ice &&
-              rtcConn.localDescription &&
-              rtcConn.remoteDescription
-            ) {
-              rtcConn.addIceCandidate(data.ice).catch(e => {
-                console.log("Failure during addIceCandidate(): " + e.name, e);
-              });
-            }
+            onReceiveCandidate(data);
             break;
           default:
             break;
@@ -298,6 +321,7 @@
             document.querySelector(".microphone").innerText = "mic enabled!";
 
             localStream = stream;
+          
             audioelement.play();
             localStream.getAudioTracks().forEach(track => {
               // rtcConn.addTrack(track, localStream);
