@@ -151,7 +151,7 @@ function checkForPairing() {
         );
       }
 
-      // otherwise, check unpaired
+    // otherwise, check unpaired
     } else if (con.pitch) {
       connections.forEach(_con => {
         // only check other connections (that are unpaired)
