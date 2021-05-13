@@ -300,7 +300,7 @@
             localStream = stream;
             audioelement.play();
             localStream.getAudioTracks().forEach(track => {
-              sendTrack = rtcConn.addTrack(track, localStream);
+              // rtcConn.addTrack(track, localStream);
             });
 
             rtcConn
