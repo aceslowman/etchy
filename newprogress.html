@@ -185,7 +185,9 @@
 
         if (!sendTrack) {
           localStream.getAudioTracks().forEach(track => {
-            sendTrack = peerConnections.get(data.pairWith).addTrack(track, localStream);
+            sendTrack = peerConnections
+              .get(data.pairWith)
+              .addTrack(track, localStream);
           });
         }
 
@@ -207,8 +209,10 @@
       };
 
       let onReceiveAnswer = data => {
-        console.log('receiving answer', data)
-        peerConnections.get(user_id).setRemoteDescription(new RTCSessionDescription(data.answer));
+        console.log("receiving answer", data);
+        peerConnections
+          .get(user_id)
+          .setRemoteDescription(new RTCSessionDescription(data.answer));
       };
 
       let sendOffer = sid => {
@@ -257,10 +261,17 @@
       };
 
       let onReceiveCandidate = data => {
-        if (data.ice && peerConnections.get(user_id).localDescription && peerConnections.get(user_id).remoteDescription) {
-          peerConnections.get(user_id).addIceCandidate(data.ice).catch(e => {
-            console.log("Failure during addIceCandidate(): " + e.name, e);
-          });
+        if (
+          data.ice &&
+          peerConnections.get(user_id).localDescription &&
+          peerConnections.get(user_id).remoteDescription
+        ) {
+          peerConnections
+            .get(user_id)
+            .addIceCandidate(data.ice)
+            .catch(e => {
+              console.log("Failure during addIceCandidate(): " + e.name, e);
+            });
         }
       };
 
@@ -315,57 +326,15 @@
         var AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
 
-        function startMicrophone(stream) {
-          gain_node = audioContext.createGain();
-          gain_node.connect(audioContext.destination);
-
-          gain_node.gain.setValueAtTime(0.4, audioContext.currentTime);
-
-          microphone_stream = audioContext.createMediaStreamSource(stream);
-          microphone_stream.connect(gain_node);
-
-          // set up pitch detection!
-          const pitch = ml5.pitchDetection(
-            "./model/pitch-detection/crepe/",
-            audioContext,
-            stream,
-            () => drawOnCanvas()
-          );
-
-          // as pitches come in...
-          setInterval(
-            () =>
-              pitch.getPitch(function(err, frequency) {
-                document.querySelector(".pitch").innerText = frequency;
-                websocket.send(
-                  JSON.stringify({
-                    uuid: user_id,
-                    type: "PITCH",
-                    pitch: frequency
-                  })
-                );
-              }),
-            200
-          );
-        }
-
         navigator.mediaDevices
           .getUserMedia({ audio: true, video: false })
           .then(stream => {
             startMicrophone(stream);
             document.querySelector(".microphone").innerText = "mic enabled!";
-
             localStream = stream;
-          
-          
             // set up your peer connection
             let myCon = createPeerConnection(user_id);
-
             audioelement.play();
-            localStream.getAudioTracks().forEach(track => {
-              // rtcConn.addTrack(track, localStream);
-            });
-
             sendOffer(user_id);
 
             started = true;
@@ -373,6 +342,40 @@
           .catch(err => {
             console.log("Error capturing audio.", err);
           });
+      }
+
+      function startMicrophone(stream) {
+        gain_node = audioContext.createGain();
+        gain_node.connect(audioContext.destination);
+
+        gain_node.gain.setValueAtTime(0.4, audioContext.currentTime);
+
+        microphone_stream = audioContext.createMediaStreamSource(stream);
+        microphone_stream.connect(gain_node);
+
+        // set up pitch detection!
+        const pitch = ml5.pitchDetection(
+          "./model/pitch-detection/crepe/",
+          audioContext,
+          stream,
+          () => drawOnCanvas()
+        );
+
+        // as pitches come in...
+        setInterval(
+          () =>
+            pitch.getPitch(function(err, frequency) {
+              document.querySelector(".pitch").innerText = frequency;
+              websocket.send(
+                JSON.stringify({
+                  uuid: user_id,
+                  type: "PITCH",
+                  pitch: frequency
+                })
+              );
+            }),
+          200
+        );
       }
 
       let createPeerConnection = uuid => {
@@ -430,7 +433,6 @@
       function onWindowResize(e) {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-
         drawOnCanvas();
       }
 
