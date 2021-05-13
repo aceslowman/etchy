@@ -148,6 +148,7 @@
       });
 
       rtcConn.ontrack = data => {
+        console.log('data', data)
         window.stream = data.streams[0];
         remoteAudio.srcObject = data.streams[0];
       };
@@ -240,8 +241,6 @@
               rtcConn.localDescription &&
               rtcConn.remoteDescription
             ) {
-              console.log("CANDIDATE", data);
-
               rtcConn.addIceCandidate(data.ice).catch(e => {
                 console.log("Failure during addIceCandidate(): " + e.name, e);
               });
@@ -274,7 +273,6 @@
             audioContext,
             stream,
             () => {
-              console.log("Model Loaded!");
               drawOnCanvas();
             }
           );
@@ -304,16 +302,14 @@
             startMicrophone(stream);
             document.querySelector(".microphone").innerText = "mic enabled!";
 
-            audioelement.play();
+            // audioelement.play();
             stream.getAudioTracks().forEach(track => {
               // track.enabled = false; // can't mute here, it stops ml5 from pitch detecting
               rtcConn.addTrack(track, stream);
             });
 
-            // chrome specific OfferToReceiveAudio flag
-            // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
             rtcConn
-              .createOffer({ offerToReceiveAudio: true })
+              .createOffer({ offerToReceiveAudio: true, voiceActivityDetection: false })
               .then(offer => rtcConn.setLocalDescription(offer))
               .then(() => {
                 websocket.send(
