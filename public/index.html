@@ -128,6 +128,7 @@
       }
 
       let user_id;
+      let paired = false;
       let canvas = document.getElementById("mainCanvas");
       let audioelement = document.getElementById("remoteAudio");
       let ctx = canvas.getContext("2d");
@@ -145,22 +146,8 @@
       });
 
       rtcConn.ontrack = (data) => {
-        console.log("a track has been added", data);
         window.stream = data.streams[0];
         remoteAudio.srcObject = data.streams[0];
-      };
-
-      rtcConn.onopen = () => {
-        console.log("Connected WEBRTC");
-      };
-
-      rtcConn.onerror = err => {
-        console.log("Got error", err);
-      };
-
-      rtcConn.onaddstream = stream => {
-        console.log("adding stream");
-        document.querySelector(".RTClog").innerText = "adding rtc stream...";
       };
 
       rtcConn.onicecandidate = event => {
@@ -205,11 +192,13 @@
             document.querySelector(
               ".paired"
             ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
+            paired = true;
             drawOnCanvas(true);
             break;
           case "UNPAIR":
             console.log("LOST OUR PAIRING", data.pair);
             document.querySelector(".paired").innerText = `UNPAIRED!`;
+            paired = false;
             drawOnCanvas(false);
             break;
           case "OFFER":
@@ -347,7 +336,7 @@
           });
       }
 
-      function drawOnCanvas(paired) {
+      function drawOnCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = "white";
         ctx.beginPath();
