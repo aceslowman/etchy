@@ -230,7 +230,11 @@
             break;
           case "CANDIDATE":
             // ANOTHER USER HAS SENT AN ICE CANDIDATE
-            if (data.ice && rtcConn.localDescription && rtcConn.remoteDescription) {
+            if (
+              data.ice &&
+              rtcConn.localDescription &&
+              rtcConn.remoteDescription
+            ) {
               console.log("CANDIDATE", data);
 
               rtcConn.addIceCandidate(data.ice).catch(e => {
@@ -345,13 +349,15 @@
         }
 
         navigator.mediaDevices
-          .getUserMedia({ audio: true })
+          .getUserMedia({ audio: true,  })
           .then(stream => {
             startMicrophone(stream);
             document.querySelector(".microphone").innerText = "mic enabled!";
-            let tracks = stream.getAudioTracks();
-            rtcConn.addTrack(tracks[0]);
-
+            
+            stream.getAudioTracks().forEach(track => {
+              rtcConn.addTrack(track);
+            });
+            
             // chrome specific OfferToReceiveAudio flag
             // https://stackoverflow.com/questions/27489881/webrtc-never-fires-onicecandidate/27758788#27758788
             rtcConn
