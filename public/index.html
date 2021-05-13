@@ -188,6 +188,31 @@
             sendTrack = rtcConn.addTrack(track, localStream);
           });
         }
+        
+        audioelement.play();
+            localStream.getAudioTracks().forEach(track => {
+              // rtcConn.addTrack(track, localStream);
+            });
+
+            rtcConn
+              .createOffer({
+                offerToReceiveAudio: true,
+                voiceActivityDetection: false
+              })
+              .then(offer => rtcConn.setLocalDescription(offer))
+              .then(() => {
+                websocket.send(
+                  JSON.stringify({
+                    uuid: user_id,
+                    type: "OFFER",
+                    offer: rtcConn.localDescription
+                  })
+                );
+              })
+              .catch(err => {
+                console.log("trouble making offer", err);
+              });
+
 
         drawOnCanvas(true);
       };
