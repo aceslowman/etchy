@@ -199,7 +199,9 @@
             console.log('localStream', localStream)
             localStream.getAudioTracks().forEach(track => {
               console.log('sending track', track)
-              sendTrack = rtcConn.addTrack(track, localStream);
+              // sendTrack = rtcConn.addTrack(track, localStream);
+              
+              rtcConn.addTrack(track, localStream);
             });
             drawOnCanvas(true);
             break;
@@ -293,10 +295,10 @@
         navigator.mediaDevices
           .getUserMedia({ audio: true, video: false })
           .then(stream => {
-            localStream = stream;
             startMicrophone(stream);
             document.querySelector(".microphone").innerText = "mic enabled!";
-
+          
+            localStream = stream;
             audioelement.play();
             stream.getAudioTracks().forEach(track => {
               // track.enabled = false; // can't mute here, it stops ml5 from pitch detecting
