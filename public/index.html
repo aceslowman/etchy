@@ -140,7 +140,7 @@
       let audioContext, audioInput, microphoneStream, gainNode;
       let started = false;
 
-      let conConfig = {
+      let PC_CONFIG = {
         iceServers: [{ url: "stun:stun.1.google.com:19302" }]
       };
 
@@ -149,13 +149,13 @@
 
       // PUBLIC STUN SERVERS: https://gist.github.com/zziuni/3741933
 
-      let handleOnTrack = data => {
+      let onAddStream = data => {
         console.log("data", data);
         window.stream = data.streams[0];
         remoteAudio.srcObject = data.streams[0];
       };
 
-      let handleOnIceCandidate = event => {
+      let onIceCandidate = event => {
         if (event.candidate) {
           websocket.send(
             JSON.stringify({
@@ -168,9 +168,9 @@
         }
       };
 
-      let rtcConn = new RTCPeerConnection(conConfig);
-      rtcConn.ontrack = handleOnTrack;
-      rtcConn.onicecandidate = handleOnIceCandidate;
+      // let rtcConn = new RTCPeerConnection(conConfig);
+      // rtcConn.ontrack = handleOnTrack;
+      // rtcConn.onicecandidate = handleOnIceCandidate;
 
       // ------------------------------------------------------------
       // setting up websocket
@@ -205,43 +205,55 @@
         peerConnections(data.uuid, newCon);
         newCon.setRemoteDescription(new RTCSessionDescription(data.offer));
         sendAnswer(data.uuid);
-        // newCon
-        //   .createAnswer()
-        //   .then(answer => {
-        //     newCon.setLocalDescription(answer);
-        //     websocket.send(
-        //       JSON.stringify({
-        //         uuid: user_id,
-        //         type: "ANSWER",
-        //         answer: answer
-        //       })
-        //     );
-        //   })
-        //   .catch(err => console.log("ERR", err));
       };
 
       let onReceiveAnswer = data => {
         rtcConn.setRemoteDescription(new RTCSessionDescription(data.answer));
       };
 
-      let sendAnswer = uuid => {
-        console.log("Send answer");
-        peers[sid].createAnswer().then(
-          sdp => setAndSendLocalDescription(sid, sdp),
-          error => {
-            console.error("Send answer failed: ", error);
-          }
-        );
+      let sendOffer = sid => {
+        console.log("Sending offer");
+        peerConnections
+          .get(sid)
+          .createOffer({
+            offerToReceiveAudio: true,
+            voiceActivityDetection: false
+          })
+          .then(offer => peerConnections.get(sid).setLocalDescription(offer))
+          .then(() => {
+            websocket.send(
+              JSON.stringify({
+                uuid: user_id,
+                type: "OFFER",
+                offer: peerConnections.get(sid).localDescription
+              })
+            );
+          })
+          .catch(err => {
+            console.log("trouble making offer", err);
+          });
       };
 
-      let setAndSendLocalDescription = (sid, sessionDescription) => {
-        peers[sid].setLocalDescription(sessionDescription);
-        console.log("Local description set");
-        sendData({
-          sid,
-          type: sessionDescription.type,
-          sdp: sessionDescription.sdp
-        });
+      let sendAnswer = sid => {
+        console.log("Sending answer");
+        peerConnections
+          .get(sid)
+          .createAnswer()
+          .then(
+            sdp => {
+              peerConnections.get(sid).setLocalDescription(answer);
+              websocket.send(
+                JSON.stringify({
+                  uuid: sid,
+                  type: "ANSWER",
+                  answer: answer
+                })
+              );
+            },
+            error => {
+              console.error("Send answer failed: ", error);
+            }
+          );
       };
 
       let onReceiveCandidate = data => {
@@ -344,30 +356,17 @@
             document.querySelector(".microphone").innerText = "mic enabled!";
 
             localStream = stream;
+          
+          
+            // set up your peer connection
+            let myCon = createPeerConnection(user_id);
 
             audioelement.play();
             localStream.getAudioTracks().forEach(track => {
               // rtcConn.addTrack(track, localStream);
             });
 
-            rtcConn
-              .createOffer({
-                offerToReceiveAudio: true,
-                voiceActivityDetection: false
-              })
-              .then(offer => rtcConn.setLocalDescription(offer))
-              .then(() => {
-                websocket.send(
-                  JSON.stringify({
-                    uuid: user_id,
-                    type: "OFFER",
-                    offer: rtcConn.localDescription
-                  })
-                );
-              })
-              .catch(err => {
-                console.log("trouble making offer", err);
-              });
+            sendOffer(user_id);
 
             started = true;
           })
