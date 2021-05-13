@@ -182,13 +182,7 @@
 
       // when server sends a message
       websocket.on("message", data => {
-        // console.log("message:", data);
-
-        try {
-          data = JSON.parse(event.data);
-        } catch (e) {
-          console.warn("invalid message from server", data);
-        }
+        data = JSON.parse(event.data);
 
         switch (data.type) {
           case "COUNT":
@@ -216,22 +210,17 @@
             // ANOTHER USER HAS SENT AN OFFER
             rtcConn.setRemoteDescription(data.offer);
 
-            rtcConn.createAnswer(
-              answer => {
+            rtcConn
+              .createAnswer()
+              .then(answer => {
                 rtcConn.setLocalDescription(answer);
-
-                websocket.send(
-                  JSON.stringify({
-                    uuid: user_id,
-                    type: "ANSWER",
-                    answer: answer
-                  })
-                );
-              },
-              error => {
-                alert("oops...error");
-              }
-            );
+                JSON.stringify({
+                  uuid: user_id,
+                  type: "ANSWER",
+                  answer: answer
+                });
+              })
+              .then(err => console.log("ERR", err));
             break;
           case "ANSWER":
             // ANOTHER USER HAS ANSWERED YOUR OFFER
@@ -243,7 +232,7 @@
             break;
           case "CANDIDATE":
             // ANOTHER USER HAS SENT AN ICE CANDIDATE
-            if (rtcConn.localDescription) {
+            if (rtcConn.localDescription && rtcConn.remoteDescription) {
               console.log("CANDIDATE", data);
 
               rtcConn.addIceCandidate(data.ice).catch(e => {
@@ -321,7 +310,7 @@
           gain_node = audioContext.createGain();
           gain_node.connect(audioContext.destination);
 
-          gain_node.gain.setValueAtTime(0.0, audioContext.currentTime); // TEMP: muted
+          gain_node.gain.setValueAtTime(0.3, audioContext.currentTime); // TEMP: muted
 
           microphone_stream = audioContext.createMediaStreamSource(stream);
           microphone_stream.connect(gain_node);
