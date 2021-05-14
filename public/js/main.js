@@ -2,7 +2,8 @@
 
 let user_id = guidGenerator();
 let paired = false;
-let peerConnections = [];
+let peers = {};
+let pendingCandidates = {};
 
 let localStream;
 let sendTrack;
@@ -43,10 +44,45 @@ rtcConn.ontrack = handleOnTrack;
 rtcConn.onicecandidate = handleOnIceCandidate;
 
 // ------------------------------------------------------------
-// setting up websocket
-let websocket = new FriendlyWebSocket({ path: "/" });
+// setting up websocket signaling server
+const websocket = new FriendlyWebSocket({ path: "/" });
 
-let onReceivePair = data => {
+let createPeerConnection = () => {
+  const pc = new RTCPeerConnection(conConfig);
+  pc.onicecandidate = onIceCandidate;
+  pc.onaddstream = onAddStream;
+  pc.addStream(localStream);
+  console.log("PeerConnection created");
+  return pc;
+};
+
+let sendOffer = sid => {
+  console.log("Send offer");
+  peers[sid].createOffer().then(
+    sdp => setAndSendLocalDescription(sid, sdp),
+    error => {
+      console.error("Send offer failed: ", error);
+    }
+  );
+};
+
+let sendAnswer = sid => {
+  console.log("Send answer");
+  peers[sid].createAnswer().then(
+    sdp => setAndSendLocalDescription(sid, sdp),
+    error => {
+      console.error("Send answer failed: ", error);
+    }
+  );
+};
+
+const setAndSendLocalDescription = (sid, sessionDescription) => {
+  peers[sid].setLocalDescription(sessionDescription);
+  console.log("Local description set");
+  send({ sid, type: sessionDescription.type, sdp: sessionDescription.sdp });
+};
+
+const onReceivePair = data => {
   document.querySelector(
     ".paired"
   ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
@@ -84,7 +120,7 @@ let onReceivePair = data => {
   drawOnCanvas(true);
 };
 
-let onReceiveUnpair = data => {
+const onReceiveUnpair = data => {
   document.querySelector(".paired").innerText = `UNPAIRED!`;
   paired = false;
   rtcConn.removeTrack(sendTrack);
@@ -92,7 +128,7 @@ let onReceiveUnpair = data => {
   drawOnCanvas(false);
 };
 
-let onReceiveOffer = data => {
+const onReceiveOffer = data => {
   rtcConn.setRemoteDescription(new RTCSessionDescription(data.offer));
   rtcConn
     .createAnswer()
@@ -107,11 +143,11 @@ let onReceiveOffer = data => {
     .catch(err => console.log("ERR", err));
 };
 
-let onReceiveAnswer = data => {
+const onReceiveAnswer = data => {
   rtcConn.setRemoteDescription(new RTCSessionDescription(data.answer));
 };
 
-let onReceiveCandidate = data => {
+const onReceiveCandidate = data => {
   if (data.ice && rtcConn.localDescription && rtcConn.remoteDescription) {
     rtcConn.addIceCandidate(data.ice).catch(e => {
       console.log("Failure during addIceCandidate(): " + e.name, e);
@@ -119,7 +155,7 @@ let onReceiveCandidate = data => {
   }
 };
 
-let onReceiveCount = data => {
+const onReceiveCount = data => {
   document.querySelector(
     ".count"
   ).innerText = `currently online: ${data.count}`;
@@ -162,11 +198,11 @@ websocket.on("message", data => {
   }
 });
 
-function send(data) {
+const send = data => {
   websocket.send(JSON.stringify(data));
-}
+};
 
-function init() {
+const init = () => {
   if (started) return;
   document.querySelector(".center").innerText = "";
 
@@ -174,13 +210,13 @@ function init() {
   audioContext = new AudioContext();
 
   function startMicrophone(stream) {
-    gain_node = audioContext.createGain();
-    gain_node.connect(audioContext.destination);
+    gainNode = audioContext.createGain();
+    gainNode.connect(audioContext.destination);
 
-    gain_node.gain.setValueAtTime(0.4, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
 
-    microphone_stream = audioContext.createMediaStreamSource(stream);
-    microphone_stream.connect(gain_node);
+    microphoneStream = audioContext.createMediaStreamSource(stream);
+    microphoneStream.connect(gainNode);
 
     // set up pitch detection!
     const pitch = ml5.pitchDetection(
@@ -238,9 +274,9 @@ function init() {
     .catch(err => {
       console.log("Error capturing audio.", err);
     });
-}
+};
 
-function drawOnCanvas() {
+const drawOnCanvas = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.strokeStyle = "white";
   ctx.beginPath();
@@ -264,13 +300,13 @@ function drawOnCanvas() {
     ctx.lineTo(canvas.width / 2, canvas.height);
     ctx.stroke();
   }
-}
+};
 
-function onWindowResize(e) {
+const onWindowResize = e => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   drawOnCanvas();
-}
+};
 
 drawOnCanvas();
 
