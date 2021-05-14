@@ -217,6 +217,7 @@ const send = data => {
 
 const init = () => {
   if (started) return;
+
   document.querySelector(".center").innerText = "";
 
   var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -262,10 +263,8 @@ const init = () => {
 
       localStream = stream;
 
-      audioelement.play();
-      localStream.getAudioTracks().forEach(track => {
-        // rtcConn.addTrack(track, localStream);
-      });
+      // initial connection
+      peers[user_id] = createPeerConnection();
 
       sendOffer();
 
