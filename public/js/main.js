@@ -1,6 +1,6 @@
-/* global FriendlyWebSocket, ml5 */
+/* global FriendlyWebSocket, ml5, guidGenerator */
 
-let user_id;
+let user_id = guidGenerator();
 let paired = false;
 let peerConnections = [];
 
@@ -29,12 +29,10 @@ let handleOnTrack = data => {
 
 let handleOnIceCandidate = event => {
   if (event.candidate) {
-    websocket.send(
-      JSON.stringify({
-        type: "CANDIDATE",
-        ice: event.candidate
-      })
-    );
+    send({
+      type: "CANDIDATE",
+      ice: event.candidate
+    });
   } else {
     console.log("All ICE candidates have been sent");
   }
@@ -52,8 +50,8 @@ let onReceivePair = data => {
   document.querySelector(
     ".paired"
   ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
+
   paired = true;
-  console.log("localStream", localStream);
 
   if (!sendTrack) {
     localStream.getAudioTracks().forEach(track => {
@@ -73,13 +71,11 @@ let onReceivePair = data => {
     })
     .then(offer => rtcConn.setLocalDescription(offer))
     .then(() => {
-      websocket.send(
-        JSON.stringify({
-          uuid: user_id,
-          type: "OFFER",
-          offer: rtcConn.localDescription
-        })
-      );
+      send({
+        uuid: user_id,
+        type: "OFFER",
+        offer: rtcConn.localDescription
+      });
     })
     .catch(err => {
       console.log("trouble making offer", err);
@@ -102,13 +98,11 @@ let onReceiveOffer = data => {
     .createAnswer()
     .then(answer => {
       rtcConn.setLocalDescription(answer);
-      websocket.send(
-        JSON.stringify({
-          uuid: user_id,
-          type: "ANSWER",
-          answer: answer
-        })
-      );
+      send({
+        uuid: user_id,
+        type: "ANSWER",
+        answer: answer
+      });
     })
     .catch(err => console.log("ERR", err));
 };
@@ -136,9 +130,8 @@ let onReceiveCount = data => {
 
 // REGISTER when connection opens
 websocket.on("open", data => {
-  user_id = guidGenerator();
   document.querySelector(".yourId").innerText = `your id: ${user_id}`;
-  websocket.send(JSON.stringify({ type: "REGISTER", uuid: user_id }));
+  send({ type: "REGISTER", uuid: user_id });
 });
 
 // when signaling server sends a message
@@ -169,6 +162,10 @@ websocket.on("message", data => {
   }
 });
 
+function send(data) {
+  websocket.send(JSON.stringify(data));
+}
+
 function init() {
   if (started) return;
   document.querySelector(".center").innerText = "";
@@ -198,13 +195,11 @@ function init() {
       () =>
         pitch.getPitch(function(err, frequency) {
           document.querySelector(".pitch").innerText = frequency;
-          websocket.send(
-            JSON.stringify({
-              uuid: user_id,
-              type: "PITCH",
-              pitch: frequency
-            })
-          );
+          send({
+            uuid: user_id,
+            type: "PITCH",
+            pitch: frequency
+          });
         }),
       200
     );
@@ -229,18 +224,14 @@ function init() {
           voiceActivityDetection: false
         })
         .then(offer => rtcConn.setLocalDescription(offer))
-        .then(() => {
-          websocket.send(
-            JSON.stringify({
-              uuid: user_id,
-              type: "OFFER",
-              offer: rtcConn.localDescription
-            })
-          );
-        })
-        .catch(err => {
-          console.log("trouble making offer", err);
-        });
+        .then(() =>
+          send({
+            uuid: user_id,
+            type: "OFFER",
+            offer: rtcConn.localDescription
+          })
+        )
+        .catch(err => console.log("trouble making offer", err));
 
       started = true;
     })
