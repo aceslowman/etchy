@@ -42,7 +42,7 @@ wss.on("connection", ws => {
     let message = JSON.parse(m);
 
     switch (message.type) {
-      case "REGISTER":
+      case "register":
         console.log("registering user", message.uuid);
         id = message.uuid;
         connections.set(id, {
@@ -53,11 +53,11 @@ wss.on("connection", ws => {
         });
         updateCount();
         break;
-      case "PITCH":
+      case "pitch":
         let con = connections.get(id);
         connections.set(id, { ...con, pitch: message.pitch });
         break;
-      case "OFFER":
+      case "offer":
         console.log("OFFER", message);
         // send offer to all *other* peers
         connections.forEach(con => {          
@@ -68,7 +68,7 @@ wss.on("connection", ws => {
           }
         });
         break;
-      case "ANSWER":
+      case "answer":
         console.log("ANSWER", message);
         // send answer to all *other* peers
         connections.forEach(con => {
@@ -79,7 +79,7 @@ wss.on("connection", ws => {
           }
         });        
         break;
-      case "CANDIDATE":
+      case "candidate":
         console.log("CANDIDATE", message);
         // send answer to all *other* peers
         connections.forEach(con => {

@@ -23,31 +23,31 @@ let conConfig = {
 // setting up WebRTC
 // PUBLIC STUN SERVERS: https://gist.github.com/zziuni/3741933
 
-let handleOnTrack = data => {
-  window.stream = data.streams[0];
-  audioelement.srcObject = data.streams[0];
-};
+// let handleOnTrack = data => {
+//   window.stream = data.streams[0];
+//   audioelement.srcObject = data.streams[0];
+// };
 
-let handleOnIceCandidate = event => {
-  if (event.candidate) {
-    send({
-      type: "CANDIDATE",
-      ice: event.candidate
-    });
-  } else {
-    console.log("All ICE candidates have been sent");
-  }
-};
+// let handleOnIceCandidate = event => {
+//   if (event.candidate) {
+//     send({
+//       type: "CANDIDATE",
+//       ice: event.candidate
+//     });
+//   } else {
+//     console.log("All ICE candidates have been sent");
+//   }
+// };
 
-let rtcConn = new RTCPeerConnection(conConfig);
-rtcConn.ontrack = handleOnTrack;
-rtcConn.onicecandidate = handleOnIceCandidate;
+// let rtcConn = new RTCPeerConnection(conConfig);
+// rtcConn.ontrack = handleOnTrack;
+// rtcConn.onicecandidate = handleOnIceCandidate;
 
 // ------------------------------------------------------------
 // setting up websocket signaling server
 const websocket = new FriendlyWebSocket({ path: "/" });
 
-let createPeerConnection = () => {
+const createPeerConnection = () => {
   const pc = new RTCPeerConnection(conConfig);
   pc.onicecandidate = onIceCandidate;
   pc.onaddstream = onAddStream;
@@ -56,7 +56,7 @@ let createPeerConnection = () => {
   return pc;
 };
 
-let sendOffer = sid => {
+const sendOffer = sid => {
   console.log("Send offer");
   peers[sid].createOffer().then(
     sdp => setAndSendLocalDescription(sid, sdp),
@@ -66,7 +66,7 @@ let sendOffer = sid => {
   );
 };
 
-let sendAnswer = sid => {
+const sendAnswer = sid => {
   console.log("Send answer");
   peers[sid].createAnswer().then(
     sdp => setAndSendLocalDescription(sid, sdp),
@@ -82,6 +82,34 @@ const setAndSendLocalDescription = (sid, sessionDescription) => {
   send({ sid, type: sessionDescription.type, sdp: sessionDescription.sdp });
 };
 
+const onIceCandidate = event => {
+  if (event.candidate) {
+    console.log("ICE candidate", event.candidate);
+    send({
+      type: "CANDIDATE",
+      candidate: event.candidate
+    });
+  } else {
+    console.log("All ICE candidates have been sent");
+  }
+};
+
+const onAddStream = event => {
+  console.log("Add stream");
+  const newRemoteStreamElem = document.createElement("video");
+  newRemoteStreamElem.autoplay = true;
+  newRemoteStreamElem.srcObject = event.stream;
+  document.querySelector("#remoteStreams").appendChild(newRemoteStreamElem);
+};
+
+const addPendingCandidates = sid => {
+  if (sid in pendingCandidates) {
+    pendingCandidates[sid].forEach(candidate => {
+      peers[sid].addIceCandidate(new RTCIceCandidate(candidate));
+    });
+  }
+};
+
 const onReceivePair = data => {
   document.querySelector(
     ".paired"
@@ -91,7 +119,7 @@ const onReceivePair = data => {
 
   if (!sendTrack) {
     localStream.getAudioTracks().forEach(track => {
-      sendTrack = rtcConn.addTrack(track, localStream);
+      // sendTrack = rtcConn.addTrack(track, localStream);
     });
   }
 
@@ -99,23 +127,8 @@ const onReceivePair = data => {
   localStream.getAudioTracks().forEach(track => {
     // rtcConn.addTrack(track, localStream);
   });
-
-  rtcConn
-    .createOffer({
-      offerToReceiveAudio: true,
-      voiceActivityDetection: false
-    })
-    .then(offer => rtcConn.setLocalDescription(offer))
-    .then(() => {
-      send({
-        uuid: user_id,
-        type: "OFFER",
-        offer: rtcConn.localDescription
-      });
-    })
-    .catch(err => {
-      console.log("trouble making offer", err);
-    });
+  
+  sendOffer(user_id);
 
   drawOnCanvas(true);
 };
@@ -123,35 +136,30 @@ const onReceivePair = data => {
 const onReceiveUnpair = data => {
   document.querySelector(".paired").innerText = `UNPAIRED!`;
   paired = false;
-  rtcConn.removeTrack(sendTrack);
+  peers[data.sid].removeTrack(sendTrack);
   sendTrack = undefined;
   drawOnCanvas(false);
 };
 
 const onReceiveOffer = data => {
-  rtcConn.setRemoteDescription(new RTCSessionDescription(data.offer));
-  rtcConn
-    .createAnswer()
-    .then(answer => {
-      rtcConn.setLocalDescription(answer);
-      send({
-        uuid: user_id,
-        type: "ANSWER",
-        answer: answer
-      });
-    })
-    .catch(err => console.log("ERR", err));
+  peers[data.uuid] = createPeerConnection();
+  peers[data.uuid].setRemoteDescription(new RTCSessionDescription(data));
+  sendAnswer(data.uuid);
+  addPendingCandidates(data.uuid);
 };
 
 const onReceiveAnswer = data => {
-  rtcConn.setRemoteDescription(new RTCSessionDescription(data.answer));
+  peers[data.sid].setRemoteDescription(new RTCSessionDescription(data));
 };
 
 const onReceiveCandidate = data => {
-  if (data.ice && rtcConn.localDescription && rtcConn.remoteDescription) {
-    rtcConn.addIceCandidate(data.ice).catch(e => {
-      console.log("Failure during addIceCandidate(): " + e.name, e);
-    });
+  if (data.sid in peers) {
+    peers[data.sid].addIceCandidate(data.ice);
+  } else {
+    if (!(data.sid in pendingCandidates)) {
+      pendingCandidates[data.sid] = [];
+    }
+    pendingCandidates[data.sid].push(data.candidate);
   }
 };
 
