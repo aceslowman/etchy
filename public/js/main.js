@@ -91,7 +91,7 @@ const onIceCandidate = event => {
   if (event.candidate) {
     console.log("ICE candidate", event.candidate);
     send({
-      type: "CANDIDATE",
+      type: "candidate",
       candidate: event.candidate
     });
   } else {
@@ -169,6 +169,7 @@ const onReceiveCandidate = data => {
 };
 
 const onReceiveCount = data => {
+  console.log('data',data)
   document.querySelector(
     ".count"
   ).innerText = `currently online: ${data.count}`;

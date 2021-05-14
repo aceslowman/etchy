@@ -166,7 +166,7 @@ function checkForPairing() {
             //A
             con.socket.send(
               JSON.stringify({
-                type: "PAIR",
+                type: "pair",
                 pairWith: _con.sid,
                 pair: [
                   { sid: con.sid, pitch: a },
@@ -178,7 +178,7 @@ function checkForPairing() {
             //B
             _con.socket.send(
               JSON.stringify({
-                type: "PAIR",
+                type: "pair",
                 pairWith: con.sid,
                 pair: [
                   { sid: con.sid, pitch: a },
@@ -197,9 +197,9 @@ function updateCount() {
   connections.forEach(con => {
     con.socket.send(
       JSON.stringify({
-        type: "COUNT",
+        type: "count",
         count: connections.size,
-        peers: Array.from(connections.values()).map(e => e.uuid)
+        peers: Array.from(connections.values()).map(e => e.sid)
       })
     );
   });
