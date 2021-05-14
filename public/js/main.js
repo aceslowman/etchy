@@ -58,12 +58,17 @@ const createPeerConnection = () => {
 
 const sendOffer = sid => {
   console.log("Send offer");
-  peers[sid].createOffer().then(
-    sdp => setAndSendLocalDescription(sid, sdp),
-    error => {
-      console.error("Send offer failed: ", error);
-    }
-  );
+  peers[sid]
+    .createOffer({
+      offerToReceiveAudio: true,
+      voiceActivityDetection: false
+    })
+    .then(
+      sdp => setAndSendLocalDescription(sid, sdp),
+      error => {
+        console.error("Send offer failed: ", error);
+      }
+    );
 };
 
 const sendAnswer = sid => {
@@ -127,7 +132,7 @@ const onReceivePair = data => {
   localStream.getAudioTracks().forEach(track => {
     // rtcConn.addTrack(track, localStream);
   });
-  
+
   sendOffer(user_id);
 
   drawOnCanvas(true);
@@ -142,10 +147,10 @@ const onReceiveUnpair = data => {
 };
 
 const onReceiveOffer = data => {
-  peers[data.uuid] = createPeerConnection();
-  peers[data.uuid].setRemoteDescription(new RTCSessionDescription(data));
-  sendAnswer(data.uuid);
-  addPendingCandidates(data.uuid);
+  peers[data.sid] = createPeerConnection();
+  peers[data.sid].setRemoteDescription(new RTCSessionDescription(data));
+  sendAnswer(data.sid);
+  addPendingCandidates(data.sid);
 };
 
 const onReceiveAnswer = data => {
@@ -175,7 +180,7 @@ const onReceiveCount = data => {
 // REGISTER when connection opens
 websocket.on("open", data => {
   document.querySelector(".yourId").innerText = `your id: ${user_id}`;
-  send({ type: "REGISTER", uuid: user_id });
+  send({ type: "REGISTER", sid: user_id });
 });
 
 // when signaling server sends a message
@@ -240,7 +245,7 @@ const init = () => {
         pitch.getPitch(function(err, frequency) {
           document.querySelector(".pitch").innerText = frequency;
           send({
-            uuid: user_id,
+            sid: user_id,
             type: "PITCH",
             pitch: frequency
           });
@@ -262,20 +267,7 @@ const init = () => {
         // rtcConn.addTrack(track, localStream);
       });
 
-      rtcConn
-        .createOffer({
-          offerToReceiveAudio: true,
-          voiceActivityDetection: false
-        })
-        .then(offer => rtcConn.setLocalDescription(offer))
-        .then(() =>
-          send({
-            uuid: user_id,
-            type: "OFFER",
-            offer: rtcConn.localDescription
-          })
-        )
-        .catch(err => console.log("trouble making offer", err));
+      sendOffer();
 
       started = true;
     })

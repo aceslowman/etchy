@@ -43,10 +43,10 @@ wss.on("connection", ws => {
 
     switch (message.type) {
       case "register":
-        console.log("registering user", message.uuid);
-        id = message.uuid;
+        console.log("registering user", message.sid);
+        id = message.sid;
         connections.set(id, {
-          uuid: id,
+          sid: id,
           socket: ws,
           pitch: 0,
           pairedWith: null
@@ -61,7 +61,7 @@ wss.on("connection", ws => {
         console.log("OFFER", message);
         // send offer to all *other* peers
         connections.forEach(con => {          
-          if (con.uuid !== message.uuid) {            
+          if (con.sid !== message.sid) {            
             con.socket.send(
               JSON.stringify(message)
             );
@@ -72,7 +72,7 @@ wss.on("connection", ws => {
         console.log("ANSWER", message);
         // send answer to all *other* peers
         connections.forEach(con => {
-          if (con.uuid !== message.uuid) {
+          if (con.sid !== message.sid) {
             con.socket.send(
               JSON.stringify(message)
             );
@@ -83,7 +83,7 @@ wss.on("connection", ws => {
         console.log("CANDIDATE", message);
         // send answer to all *other* peers
         connections.forEach(con => {
-          if (con.uuid !== message.uuid) {
+          if (con.sid !== message.sid) {
             con.socket.send(
               JSON.stringify(message)
             );
@@ -137,14 +137,14 @@ function checkForPairing() {
         //A
         conA.socket.send(
           JSON.stringify({
-            type: "UNPAIR"
+            type: "pair"
           })
         );
 
         //B
         conB.socket.send(
           JSON.stringify({
-            type: "UNPAIR"
+            type: "unpair"
           })
         );
       }
@@ -153,24 +153,24 @@ function checkForPairing() {
     } else if (con.pitch) {
       connections.forEach(_con => {
         // only check other connections (that are unpaired)
-        if (_con.uuid !== con.uuid && _con.pitch && _con.pairedWith === null) {
+        if (_con.sid !== con.sid && _con.pitch && _con.pairedWith === null) {
           let b = _con.pitch;
           let diff = Math.abs(b - a);
           let match = diff < tolerance;
 
           if (match) {
             // mark both as paired...
-            con.pairedWith = _con.uuid;
-            _con.pairedWith = con.uuid;
+            con.pairedWith = _con.sid;
+            _con.pairedWith = con.sid;
 
             //A
             con.socket.send(
               JSON.stringify({
                 type: "PAIR",
-                pairWith: _con.uuid,
+                pairWith: _con.sid,
                 pair: [
-                  { uuid: con.uuid, pitch: a },
-                  { uuid: _con.uuid, pitch: b }
+                  { sid: con.sid, pitch: a },
+                  { sid: _con.sid, pitch: b }
                 ]
               })
             );
@@ -179,10 +179,10 @@ function checkForPairing() {
             _con.socket.send(
               JSON.stringify({
                 type: "PAIR",
-                pairWith: con.uuid,
+                pairWith: con.sid,
                 pair: [
-                  { uuid: con.uuid, pitch: a },
-                  { uuid: _con.uuid, pitch: b }
+                  { sid: con.sid, pitch: a },
+                  { sid: _con.sid, pitch: b }
                 ]
               })
             );
