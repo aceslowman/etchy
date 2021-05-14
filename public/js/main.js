@@ -180,7 +180,7 @@ const onReceiveCount = data => {
 // REGISTER when connection opens
 websocket.on("open", data => {
   document.querySelector(".yourId").innerText = `your id: ${user_id}`;
-  send({ type: "REGISTER", sid: user_id });
+  send({ type: "register", sid: user_id });
 });
 
 // when signaling server sends a message
@@ -188,22 +188,22 @@ websocket.on("message", data => {
   data = JSON.parse(event.data);
 
   switch (data.type) {
-    case "COUNT":
+    case "count":
       onReceiveCount(data);
       break;
-    case "PAIR":
+    case "pair":
       onReceivePair(data);
       break;
-    case "UNPAIR":
+    case "unpair":
       onReceiveUnpair(data);
       break;
-    case "OFFER":
+    case "offer":
       onReceiveOffer(data);
       break;
-    case "ANSWER":
+    case "answer":
       onReceiveAnswer(data);
       break;
-    case "CANDIDATE":
+    case "candidate":
       onReceiveCandidate(data);
       break;
     default:
@@ -247,7 +247,7 @@ const init = () => {
           document.querySelector(".pitch").innerText = frequency;
           send({
             sid: user_id,
-            type: "PITCH",
+            type: "pitch",
             pitch: frequency
           });
         }),
@@ -266,7 +266,7 @@ const init = () => {
       // initial connection
       peers[user_id] = createPeerConnection();
 
-      sendOffer();
+      sendOffer(user_id);
 
       started = true;
     })
