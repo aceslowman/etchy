@@ -8,40 +8,14 @@ let pendingCandidates = {};
 let localStream;
 let sendTrack;
 let canvas = document.getElementById("mainCanvas");
-let audioelement = document.getElementById("remoteAudio");
 let ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-let audioContext, audioInput, microphoneStream, gainNode;
 let started = false;
 
 let conConfig = {
   iceServers: [{ url: "stun:stun.1.google.com:19302" }]
 };
-
-// ------------------------------------------------------------
-// setting up WebRTC
-// PUBLIC STUN SERVERS: https://gist.github.com/zziuni/3741933
-
-// let handleOnTrack = data => {
-//   window.stream = data.streams[0];
-//   audioelement.srcObject = data.streams[0];
-// };
-
-// let handleOnIceCandidate = event => {
-//   if (event.candidate) {
-//     send({
-//       type: "CANDIDATE",
-//       ice: event.candidate
-//     });
-//   } else {
-//     console.log("All ICE candidates have been sent");
-//   }
-// };
-
-// let rtcConn = new RTCPeerConnection(conConfig);
-// rtcConn.ontrack = handleOnTrack;
-// rtcConn.onicecandidate = handleOnIceCandidate;
 
 // ------------------------------------------------------------
 // setting up websocket signaling server
@@ -59,10 +33,7 @@ const createPeerConnection = () => {
 const sendOffer = sid => {
   console.log("Send offer");
   peers[sid]
-    .createOffer({
-      offerToReceiveAudio: true,
-      voiceActivityDetection: false
-    })
+    .createOffer()
     .then(
       sdp => setAndSendLocalDescription(sid, sdp),
       error => {
@@ -221,47 +192,10 @@ const init = () => {
 
   document.querySelector(".center").innerText = "";
 
-  var AudioContext = window.AudioContext || window.webkitAudioContext;
-  audioContext = new AudioContext();
-
-  function startMicrophone(stream) {
-    gainNode = audioContext.createGain();
-    gainNode.connect(audioContext.destination);
-
-    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
-
-    microphoneStream = audioContext.createMediaStreamSource(stream);
-    microphoneStream.connect(gainNode);
-
-    // set up pitch detection!
-    const pitch = ml5.pitchDetection(
-      "./model/pitch-detection/crepe/",
-      audioContext,
-      stream,
-      () => drawOnCanvas()
-    );
-
-    // as pitches come in...
-    setInterval(
-      () =>
-        pitch.getPitch(function(err, frequency) {
-          document.querySelector(".pitch").innerText = frequency;
-          send({
-            sid: user_id,
-            type: "pitch",
-            pitch: frequency
-          });
-        }),
-      200
-    );
-  }
-
   navigator.mediaDevices
-    .getUserMedia({ audio: true, video: false })
+    .getUserMedia({ audio: false, video: true })
     .then(stream => {
-      startMicrophone(stream);
-      document.querySelector(".microphone").innerText = "mic enabled!";
-
+      console.log('got user media', stream);
       localStream = stream;
 
       // initial connection
@@ -272,34 +206,12 @@ const init = () => {
       started = true;
     })
     .catch(err => {
-      console.log("Error capturing audio.", err);
+      console.log("Error capturing stream.", err);
     });
 };
 
 const drawOnCanvas = () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.strokeStyle = "white";
-  ctx.beginPath();
-  ctx.save();
-  if (!paired) ctx.setLineDash([1, 3]);
-  ctx.ellipse(canvas.width / 2, canvas.height / 2, 50, 50, 0, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.strokeStyle = "white";
-  ctx.moveTo(canvas.width / 2, 0);
-  ctx.lineTo(canvas.width / 2, canvas.height / 2 - 50);
-  ctx.stroke();
-  ctx.restore();
-
-  if (paired) {
-    ctx.fillStyle = "white";
-    ctx.beginPath();
-    ctx.ellipse(canvas.width / 2, canvas.height / 2, 50, 50, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = "white";
-    ctx.moveTo(canvas.width / 2, canvas.height / 2 + 50);
-    ctx.lineTo(canvas.width / 2, canvas.height);
-    ctx.stroke();
-  }
+  
 };
 
 const onWindowResize = e => {
