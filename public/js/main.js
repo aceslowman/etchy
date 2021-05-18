@@ -1,4 +1,4 @@
-/* global FriendlyWebSocket, ml5, guidGenerator */
+/* global FriendlyWebSocket, guidGenerator */
 
 let user_id = guidGenerator();
 let paired = false;
