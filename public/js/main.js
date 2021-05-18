@@ -14,7 +14,9 @@ canvas.height = window.innerHeight;
 let started = false;
 
 let conConfig = {
-  iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+  iceServers: [{ url: "stun:stun.1.google.com:19302" }],
+  offerToReceiveAudio: true,
+  offerToReceiveVideo: true
 };
 
 // ------------------------------------------------------------
@@ -24,8 +26,14 @@ const websocket = new FriendlyWebSocket({ path: "/" });
 const createPeerConnection = () => {
   const pc = new RTCPeerConnection(conConfig);
   pc.onicecandidate = onIceCandidate;
-  pc.onaddstream = onAddStream;
-  pc.addStream(localStream);
+  // pc.onaddstream = onAddStream;
+  pc.ontrack = onAddStream;
+  // pc.addTrack(localStream);
+  for (const track of localStream.getTracks()) {
+    console.log('adding track')
+    pc.addTrack(track, localStream);
+  }
+  
   console.log("PeerConnection created");
   return pc;
 };
