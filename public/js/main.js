@@ -93,32 +93,32 @@ const addPendingCandidates = sid => {
   }
 };
 
-const onReceiveOffer = data => {
-  console.log("receiving offer from "+data.sid, data)
-  peers[data.sid] = createPeerConnection();
-  peers[data.sid].setRemoteDescription(new RTCSessionDescription(data));
-  sendAnswer(data.sid);
-  addPendingCandidates(data.sid);
+const onReceiveOffer = (sid,data) => {
+  console.log("receiving offer from "+sid, data)
+  peers[sid] = createPeerConnection();
+  peers[sid].setRemoteDescription(new RTCSessionDescription(JSON.stringify(data)));
+  sendAnswer(sid);
+  addPendingCandidates(sid);
 };
 
-const onReceiveAnswer = data => {
-  console.log("receiving answer from "+data.sid, data)
+const onReceiveAnswer = (sid,data) => {
+  console.log("receiving answer from "+sid, data)
   // if(peers[data.sid])
-  peers[data.sid].setRemoteDescription(new RTCSessionDescription(data));
+  peers[sid].setRemoteDescription(new RTCSessionDescription(JSON.stringify(data)));
 };
 
-const onReceiveCandidate = data => {
-  if (data.sid in peers) {
-    peers[data.sid].addIceCandidate(data.ice);
+const onReceiveCandidate = (sid,data) => {
+  if (sid in peers) {
+    peers[sid].addIceCandidate(data.ice);
   } else {
-    if (!(data.sid in pendingCandidates)) {
-      pendingCandidates[data.sid] = [];
+    if (!(sid in pendingCandidates)) {
+      pendingCandidates[sid] = [];
     }
-    pendingCandidates[data.sid].push(data.candidate);
+    pendingCandidates[sid].push(data.candidate);
   }
 };
 
-const onReceiveCount = data => {
+const onReceiveCount = (sid,data) => {
   console.log('data',data)
   document.querySelector(
     ".count"
@@ -137,19 +137,21 @@ websocket.on("open", data => {
 // when signaling server sends a message
 websocket.on("message", data => {
   data = JSON.parse(event.data);
-
+  const sid = data.sid;
+  delete data.sid;
+  
   switch (data.type) {
     case "count":
-      onReceiveCount(data);
+      onReceiveCount(sid,data);
       break;
     case "offer":
-      onReceiveOffer(data);
+      onReceiveOffer(sid,data);
       break;
     case "answer":
-      onReceiveAnswer(data);
+      onReceiveAnswer(sid,data);
       break;
     case "candidate":
-      onReceiveCandidate(data);
+      onReceiveCandidate(sid,data);
       break;
     default:
       break;
