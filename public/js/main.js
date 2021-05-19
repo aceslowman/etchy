@@ -88,7 +88,7 @@ const handleOnTrack = event => {
 const addPendingCandidates = sid => {
   if (sid in pendingCandidates) {
     pendingCandidates[sid].forEach(candidate => {
-      peers[sid].addIceCandidate(new RTCIceCandidate(candidate));
+      peers[sid].addIceCandidate(candidate);
     });
   }
 };
@@ -96,7 +96,7 @@ const addPendingCandidates = sid => {
 const onReceiveOffer = (sid,data) => {
   console.log("receiving offer from "+sid, data)
   peers[sid] = createPeerConnection();
-  peers[sid].setRemoteDescription(new RTCSessionDescription(JSON.stringify(data)));
+  peers[sid].setRemoteDescription(data);
   sendAnswer(sid);
   addPendingCandidates(sid);
 };
@@ -104,7 +104,7 @@ const onReceiveOffer = (sid,data) => {
 const onReceiveAnswer = (sid,data) => {
   console.log("receiving answer from "+sid, data)
   // if(peers[data.sid])
-  peers[sid].setRemoteDescription(new RTCSessionDescription(JSON.stringify(data)));
+  peers[sid].setRemoteDescription(data);
 };
 
 const onReceiveCandidate = (sid,data) => {
