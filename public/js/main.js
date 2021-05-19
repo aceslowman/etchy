@@ -1,17 +1,16 @@
 /* global FriendlyWebSocket, guidGenerator */
 
 let user_id = guidGenerator();
-let paired = false;
 let peers = {};
 let pendingCandidates = {};
-
 let localStream;
-let sendTrack;
+
+let started = false;
+
 let canvas = document.getElementById("mainCanvas");
 let ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-let started = false;
 
 let conConfig = {
   iceServers: [{ url: "stun:stun.1.google.com:19302" }],
@@ -29,10 +28,13 @@ const createPeerConnection = () => {
   // pc.onaddstream = onAddStream;
   pc.ontrack = onAddStream;
   // pc.addTrack(localStream);
-  for (const track of localStream.getTracks()) {
-    console.log('adding track')
-    pc.addTrack(track, localStream);
-  }
+  
+  //
+  if(localStream)
+    for (const track of localStream.getTracks()) {
+      console.log('adding track')
+      pc.addTrack(track, localStream);
+    }
   
   console.log("PeerConnection created");
   return pc;
@@ -40,9 +42,7 @@ const createPeerConnection = () => {
 
 const sendOffer = sid => {
   console.log("Send offer");
-  peers[sid]
-    .createOffer()
-    .then(
+  peers[sid].createOffer().then(
       sdp => setAndSendLocalDescription(sid, sdp),
       error => {
         console.error("Send offer failed: ", error);
@@ -94,37 +94,6 @@ const addPendingCandidates = sid => {
   }
 };
 
-const onReceivePair = data => {
-  document.querySelector(
-    ".paired"
-  ).innerText = `PAIRED! with your new friend: ${data.pairWith}`;
-
-  paired = true;
-
-  if (!sendTrack) {
-    localStream.getAudioTracks().forEach(track => {
-      // sendTrack = rtcConn.addTrack(track, localStream);
-    });
-  }
-
-  audioelement.play();
-  localStream.getAudioTracks().forEach(track => {
-    // rtcConn.addTrack(track, localStream);
-  });
-
-  sendOffer(user_id);
-
-  drawOnCanvas(true);
-};
-
-const onReceiveUnpair = data => {
-  document.querySelector(".paired").innerText = `UNPAIRED!`;
-  paired = false;
-  peers[data.sid].removeTrack(sendTrack);
-  sendTrack = undefined;
-  drawOnCanvas(false);
-};
-
 const onReceiveOffer = data => {
   peers[data.sid] = createPeerConnection();
   peers[data.sid].setRemoteDescription(new RTCSessionDescription(data));
@@ -170,12 +139,6 @@ websocket.on("message", data => {
   switch (data.type) {
     case "count":
       onReceiveCount(data);
-      break;
-    case "pair":
-      onReceivePair(data);
-      break;
-    case "unpair":
-      onReceiveUnpair(data);
       break;
     case "offer":
       onReceiveOffer(data);
