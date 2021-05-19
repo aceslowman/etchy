@@ -25,7 +25,7 @@ const websocket = new FriendlyWebSocket({ path: "/" });
 const createPeerConnection = () => {
   const pc = new RTCPeerConnection(conConfig);
   pc.onicecandidate = onIceCandidate;
-  pc.ontrack = onAddTrack;
+  pc.ontrack = handleOnTrack;
   
   //
   if(localStream)
@@ -39,7 +39,7 @@ const createPeerConnection = () => {
 };
 
 const sendOffer = sid => {
-  console.log("Send offer");
+  console.log("Send offer to "+sid);
   peers[sid].createOffer().then(
       sdp => setAndSendLocalDescription(sid, sdp),
       error => {
@@ -49,7 +49,7 @@ const sendOffer = sid => {
 };
 
 const sendAnswer = sid => {
-  console.log("Send answer");
+  console.log("Send answer to "+sid);
   peers[sid].createAnswer().then(
     sdp => setAndSendLocalDescription(sid, sdp),
     error => {
@@ -76,7 +76,7 @@ const onIceCandidate = event => {
   }
 };
 
-const onAddTrack = track => {
+const handleOnTrack = event => {
   console.log("Add streaming element");
   const newRemoteStreamElem = document.createElement("video");
   newRemoteStreamElem.autoplay = true;
@@ -103,7 +103,8 @@ const onReceiveOffer = data => {
 
 const onReceiveAnswer = data => {
   console.log("receiving answer from "+data.sid, data)
-  peers[data.sid].setRemoteDescription(new   RTCSessionDescription(data));
+  // if(peers[data.sid])
+  peers[data.sid].setRemoteDescription(new RTCSessionDescription(data));
 };
 
 const onReceiveCandidate = data => {

@@ -55,11 +55,11 @@ wss.on("connection", ws => {
         console.log("OFFER", message);
         // send offer to all *other* peers
         connections.forEach(con => {          
-          // if (con.sid !== message.sid) {            
+          if (con.sid !== message.sid) {            
             con.socket.send(
               JSON.stringify(message)
             );
-          // }
+          }
         });
         break;
       case "answer":
