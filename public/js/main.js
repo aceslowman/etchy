@@ -21,7 +21,6 @@ let conConfig = {
 // ------------------------------------------------------------
 // setting up websocket signaling server
 const websocket = new FriendlyWebSocket({ path: "/" });
-// let websocket;
 
 const createPeerConnection = () => {
   const pc = new RTCPeerConnection(conConfig);
@@ -82,6 +81,7 @@ const onAddTrack = track => {
   const newRemoteStreamElem = document.createElement("video");
   newRemoteStreamElem.autoplay = true;
   newRemoteStreamElem.srcObject = event.stream;
+  newRemoteStreamElem.controls = true;
   document.querySelector("#remoteStreams").appendChild(newRemoteStreamElem);
 };
 
@@ -127,8 +127,8 @@ const onReceiveCount = data => {
 
 // REGISTER when connection opens
 websocket.on("open", data => {
-  // document.querySelector(".yourId").innerText = `your id: ${user_id}`;
-  // send({ type: "register", sid: user_id });
+  document.querySelector(".yourId").innerText = `your id: ${user_id}`;
+  send({ type: "register", sid: user_id });
 });
 
 // when signaling server sends a message
@@ -166,11 +166,7 @@ const init = () => {
     .getUserMedia({ audio: false, video: true })
     .then(stream => {
       console.log('got user media', stream);
-    
       localStream = stream;
-    
-      // register when media is grabbed
-      send({ type: "register", sid: user_id });
 
       // initial connection
       peers[user_id] = createPeerConnection();

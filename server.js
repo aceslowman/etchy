@@ -48,46 +48,40 @@ wss.on("connection", ws => {
         connections.set(id, {
           sid: id,
           socket: ws,
-          pitch: 0,
-          pairedWith: null
         });
         updateCount();
-        break;
-      case "pitch":
-        let con = connections.get(id);
-        connections.set(id, { ...con, pitch: message.pitch });
         break;
       case "offer":
         console.log("OFFER", message);
         // send offer to all *other* peers
         connections.forEach(con => {          
-          if (con.sid !== message.sid) {            
+          // if (con.sid !== message.sid) {            
             con.socket.send(
               JSON.stringify(message)
             );
-          }
+          // }
         });
         break;
       case "answer":
         console.log("ANSWER", message);
         // send answer to all *other* peers
         connections.forEach(con => {
-          if (con.sid !== message.sid) {
+          // if (con.sid !== message.sid) {
             con.socket.send(
               JSON.stringify(message)
             );
-          }
+          // }
         });        
         break;
       case "candidate":
         console.log("CANDIDATE", message);
         // send answer to all *other* peers
         connections.forEach(con => {
-          if (con.sid !== message.sid) {
+          // if (con.sid !== message.sid) {
             con.socket.send(
               JSON.stringify(message)
             );
-          }
+          // }
         });
         break;
       default:
@@ -95,8 +89,6 @@ wss.on("connection", ws => {
         break;
     }
 
-    // check for any matching frequencies, within bounds
-    checkForPairing();
   });
 
   ws.on("close", () => {
