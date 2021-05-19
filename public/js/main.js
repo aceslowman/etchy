@@ -94,6 +94,7 @@ const addPendingCandidates = sid => {
 };
 
 const onReceiveOffer = data => {
+  console.log("receiving offer from "+data.sid, data)
   peers[data.sid] = createPeerConnection();
   peers[data.sid].setRemoteDescription(new RTCSessionDescription(data));
   sendAnswer(data.sid);
@@ -101,7 +102,8 @@ const onReceiveOffer = data => {
 };
 
 const onReceiveAnswer = data => {
-  peers[data.sid].setRemoteDescription(new RTCSessionDescription(data));
+  console.log("receiving answer from "+data.sid, data)
+  peers[data.sid].setRemoteDescription(new   RTCSessionDescription(data));
 };
 
 const onReceiveCandidate = data => {

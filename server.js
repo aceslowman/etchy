@@ -66,11 +66,11 @@ wss.on("connection", ws => {
         console.log("ANSWER", message);
         // send answer to all *other* peers
         connections.forEach(con => {
-          // if (con.sid !== message.sid) {
+          if (con.sid !== message.sid) {
             con.socket.send(
               JSON.stringify(message)
             );
-          // }
+          }
         });        
         break;
       case "candidate":
@@ -80,7 +80,7 @@ wss.on("connection", ws => {
           // if (con.sid !== message.sid) {
             con.socket.send(
               JSON.stringify(message)
-            );
+            );1
           // }
         });
         break;
@@ -99,91 +99,6 @@ wss.on("connection", ws => {
 
   updateCount();
 });
-
-function checkForPairing() {
-  let tolerance = 50;
-  // TODO: min pitch
-  // TODO: max pitch
-
-  connections.forEach(con => {
-    let a = con.pitch;
-
-    // if it's already paired, check to see if the
-    // pair has broken
-    if (con.pairedWith !== null) {
-      let conA = con;
-      console.log("pairedWith", conA.pairedWith);
-      let conB = connections.get(conA.pairedWith);
-
-      // if(conB)
-      let b = conB.pitch;
-      let diff = Math.abs(b - a);
-      let match = diff > tolerance; // if NOT within range
-      console.log("diff", diff);
-
-      if (match) {
-        // mark both as paired...
-        conA.pairedWith = null;
-        conB.pairedWith = null;
-
-        //A
-        conA.socket.send(
-          JSON.stringify({
-            type: "pair"
-          })
-        );
-
-        //B
-        conB.socket.send(
-          JSON.stringify({
-            type: "unpair"
-          })
-        );
-      }
-
-    // otherwise, check unpaired
-    } else if (con.pitch) {
-      connections.forEach(_con => {
-        // only check other connections (that are unpaired)
-        if (_con.sid !== con.sid && _con.pitch && _con.pairedWith === null) {
-          let b = _con.pitch;
-          let diff = Math.abs(b - a);
-          let match = diff < tolerance;
-
-          if (match) {
-            // mark both as paired...
-            con.pairedWith = _con.sid;
-            _con.pairedWith = con.sid;
-
-            //A
-            con.socket.send(
-              JSON.stringify({
-                type: "pair",
-                pairWith: _con.sid,
-                pair: [
-                  { sid: con.sid, pitch: a },
-                  { sid: _con.sid, pitch: b }
-                ]
-              })
-            );
-
-            //B
-            _con.socket.send(
-              JSON.stringify({
-                type: "pair",
-                pairWith: con.sid,
-                pair: [
-                  { sid: con.sid, pitch: a },
-                  { sid: _con.sid, pitch: b }
-                ]
-              })
-            );
-          }
-        }
-      });
-    }
-  });
-}
 
 function updateCount() {
   connections.forEach(con => {
