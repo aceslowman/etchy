@@ -26,42 +26,43 @@ const createPeerConnection = () => {
   const pc = new RTCPeerConnection(conConfig);
   pc.onicecandidate = onIceCandidate;
   pc.ontrack = handleOnTrack;
-  
+
   //
-  if(localStream)
+  // if (localStream) {}
     for (const track of localStream.getTracks()) {
-      console.log('adding track')
+      console.log("adding track");
       pc.addTrack(track, localStream);
     }
-  
+
   console.log("PeerConnection created");
   return pc;
 };
 
 const sendOffer = sid => {
-  console.log("Send offer to "+sid);
-  peers[sid].createOffer().then(
-      sdp => setAndSendLocalDescription(sid, sdp),
-      error => {
-        console.error("Send offer failed: ", error);
-      }
-    );
+  console.log("Send offer to " + sid);
+  peers[sid]
+    .createOffer()
+    .then(sdp => setAndSendLocalDescription(sid, sdp))
+    .catch(error => {
+      console.error("Send offer failed: ", error);
+    });
 };
 
 const sendAnswer = sid => {
-  console.log("Send answer to "+sid);
-  peers[sid].createAnswer().then(
-    sdp => setAndSendLocalDescription(sid, sdp),
-    error => {
+  console.log("Send answer to " + sid);
+  peers[sid]
+    .createAnswer()
+    .then(sdp => setAndSendLocalDescription(sid, sdp))
+    .catch(error => {
       console.error("Send answer failed: ", error);
-    }
-  );
+    });
 };
 
 const setAndSendLocalDescription = (sid, sessionDescription) => {
-  peers[sid].setLocalDescription(sessionDescription);
-  console.log("Local description set");
-  send({ sid, type: sessionDescription.type, sdp: sessionDescription.sdp });
+  peers[sid].setLocalDescription(sessionDescription).then(() => {
+    send({ sid, type: sessionDescription.type, sdp: sessionDescription.sdp });
+    console.log("Local description set");
+  });
 };
 
 const onIceCandidate = event => {
@@ -93,21 +94,21 @@ const addPendingCandidates = sid => {
   }
 };
 
-const onReceiveOffer = (sid,data) => {
-  console.log("receiving offer from "+sid, data)
+const onReceiveOffer = (sid, data) => {
+  console.log("receiving offer from " + sid, data);
   peers[sid] = createPeerConnection();
-  peers[sid].setRemoteDescription(data);
-  sendAnswer(sid);
-  addPendingCandidates(sid);
+  peers[sid].setRemoteDescription(data).then(() => {    
+    sendAnswer(sid);
+    addPendingCandidates(sid);
+  });
 };
 
-const onReceiveAnswer = (sid,data) => {
-  console.log("receiving answer from "+sid, data)
-  // if(peers[data.sid])
+const onReceiveAnswer = (sid, data) => {
+  console.log("receiving answer from " + sid, data);
   peers[sid].setRemoteDescription(data);
 };
 
-const onReceiveCandidate = (sid,data) => {
+const onReceiveCandidate = (sid, data) => {
   if (sid in peers) {
     peers[sid].addIceCandidate(data.ice);
   } else {
@@ -118,8 +119,8 @@ const onReceiveCandidate = (sid,data) => {
   }
 };
 
-const onReceiveCount = (sid,data) => {
-  console.log('data',data)
+const onReceiveCount = (sid, data) => {
+  console.log("data", data);
   document.querySelector(
     ".count"
   ).innerText = `currently online: ${data.count}`;
@@ -139,19 +140,19 @@ websocket.on("message", data => {
   data = JSON.parse(event.data);
   const sid = data.sid;
   delete data.sid;
-  
+
   switch (data.type) {
     case "count":
-      onReceiveCount(sid,data);
+      onReceiveCount(sid, data);
       break;
     case "offer":
-      onReceiveOffer(sid,data);
+      onReceiveOffer(sid, data);
       break;
     case "answer":
-      onReceiveAnswer(sid,data);
+      onReceiveAnswer(sid, data);
       break;
     case "candidate":
-      onReceiveCandidate(sid,data);
+      onReceiveCandidate(sid, data);
       break;
     default:
       break;
@@ -170,7 +171,7 @@ const init = () => {
   navigator.mediaDevices
     .getUserMedia({ audio: false, video: true })
     .then(stream => {
-      console.log('got user media', stream);
+      console.log("got user media", stream);
       localStream = stream;
 
       // initial connection
@@ -185,9 +186,7 @@ const init = () => {
     });
 };
 
-const drawOnCanvas = () => {
-  
-};
+const drawOnCanvas = () => {};
 
 const onWindowResize = e => {
   canvas.width = window.innerWidth;
