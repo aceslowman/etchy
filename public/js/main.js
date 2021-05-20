@@ -72,8 +72,9 @@ const setAndSendLocalDescription = (sid, sessionDescription) => {
 
 const onIceCandidate = event => {
   if (event.candidate) {
-    console.log("ICE candidate", event.candidate);
+    console.log("ICE candidate", event);
     send({
+      sid: user_id,
       type: "candidate",
       candidate: event.candidate
     });

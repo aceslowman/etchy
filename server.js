@@ -52,7 +52,7 @@ wss.on("connection", ws => {
         updateCount();
         break;
       case "offer":
-        console.log("OFFER", message);
+        console.log("OFFER", message.sid);
         // send offer to all *other* peers
         connections.forEach(con => {          
           // if (con.sid !== message.sid) {            
@@ -63,7 +63,7 @@ wss.on("connection", ws => {
         });
         break;
       case "answer":
-        console.log("ANSWER", message);
+        console.log("ANSWER", message.sid);
         // send answer to all *other* peers
         connections.forEach(con => {
           // if (con.sid !== message.sid) {
@@ -74,7 +74,7 @@ wss.on("connection", ws => {
         });        
         break;
       case "candidate":
-        console.log("CANDIDATE", message);
+        console.log("CANDIDATE", message.sid);
         // send answer to all *other* peers
         connections.forEach(con => {
           // if (con.sid !== message.sid) {
