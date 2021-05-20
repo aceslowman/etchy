@@ -30,7 +30,7 @@ const createPeerConnection = () => {
   console.log("PeerConnection created");
 
   for (const track of localStream.getTracks()) {
-    console.log("adding track to peer connection");
+    console.log("adding track to peer connection", track);
     pc.addTrack(track, localStream);
   }
 
@@ -41,7 +41,7 @@ const sendOffer = sid => {
   console.log("Send offer to " + sid);
   peers[sid]
     .createOffer()
-    .then(setAndSendLocalDescription)
+    .then(sdp => setAndSendLocalDescription(sid, sdp))
     .catch(error => {
       console.error("Send offer failed: ", error);
     });
@@ -51,18 +51,20 @@ const sendAnswer = sid => {
   console.log("Send answer to " + sid);
   peers[sid]
     .createAnswer()
-    .then(setAndSendLocalDescription)
+    .then(sdp => setAndSendLocalDescription(sid, sdp))
     .catch(error => {
       console.error("Send answer failed: ", error);
     });
 };
 
-const setAndSendLocalDescription = (sessionDescription) => {
-  peers[sessionDescription.sid]
+const setAndSendLocalDescription = (sid, sessionDescription) => {
+  console.log("sessionDescription", sessionDescription);
+  peers[sid]
     .setLocalDescription(sessionDescription)
     .then(() => {
-      send({ sid: sessionDescription.sid, type: sessionDescription.type, sdp: sessionDescription.sdp });
-      console.log("Local description set");
+      console.log("check here", { sid, sdp: sessionDescription });
+      send({ sid, type: sessionDescription.type, sdp: sessionDescription });
+      console.log("Local description set", sessionDescription);
     })
     .catch(error => {
       console.error("issue with setting local description: ", error);
@@ -93,6 +95,8 @@ const handleOnTrack = event => {
     let inboundStream = new MediaStream(event.track);
     newRemoteStreamElem.srcObject = inboundStream;
   }
+  
+  newRemoteStreamElem.play();
 
   document.querySelector("#remoteStreams").appendChild(newRemoteStreamElem);
 };
@@ -108,7 +112,7 @@ const addPendingCandidates = sid => {
 const onReceiveOffer = (sid, data) => {
   console.log("receiving offer from " + sid, data);
   peers[sid] = createPeerConnection();
-  peers[sid].setRemoteDescription(data).then(() => {
+  peers[sid].setRemoteDescription(data.sdp).then(() => {
     sendAnswer(sid);
     addPendingCandidates(sid);
   });
@@ -116,8 +120,8 @@ const onReceiveOffer = (sid, data) => {
 
 const onReceiveAnswer = (sid, data) => {
   console.log("receiving answer from " + sid, data);
-  // if (sid !== user_id) peers[sid].setRemoteDescription(data);
-  peers[sid].setRemoteDescription(data);
+  if (sid !== user_id) peers[sid].setRemoteDescription(data);
+  // peers[sid].setRemoteDescription(data.sdp);
 };
 
 const onReceiveCandidate = (sid, data) => {
