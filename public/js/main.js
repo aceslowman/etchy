@@ -27,12 +27,10 @@ const createPeerConnection = () => {
   pc.onicecandidate = onIceCandidate;
   pc.ontrack = handleOnTrack;
 
-  //
-  // if (localStream) {}
-    for (const track of localStream.getTracks()) {
-      console.log("adding track");
-      pc.addTrack(track, localStream);
-    }
+  for (const track of localStream.getTracks()) {
+    console.log("adding track");
+    pc.addTrack(track, localStream);
+  }
 
   console.log("PeerConnection created");
   return pc;
@@ -78,11 +76,19 @@ const onIceCandidate = event => {
 };
 
 const handleOnTrack = event => {
-  console.log("Add streaming element");
+  console.log("Add streaming element", event);
   const newRemoteStreamElem = document.createElement("video");
   newRemoteStreamElem.autoplay = true;
-  newRemoteStreamElem.srcObject = event.stream;
+  // newRemoteStreamElem.srcObject = event.streams[0];
   newRemoteStreamElem.controls = true;
+  
+  if (event.streams && event.streams[0]) {
+    newRemoteStreamElem.srcObject = event.streams[0];
+  } else {
+    let inboundStream = new MediaStream(event.track);
+    newRemoteStreamElem.srcObject = inboundStream;
+  }
+  
   document.querySelector("#remoteStreams").appendChild(newRemoteStreamElem);
 };
 
