@@ -79,8 +79,7 @@ const handleOnTrack = event => {
   console.log("Add streaming element", event);
   const newRemoteStreamElem = document.createElement("video");
   newRemoteStreamElem.autoplay = true;
-  // newRemoteStreamElem.srcObject = event.streams[0];
-  newRemoteStreamElem.controls = true;
+  newRemoteStreamElem.controls = true; // TEMP
   
   if (event.streams && event.streams[0]) {
     newRemoteStreamElem.srcObject = event.streams[0];
@@ -111,7 +110,7 @@ const onReceiveOffer = (sid, data) => {
 
 const onReceiveAnswer = (sid, data) => {
   console.log("receiving answer from " + sid, data);
-  peers[sid].setRemoteDescription(data);
+  if(sid !== user_id) peers[sid].setRemoteDescription(data);
 };
 
 const onReceiveCandidate = (sid, data) => {
@@ -126,7 +125,6 @@ const onReceiveCandidate = (sid, data) => {
 };
 
 const onReceiveCount = (sid, data) => {
-  console.log("data", data);
   document.querySelector(
     ".count"
   ).innerText = `currently online: ${data.count}`;
