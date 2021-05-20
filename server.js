@@ -80,7 +80,7 @@ wss.on("connection", ws => {
           // if (con.sid !== message.sid) {
             con.socket.send(
               JSON.stringify(message)
-            );1
+            );
           // }
         });
         break;

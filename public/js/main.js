@@ -27,12 +27,13 @@ const createPeerConnection = () => {
   pc.onicecandidate = onIceCandidate;
   pc.ontrack = handleOnTrack;
 
+  console.log("PeerConnection created");
+
   for (const track of localStream.getTracks()) {
-    console.log("adding track");
+    console.log("adding track to peer connection");
     pc.addTrack(track, localStream);
   }
 
-  console.log("PeerConnection created");
   return pc;
 };
 
@@ -40,7 +41,7 @@ const sendOffer = sid => {
   console.log("Send offer to " + sid);
   peers[sid]
     .createOffer()
-    .then(sdp => setAndSendLocalDescription(sid, sdp))
+    .then(setAndSendLocalDescription)
     .catch(error => {
       console.error("Send offer failed: ", error);
     });
@@ -50,17 +51,22 @@ const sendAnswer = sid => {
   console.log("Send answer to " + sid);
   peers[sid]
     .createAnswer()
-    .then(sdp => setAndSendLocalDescription(sid, sdp))
+    .then(setAndSendLocalDescription)
     .catch(error => {
       console.error("Send answer failed: ", error);
     });
 };
 
-const setAndSendLocalDescription = (sid, sessionDescription) => {
-  peers[sid].setLocalDescription(sessionDescription).then(() => {
-    send({ sid, type: sessionDescription.type, sdp: sessionDescription.sdp });
-    console.log("Local description set");
-  });
+const setAndSendLocalDescription = (sessionDescription) => {
+  peers[sessionDescription.sid]
+    .setLocalDescription(sessionDescription)
+    .then(() => {
+      send({ sid: sessionDescription.sid, type: sessionDescription.type, sdp: sessionDescription.sdp });
+      console.log("Local description set");
+    })
+    .catch(error => {
+      console.error("issue with setting local description: ", error);
+    });
 };
 
 const onIceCandidate = event => {
@@ -80,14 +86,14 @@ const handleOnTrack = event => {
   const newRemoteStreamElem = document.createElement("video");
   newRemoteStreamElem.autoplay = true;
   newRemoteStreamElem.controls = true; // TEMP
-  
+
   if (event.streams && event.streams[0]) {
     newRemoteStreamElem.srcObject = event.streams[0];
   } else {
     let inboundStream = new MediaStream(event.track);
     newRemoteStreamElem.srcObject = inboundStream;
   }
-  
+
   document.querySelector("#remoteStreams").appendChild(newRemoteStreamElem);
 };
 
@@ -102,7 +108,7 @@ const addPendingCandidates = sid => {
 const onReceiveOffer = (sid, data) => {
   console.log("receiving offer from " + sid, data);
   peers[sid] = createPeerConnection();
-  peers[sid].setRemoteDescription(data).then(() => {    
+  peers[sid].setRemoteDescription(data).then(() => {
     sendAnswer(sid);
     addPendingCandidates(sid);
   });
@@ -110,7 +116,8 @@ const onReceiveOffer = (sid, data) => {
 
 const onReceiveAnswer = (sid, data) => {
   console.log("receiving answer from " + sid, data);
-  if(sid !== user_id) peers[sid].setRemoteDescription(data);
+  // if (sid !== user_id) peers[sid].setRemoteDescription(data);
+  peers[sid].setRemoteDescription(data);
 };
 
 const onReceiveCandidate = (sid, data) => {
