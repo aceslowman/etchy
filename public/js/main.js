@@ -62,7 +62,6 @@ const setAndSendLocalDescription = (sid, sessionDescription) => {
   peers[sid]
     .setLocalDescription(sessionDescription)
     .then(() => {
-      console.log("check here", { sid, sdp: sessionDescription });
       send({ sid, type: sessionDescription.type, sdp: sessionDescription });
       console.log("Local description set", sessionDescription);
     })
@@ -120,8 +119,8 @@ const onReceiveOffer = (sid, data) => {
 
 const onReceiveAnswer = (sid, data) => {
   console.log("receiving answer from " + sid, data);
-  if (sid !== user_id) peers[sid].setRemoteDescription(data);
-  // peers[sid].setRemoteDescription(data.sdp);
+  // if (sid !== user_id) peers[sid].setRemoteDescription(data.sdp);
+  peers[sid].setRemoteDescription(data.sdp);
 };
 
 const onReceiveCandidate = (sid, data) => {
@@ -148,6 +147,7 @@ const onReceiveCount = (sid, data) => {
 websocket.on("open", data => {
   document.querySelector(".yourId").innerText = `your id: ${user_id}`;
   send({ type: "register", sid: user_id });
+  // peers[user_id] = createPeerConnection();
 });
 
 // when signaling server sends a message
