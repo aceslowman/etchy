@@ -1,29 +1,3 @@
-// https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
-function guidGenerator() {
-  var S4 = function() {
-    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-  };
-  return (
-    S4() +
-    S4() +
-    "-" +
-    S4() +
-    "-" +
-    S4() +
-    "-" +
-    S4() +
-    "-" +
-    S4() +
-    S4() +
-    S4()
-  );
-}
-
-// https://stackoverflow.com/questions/6454198/check-if-a-value-is-within-a-range-of-numbers
-function between(x, min, max) {
-  return x >= min && x <= max;
-}
-
 const http = require("http");
 const express = require("express");
 const ws = require("ws");
@@ -55,7 +29,9 @@ wss.on("connection", ws => {
         break;
       default:
         connections.forEach(con => {
+          if (con.userId !== message.userId) {
           con.socket.send(JSON.stringify(message));
+          }
         });
         break;
     }

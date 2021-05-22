@@ -9,8 +9,8 @@ socket.addEventListener("open", () => {
   navigator.mediaDevices
     .getUserMedia({ audio: false, video: true })
     .then(stream => {
-      let track = stream.getTracks()[0];
-      console.log(track);
+      // let track = stream.getTracks()[0];
+      // console.log(track);
       const swarm = new FastRTCSwarm();
 
       // send the signal to the signaling server
@@ -24,13 +24,13 @@ socket.addEventListener("open", () => {
         // console.log("got a message", event.data);
         const payload = JSON.parse(event.data);
 
-        switch (payload.type) {
-          case "registered":
-            console.log("registered", payload.userId);
-            break;
-          default:
+//         switch (payload.type) {
+//           case "registered":
+//             console.log("registered", payload.userId);
+//             break;
+//           default:
             swarm.dispatch(payload);
-        }
+        // }
       });
 
       // when the connection is open, say hi to your new peer
@@ -45,39 +45,39 @@ socket.addEventListener("open", () => {
       });
 
       // fired when a peer creates or updates an audio/video track.
-      swarm.on("stream", (stream, peer) => {
-        console.log("Add streaming element", event);
-        const el = document.createElement("video");
-        el.autoplay = true;
-        el.controls = true; // TEMP
+//       swarm.on("stream", (stream, peer) => {
+//         console.log("Add streaming element", event);
+//         const el = document.createElement("video");
+//         el.autoplay = true;
+//         el.controls = true; // TEMP
 
-        if (event.streams && event.streams[0]) {
-          el.srcObject = event.streams[0];
-        } else {
-          let inboundStream = new MediaStream(event.track);
-          el.srcObject = inboundStream;
-        }
+//         if (event.streams && event.streams[0]) {
+//           el.srcObject = event.streams[0];
+//         } else {
+//           let inboundStream = new MediaStream(event.track);
+//           el.srcObject = inboundStream;
+//         }
 
-        el.play();
+//         el.play();
 
-        document.querySelector("#remoteStreams").appendChild(el);
-      });
+//         document.querySelector("#remoteStreams").appendChild(el);
+//       });
 
       swarm.on("error", (error, peer) => {
         console.error(error);
       });
 
-      console.log("got user media", stream);
-      localStream = stream;
-      started = true;
-      // swarm.addStreams({ [user_id]: localStream.getTracks().tracks[0] });
+//       console.log("got user media", stream);
+//       localStream = stream;
+//       started = true;
+//       // swarm.addStreams({ [user_id]: localStream.getTracks().tracks[0] });
 
-      for (const track of localStream.getTracks()) {
-        console.log("adding track to peer connection", track);
-        // pc.addTrack(track, localStream);
-        // swarm.addStreams({ [user_id]: track });
-        // swarm.addStreams({ track });
-      }
+//       for (const track of localStream.getTracks()) {
+//         console.log("adding track to peer connection", track);
+//         // pc.addTrack(track, localStream);
+//         // swarm.addStreams({ [user_id]: track });
+//         // swarm.addStreams({ track });
+//       }
     })
     .catch(err => {
       console.log("Error capturing stream.", err);

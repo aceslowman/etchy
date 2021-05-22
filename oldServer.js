@@ -77,7 +77,7 @@ wss.on("connection", ws => {
         console.log("CANDIDATE", message.sid);
         // send answer to all *other* peers
         connections.forEach(con => {
-          // if (con.sid !== message.sid) {
+          // if (con.sid !== message.sid) {1
             con.socket.send(
               JSON.stringify(message)
             );
