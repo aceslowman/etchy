@@ -2,7 +2,8 @@ import FriendlyWebSocket from "./FriendlyWebSocket";
 import FastRTCSwarm from "@mattkrick/fast-rtc-swarm";
 
 // const cam = await navigator.mediaDevices.getUserMedia({video: true, audio: false})
-const socket = new FriendlyWebSocket({ path: "/" }).socket;
+// const socket = new FriendlyWebSocket({ path: "/" }).socket;
+const socket = new WebSocket('wss://etchy.glitch.me/');
 
 socket.addEventListener("open", () => {
   navigator.mediaDevices
@@ -14,7 +15,7 @@ socket.addEventListener("open", () => {
 
       // send the signal to the signaling server
       swarm.on("signal", signal => {
-        console.log("signaling");
+        // console.log("signaling");
         socket.send(JSON.stringify(signal));
       });
 
@@ -63,7 +64,7 @@ socket.addEventListener("open", () => {
       });
 
       swarm.on("error", (error, peer) => {
-        console.log("swarm has received error", error);
+        console.error(error);
       });
 
       console.log("got user media", stream);
@@ -75,7 +76,7 @@ socket.addEventListener("open", () => {
         console.log("adding track to peer connection", track);
         // pc.addTrack(track, localStream);
         // swarm.addStreams({ [user_id]: track });
-        swarm.addStreams({ track });
+        // swarm.addStreams({ track });
       }
     })
     .catch(err => {
