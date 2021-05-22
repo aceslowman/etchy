@@ -31,7 +31,7 @@ const createPeerConnection = () => {
 
   for (const track of localStream.getTracks()) {
     console.log("adding track to peer connection", track);
-    pc.addTrack(track, localStream);
+    pc.addTra1ck(track, localStream);
   }
 
   return pc;
