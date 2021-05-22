@@ -9,28 +9,26 @@ socket.addEventListener("open", () => {
   navigator.mediaDevices
     .getUserMedia({ audio: false, video: true })
     .then(stream => {
-      // let track = stream.getTracks()[0];
-      // console.log(track);
       const swarm = new FastRTCSwarm();
+        
+      console.log("got user media", stream);
+      localStream = stream;
+      started = true;
 
-      // send the signal to the signaling server
       swarm.on("signal", signal => {
-        // console.log("signaling");
         socket.send(JSON.stringify(signal));
       });
 
-      // when the signal come back, dispatch it to the swarm
       socket.addEventListener("message", event => {
         // console.log("got a message", event.data);
         const payload = JSON.parse(event.data);
 
         switch (payload.type) {
           case "registered":
+            user_id = payload.userId;
             console.log("registered", payload.userId);
             for (const track of localStream.getTracks()) {
               console.log("adding track to peer connection", track);
-              // pc.addTrack(track, localStream);
-              // swarm.addStreams({ [user_id]: track });
               swarm.addStreams({ track });
             }
             break;
@@ -52,30 +50,26 @@ socket.addEventListener("open", () => {
 
       // fired when a peer creates or updates an audio/video track.
       swarm.on("stream", (stream, peer) => {
-        console.log("Add streaming element", event);
-        const el = document.createElement("video");
-        el.autoplay = true;
-        el.controls = true; // TEMP
+        console.log("Add streaming element", stream);
+//         const el = document.createElement("video");
+//         el.autoplay = true;
+//         el.controls = true; // TEMP
 
-        if (event.streams && event.streams[0]) {
-          el.srcObject = event.streams[0];
-        } else {
-          let inboundStream = new MediaStream(event.track);
-          el.srcObject = inboundStream;
-        }
+//         if (event.streams && event.streams[0]) {
+//           el.srcObject = event.streams[0];
+//         } else {
+//           let inboundStream = new MediaStream(event.track);
+//           el.srcObject = inboundStream;
+//         }
 
-        el.play();
+//         el.play();
 
-        document.querySelector("#remoteStreams").appendChild(el);
+//         document.querySelector("#remoteStreams").appendChild(el);
       });
 
       swarm.on("error", (error, peer) => {
         console.error(error);
       });
-
-      console.log("got user media", stream);
-      localStream = stream;
-      started = true;
     })
     .catch(err => {
       console.log("Error capturing stream.", err);
@@ -98,22 +92,22 @@ const send = data => {
   socket.send(JSON.stringify(data));
 };
 
-const init = () => {
-  if (started) return;
+// const init = () => {
+//   if (started) return;
 
-  //   document.querySelector(".center").innerText = "";
+//   //   document.querySelector(".center").innerText = "";
 
-  //   navigator.mediaDevices
-  //     .getUserMedia({ audio: false, video: true })
-  //     .then(stream => {
-  //       console.log("got user media", stream);
-  //       localStream = stream;
-  //       started = true;
-  //     })
-  //     .catch(err => {
-  //       console.log("Error capturing stream.", err);
-  //     });
-};
+//   //   navigator.mediaDevices
+//   //     .getUserMedia({ audio: false, video: true })
+//   //     .then(stream => {
+//   //       console.log("got user media", stream);
+//   //       localStream = stream;
+//   //       started = true;
+//   //     })
+//   //     .catch(err => {
+//   //       console.log("Error capturing stream.", err);
+//   //     });
+// };
 
 const drawOnCanvas = () => {};
 
@@ -125,5 +119,5 @@ const onWindowResize = e => {
 
 drawOnCanvas();
 
-document.addEventListener("click", init, false);
+// document.addEventListener("click", init, false);
 window.addEventListener("resize", onWindowResize, false);

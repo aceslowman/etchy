@@ -16,7 +16,41 @@ wss.on("connection", ws => {
     let message = JSON.parse(m);
     console.log("check here", message);
 
+    
     switch (message.type) {
+      case "offer":
+        console.log("OFFER", message.sid);
+        // send offer to all *other* peers
+        connections.forEach(con => {          
+          // if (con.sid !== message.sid) {            
+            con.socket.send(
+              JSON.stringify(message)
+            );
+          // }
+        });
+        break;
+      case "answer":
+        console.log("ANSWER", message.sid);
+        // send answer to all *other* peers
+        connections.forEach(con => {
+          // if (con.sid !== message.sid) {
+            con.socket.send(
+              JSON.stringify(message)
+            );
+          // }
+        });        
+        break;
+      case "candidate":
+        console.log("CANDIDATE", message.sid);
+        // send answer to all *other* peers
+        connections.forEach(con => {
+          // if (con.sid !== message.sid) {1
+            con.socket.send(
+              JSON.stringify(message)
+            );
+          // }
+        });
+        break;
       case "init":
         console.log("initializing user", message.userId);
         id = message.userId;
@@ -35,6 +69,7 @@ wss.on("connection", ws => {
         });
         break;
     }
+    
   });
 
   ws.on("close", () => {
