@@ -2,10 +2,7 @@ import FriendlyWebSocket from './FriendlyWebSocket';
 import FastRTCSwarm from '@mattkrick/fast-rtc-swarm';
 
 const socket = new FriendlyWebSocket({ path: "/" }).socket;
-console.log(socket)
-console.log('check here')
-// const socket = new WebSocket('ws://localhost:3000');
-// const socket = new WebSocket('wss://etchy.glitch.me:3000');
+
 socket.addEventListener('open', () => {
   const swarm = new FastRTCSwarm()
   // send the signal to the signaling server
@@ -14,6 +11,7 @@ socket.addEventListener('open', () => {
   })
   // when the signal come back, dispatch it to the swarm
   socket.addEventListener('message', (event) => {
+    console.log('got a message', event.data)
     const payload = JSON.parse(event.data)
     swarm.dispatch(payload)
   })
@@ -27,27 +25,6 @@ socket.addEventListener('open', () => {
     console.log('data received', data, peer)
   })
 })
-
-// // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
-// function guidGenerator() {
-//   var S4 = function() {
-//     return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-//   };
-//   return (
-//     S4() +
-//     S4() +
-//     "-" +
-//     S4() +
-//     "-" +
-//     S4() +
-//     "-" +
-//     S4() +
-//     "-" +
-//     S4() +
-//     S4() +
-//     S4()
-//   );
-// }
 
 // let user_id = guidGenerator();
 // let peers = {};
