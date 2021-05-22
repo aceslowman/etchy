@@ -1,4 +1,5 @@
 dependencies:
+  '@mattkrick/fast-rtc-swarm': 0.4.1
   express: 4.17.1
   webpack: 5.37.1
   webpack-cli: 4.7.0
@@ -11,6 +12,26 @@ packages:
       node: '>=10.0.0'
     resolution:
       integrity: sha512-Fxt+AfXgjMoin2maPIYzFZnQjAXjAL0PHscM5pRTtatFqB+vZxAM9tLp2Optnuw3QOQC40jTNeGYFOMvyf7v9g==
+  /@mattkrick/fast-rtc-peer/0.4.1:
+    dependencies:
+      eventemitter3: 3.1.2
+      shortid: 2.2.16
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>=10.0.0'
+    resolution:
+      integrity: sha512-BTQS3xEbFq9VD/AWYNACjQZDsh4Rczemukk0MvS9tXG4odoUZa3S1FFD8lBgnCp0pteB5rvYBggX/AaJCk2VHQ==
+  /@mattkrick/fast-rtc-swarm/0.4.1:
+    dependencies:
+      '@mattkrick/fast-rtc-peer': 0.4.1
+      eventemitter3: 3.1.2
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>=6.0.0'
+    resolution:
+      integrity: sha512-4KX4MmX3q/K9Pkw4MqRF8dw2sCW1Q2Hmq8UedNnGg8usUrrMOIJQIkO9sAEShZF3tmQ0YWouXA4cNoLg3Lvnbg==
   /@types/eslint-scope/3.7.0:
     dependencies:
       '@types/eslint': 7.2.11
@@ -413,6 +434,10 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
+  /eventemitter3/3.1.2:
+    dev: false
+    resolution:
+      integrity: sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
   /events/3.3.0:
     dev: false
     engines:
@@ -742,6 +767,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==
+  /nanoid/2.1.11:
+    dev: false
+    resolution:
+      integrity: sha512-s/snB+WGm6uwi0WjsZdaVcuf3KJXlfGl2LcxgwkEwJF0D/BWzVWAZW/XY4bFaiR7s0Jk3FPvlnepg1H1b1UwlA==
   /negotiator/0.6.2:
     dev: false
     engines:
@@ -1015,6 +1044,12 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
+  /shortid/2.2.16:
+    dependencies:
+      nanoid: 2.1.11
+    dev: false
+    resolution:
+      integrity: sha512-Ugt+GIZqvGXCIItnsL+lvFJOiN7RYqlGy7QE41O3YC1xbNSeDGIRO7xg2JJXIAj1cAGnOeC1r7/T9pgrtQbv4g==
   /signal-exit/3.0.3:
     dev: false
     resolution:
@@ -1100,6 +1135,10 @@ packages:
       node: '>=0.6'
     resolution:
       integrity: sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw==
+  /tslib/1.14.1:
+    dev: false
+    resolution:
+      integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
   /type-is/1.6.18:
     dependencies:
       media-typer: 0.3.0
@@ -1260,6 +1299,7 @@ registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 9
 shrinkwrapVersion: 3
 specifiers:
+  '@mattkrick/fast-rtc-swarm': ^0.4.1
   express: ^4.17.1
   webpack: ^5.37.1
   webpack-cli: ^4.7.0
