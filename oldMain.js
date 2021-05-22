@@ -1,5 +1,4 @@
 /* global FriendlyWebSocket, guidGenerator */
-import FastRTCSwarm from '@mattkrick/fast-rtc-swarm'
 
 let user_id = guidGenerator();
 let peers = {};

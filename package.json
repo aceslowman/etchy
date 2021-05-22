@@ -7,13 +7,16 @@
     "start": "node server.js"
   },
   "private": true,
-  "dependencies": {  
+  "dependencies": {
     "express": "^4.17.1",
     "ws": "^7.4.4",
-    "webrtc-adapter": "^7.7.1"
+    "webrtc-adapter": "^7.7.1",
+    "webpack": "^5.37.1",
+    "webpack-cli": "^4.7.0",
+    "@mattkrick/fast-rtc-swarm": "^0.4.1"
   },
   "engines": {
-    "node": "12.x" 
+    "node": "12.x"
   },
   "repository": {
     "url": "https://glitch.com/edit/#!/hello-express"
