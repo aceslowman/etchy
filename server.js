@@ -40,56 +40,63 @@ wss.on("connection", ws => {
 
   ws.on("message", m => {
     let message = JSON.parse(m);
-    console.log('check here', message)
-
-    switch (message.type) {
-      case "register":
-        console.log("registering user", message.sid);
-        id = message.sid;
-        connections.set(id, {
-          sid: id,
-          socket: ws,
-        });
-        updateCount();
-        break;
-      case "offer":
-        console.log("OFFER", message.sid);
-        // send offer to all *other* peers
-        connections.forEach(con => {          
-          // if (con.sid !== message.sid) {            
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });
-        break;
-      case "answer":
-        console.log("ANSWER", message.sid);
-        // send answer to all *other* peers
-        connections.forEach(con => {
-          // if (con.sid !== message.sid) {
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });        
-        break;
-      case "candidate":
-        console.log("CANDIDATE", message.sid);
-        // send answer to all *other* peers
-        connections.forEach(con => {
-          // if (con.sid !== message.sid) {
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });
-        break;
-      default:
-        console.log("message received without TYPE");
-        break;
+    console.log("check here", message);
+    
+    connections.forEach(con => {
+      con.socket.send(JSON.stringify(message));
+    });
+    
+    if(message.type === 'init') {
+      
     }
 
+    // switch (message.type) {
+    //   case "register":
+    //     console.log("registering user", message.sid);
+    //     id = message.sid;
+    //     connections.set(id, {
+    //       sid: id,
+    //       socket: ws,
+    //     });
+    //     updateCount();
+    //     break;
+    //   case "offer":
+    //     console.log("OFFER", message.sid);
+    //     // send offer to all *other* peers
+    //     connections.forEach(con => {
+    //       // if (con.sid !== message.sid) {
+    //         con.socket.send(
+    //           JSON.stringify(message)
+    //         );
+    //       // }
+    //     });
+    //     break;
+    //   case "answer":
+    //     console.log("ANSWER", message.sid);
+    //     // send answer to all *other* peers
+    //     connections.forEach(con => {
+    //       // if (con.sid !== message.sid) {
+    //         con.socket.send(
+    //           JSON.stringify(message)
+    //         );
+    //       // }
+    //     });
+    //     break;
+    //   case "candidate":
+    //     console.log("CANDIDATE", message.sid);
+    //     // send answer to all *other* peers
+    //     connections.forEach(con => {
+    //       // if (con.sid !== message.sid) {
+    //         con.socket.send(
+    //           JSON.stringify(message)
+    //         );
+    //       // }
+    //     });
+    //     break;
+    //   default:
+    //     console.log("message received without TYPE");
+    //     break;
+    // }
   });
 
   ws.on("close", () => {
