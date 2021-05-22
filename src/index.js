@@ -1,32 +1,32 @@
 import FriendlyWebSocket from './FriendlyWebSocket';
 import FastRTCSwarm from '@mattkrick/fast-rtc-swarm';
 
-const socket = new FriendlyWebSocket({ path: "/" });
+// const socket = new FriendlyWebSocket({ path: "/" });
 // console.log(socket)
 console.log('check here')
 // const socket = new WebSocket('ws://localhost:3000');
 // const socket = new WebSocket('wss://etchy.glitch.me:3000');
-socket.addEventListener('open', () => {
-  const swarm = new FastRTCSwarm()
-  // send the signal to the signaling server
-  swarm.on('signal', (signal) => {
-    socket.send(JSON.stringify(signal))
-  })
-  // when the signal come back, dispatch it to the swarm
-  socket.addEventListener('message', (event) => {
-    const payload = JSON.parse(event.data)
-    swarm.dispatch(payload)
-  })
-  // when the connection is open, say hi to your new peer
-  swarm.on('dataOpen', (peer) => {
-    console.log('data channel open!')
-    peer.send('hi')
-  })
-  // when your peer says hi, log it
-  swarm.on('data', (data, peer) => {
-    console.log('data received', data, peer)
-  })
-})
+// socket.addEventListener('open', () => {
+//   const swarm = new FastRTCSwarm()
+//   // send the signal to the signaling server
+//   swarm.on('signal', (signal) => {
+//     socket.send(JSON.stringify(signal))
+//   })
+//   // when the signal come back, dispatch it to the swarm
+//   socket.addEventListener('message', (event) => {
+//     const payload = JSON.parse(event.data)
+//     swarm.dispatch(payload)
+//   })
+//   // when the connection is open, say hi to your new peer
+//   swarm.on('dataOpen', (peer) => {
+//     console.log('data channel open!')
+//     peer.send('hi')
+//   })
+//   // when your peer says hi, log it
+//   swarm.on('data', (data, peer) => {
+//     console.log('data received', data, peer)
+//   })
+// })
 
 // // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
 // function guidGenerator() {
