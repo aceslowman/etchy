@@ -2,8 +2,8 @@ import FriendlyWebSocket from "./FriendlyWebSocket";
 import FastRTCSwarm from "@mattkrick/fast-rtc-swarm";
 
 // const cam = await navigator.mediaDevices.getUserMedia({video: true, audio: false})
-// const socket = new FriendlyWebSocket({ path: "/" }).socket;
-const socket = new WebSocket('wss://etchy.glitch.me/');
+const socket = new FriendlyWebSocket({ path: "/" }).socket;
+// const socket = new WebSocket('wss://etchy.glitch.me/');
 
 socket.addEventListener("open", () => {
   navigator.mediaDevices
@@ -24,13 +24,19 @@ socket.addEventListener("open", () => {
         // console.log("got a message", event.data);
         const payload = JSON.parse(event.data);
 
-//         switch (payload.type) {
-//           case "registered":
-//             console.log("registered", payload.userId);
-//             break;
-//           default:
+        switch (payload.type) {
+          case "registered":
+            console.log("registered", payload.userId);
+            for (const track of localStream.getTracks()) {
+              console.log("adding track to peer connection", track);
+              // pc.addTrack(track, localStream);
+              // swarm.addStreams({ [user_id]: track });
+              swarm.addStreams({ track });
+            }
+            break;
+          default:
             swarm.dispatch(payload);
-        // }
+        }
       });
 
       // when the connection is open, say hi to your new peer
@@ -45,39 +51,31 @@ socket.addEventListener("open", () => {
       });
 
       // fired when a peer creates or updates an audio/video track.
-//       swarm.on("stream", (stream, peer) => {
-//         console.log("Add streaming element", event);
-//         const el = document.createElement("video");
-//         el.autoplay = true;
-//         el.controls = true; // TEMP
+      swarm.on("stream", (stream, peer) => {
+        console.log("Add streaming element", event);
+        const el = document.createElement("video");
+        el.autoplay = true;
+        el.controls = true; // TEMP
 
-//         if (event.streams && event.streams[0]) {
-//           el.srcObject = event.streams[0];
-//         } else {
-//           let inboundStream = new MediaStream(event.track);
-//           el.srcObject = inboundStream;
-//         }
+        if (event.streams && event.streams[0]) {
+          el.srcObject = event.streams[0];
+        } else {
+          let inboundStream = new MediaStream(event.track);
+          el.srcObject = inboundStream;
+        }
 
-//         el.play();
+        el.play();
 
-//         document.querySelector("#remoteStreams").appendChild(el);
-//       });
+        document.querySelector("#remoteStreams").appendChild(el);
+      });
 
       swarm.on("error", (error, peer) => {
         console.error(error);
       });
 
-//       console.log("got user media", stream);
-//       localStream = stream;
-//       started = true;
-//       // swarm.addStreams({ [user_id]: localStream.getTracks().tracks[0] });
-
-//       for (const track of localStream.getTracks()) {
-//         console.log("adding track to peer connection", track);
-//         // pc.addTrack(track, localStream);
-//         // swarm.addStreams({ [user_id]: track });
-//         // swarm.addStreams({ track });
-//       }
+      console.log("got user media", stream);
+      localStream = stream;
+      started = true;
     })
     .catch(err => {
       console.log("Error capturing stream.", err);

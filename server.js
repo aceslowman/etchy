@@ -29,9 +29,9 @@ wss.on("connection", ws => {
         break;
       default:
         connections.forEach(con => {
-          if (con.userId !== message.userId) {
-          con.socket.send(JSON.stringify(message));
-          }
+          // if (con.userId !== message.userId) {
+            con.socket.send(JSON.stringify(message));
+          // }
         });
         break;
     }
