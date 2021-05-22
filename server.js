@@ -50,7 +50,7 @@ wss.on("connection", ws => {
           userId: id,
           socket: ws
         });
-        ws
+        ws.send(JSON.stringify({type:'registered',userId:id}));
         updateCount();
         break;
       default:
