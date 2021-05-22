@@ -50,6 +50,7 @@ wss.on("connection", ws => {
           userId: id,
           socket: ws
         });
+        ws
         updateCount();
         break;
       default:
