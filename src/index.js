@@ -1,7 +1,11 @@
 import FriendlyWebSocket from './FriendlyWebSocket';
 import FastRTCSwarm from '@mattkrick/fast-rtc-swarm';
 
-const socket = new WebSocket('ws://localhost:3000');
+const socket = new FriendlyWebSocket({ path: "/" });
+// console.log(socket)
+console.log('check here')
+// const socket = new WebSocket('ws://localhost:3000');
+// const socket = new WebSocket('wss://etchy.glitch.me:3000');
 socket.addEventListener('open', () => {
   const swarm = new FastRTCSwarm()
   // send the signal to the signaling server

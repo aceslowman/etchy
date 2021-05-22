@@ -40,7 +40,6 @@ wss.on("connection", ws => {
 
   ws.on("message", m => {
     let message = JSON.parse(m);
-    console.log('check here', message)
 
     switch (message.type) {
       case "register":
@@ -124,6 +123,10 @@ function checkHttps(req, res, next) {
 app.all("*", checkHttps);
 
 app.use(express.static("dist"));
+
+app.get("/", function(request, response) {
+  response.sendFile(__dirname + "/views/index.html");
+});
 
 const listener = server.listen(process.env.PORT, function() {
   console.log("Your app is listening on port " + listener.address().port);
