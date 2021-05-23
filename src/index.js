@@ -10,7 +10,7 @@ socket.addEventListener("open", () => {
     .getUserMedia({ audio: false, video: true })
     .then(stream => {
       const swarm = new FastRTCSwarm();
-        
+
       console.log("got user media", stream);
       localStream = stream;
       started = true;
@@ -25,12 +25,22 @@ socket.addEventListener("open", () => {
 
         switch (payload.type) {
           case "registered":
-            user_id = payload.userId;
+            document.querySelector(".yourId").innerText = `your id: ${payload.id}`;
+            user_id = payload.id;
             console.log("registered", payload.id);
             for (const track of localStream.getTracks()) {
               console.log("adding track to peer connection", track);
               swarm.addStreams({ track });
             }
+            break;
+          case "count":
+            console.log('message', payload)
+            document.querySelector(
+              ".count"
+            ).innerText = `currently online: ${payload.count}`;
+            document.querySelector(
+              ".peers"
+            ).innerText = `currently online: [${payload.peers}]`;
             break;
           default:
             swarm.dispatch(payload);
@@ -51,20 +61,20 @@ socket.addEventListener("open", () => {
       // fired when a peer creates or updates an audio/video track.
       swarm.on("stream", (stream, peer) => {
         console.log("Add streaming element", stream);
-//         const el = document.createElement("video");
-//         el.autoplay = true;
-//         el.controls = true; // TEMP
+        //         const el = document.createElement("video");
+        //         el.autoplay = true;
+        //         el.controls = true; // TEMP
 
-//         if (event.streams && event.streams[0]) {
-//           el.srcObject = event.streams[0];
-//         } else {
-//           let inboundStream = new MediaStream(event.track);
-//           el.srcObject = inboundStream;
-//         }
+        //         if (event.streams && event.streams[0]) {
+        //           el.srcObject = event.streams[0];
+        //         } else {
+        //           let inboundStream = new MediaStream(event.track);
+        //           el.srcObject = inboundStream;
+        //         }
 
-//         el.play();
+        //         el.play();
 
-//         document.querySelector("#remoteStreams").appendChild(el);
+        //         document.querySelector("#remoteStreams").appendChild(el);
       });
 
       swarm.on("error", (error, peer) => {

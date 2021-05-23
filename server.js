@@ -19,6 +19,7 @@ wss.on("connection", ws => {
       case "offer":
         console.log("OFFER", message);
         // send offer to all *other* peers
+        console.log('connections', connections)
         connections[message.id].socket.send(JSON.stringify(message));
         // connections.forEach(con => {          
         //   // if (con.sid !== message.sid) {            
@@ -31,6 +32,7 @@ wss.on("connection", ws => {
       case "answer":
         console.log("ANSWER", message);
         // send answer to all *other* peers\
+        console.log('connections', connections)
         connections[message.id].socket.send(JSON.stringify(message));
         // connections.forEach(con => {
         //   // if (con.sid !== message.sid) {
@@ -43,13 +45,15 @@ wss.on("connection", ws => {
       case "candidate":
         console.log("CANDIDATE", message);
         // send ans5wer to all *other* peers
-        connections.forEach(con => {
-          // if (con.sid !== message.sid) {1
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });
+        console.log('connections', connections)
+        connections[message.id].socket.send(JSON.stringify(message));        
+        // connections.forEach(con => {
+        //   // if (con.sid !== message.sid) {1
+        //     con.socket.send(
+        //       JSON.stringify(message)
+        //     );
+        //   // }
+        // });
         break;
       case "init":
         console.log("initializing user", message);
@@ -87,7 +91,7 @@ function updateCount() {
       JSON.stringify({
         type: "count",
         count: connections.size,
-        peers: Array.from(connections.values()).map(e => e.userId)
+        peers: Array.from(connections.values()).map(e => e.id)
       })
     );
   });
