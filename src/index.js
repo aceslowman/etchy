@@ -72,8 +72,8 @@ const setAndSendLocalDescription = (sessionDescription) => {
     .setLocalDescription(sessionDescription)
     .then(() => {
       send({
-        fromId: user_id,
-        toId: peer_id,
+        from_id: user_id,
+        to_id: peer_id,
         type: sessionDescription.type,
         sdp: sessionDescription
       });
@@ -88,8 +88,8 @@ const onIceCandidate = event => {
   if (event.candidate) {
     console.log("ICE candidate", event);
     send({
-      fromId: user_id,
-      toId: peer_id,
+      from_id: user_id,
+      to_id: peer_id,
       type: "candidate",
       candidate: event.candidate
     });
@@ -116,12 +116,8 @@ const handleOnTrack = event => {
   document.querySelector("#remoteStreams").appendChild(newRemoteStreamElem);
 };
 
-const addPendingCandidates = sid => {
-  if (sid in pendingCandidates) {
-    pendingCandidates[sid].forEach(candidate => {
-      peer.addIceCandidate(candidate);
-    });
-  }
+const addPendingCandidates = () => {
+  peer.addIceCandidate(candidate);
 };
 
 // REGISTER when connection opens
@@ -133,8 +129,6 @@ websocket.on("open", data => {
 // when signaling server sends a message
 websocket.on("message", data => {
   data = JSON.parse(event.data);
-  const sid = data.sid;
-  delete data.sid;
 
   switch (data.type) {
     case "count":
@@ -159,15 +153,17 @@ websocket.on("message", data => {
       }
       break;
     case "offer":
-      console.log("receiving offer from " + sid, data);
+      console.log("receiving offer from " + data.from_id, data);
       peer = createPeerConnection();
+      peer_id = data.from_id;
       peer.setRemoteDescription(data.sdp).then(() => {
-        sendAnswer(sid);
-        addPendingCandidates(sid);
+        sendAnswer();
+        // addPendingCandidates();
+        // peer.addIceCandidate(data.ice);
       });
       break;
     case "answer":
-      console.log("receiving answer from " + sid, data);
+      console.log("receiving answer from " + data.from_id, data);
       // if (sid !== user_id) peers[sid].setRemoteDescription(data.sdp);
       peer.setRemoteDescription(data.sdp);
       break;
