@@ -49,21 +49,39 @@ const createPeerConnection = (isOfferer = false) => {
   };
 
   pc.ontrack = event => {
-    console.log("Add streaming element", event);
-    const ele = document.createElement("video");
-    ele.autoplay = true;
-    ele.controls = true; // TEMP
+    if (document.querySelector("#peerRemote")) {
+      const ele = document.querySelector("#peerRemote");
+      console.log("update streaming element", ele);
+      ele.id = "peerRemote";
+      ele.autoplay = true;
+      ele.controls = true; // TEMP
 
-    if (event.streams && event.streams[0]) {
-      ele.srcObject = event.streams[0];
+      if (event.streams && event.streams[0]) {
+        ele.srcObject = event.streams[0];
+      } else {
+        let inboundStream = new MediaStream(event.track);
+        ele.srcObject = inboundStream;
+      }
+
+      // ele.play();
     } else {
-      let inboundStream = new MediaStream(event.track);
-      ele.srcObject = inboundStream;
+      console.log("Add streaming element", event);
+      const ele = document.createElement("video");
+      ele.id = "peerRemote";
+      ele.autoplay = true;
+      ele.controls = true; // TEMP
+
+      if (event.streams && event.streams[0]) {
+        ele.srcObject = event.streams[0];
+      } else {
+        let inboundStream = new MediaStream(event.track);
+        ele.srcObject = inboundStream;
+      }
+
+      // ele.play();
+
+      document.querySelector("#remoteStreams").appendChild(ele);
     }
-
-    ele.play();
-
-    document.querySelector("#remoteStreams").appendChild(ele);
   };
 
   // if (isOfferer) {
@@ -73,19 +91,6 @@ const createPeerConnection = (isOfferer = false) => {
   // }
 
   console.log("PeerConnection created");
-
-  // addCamera();
-  // navigator.mediaDevices
-  //   .getUserMedia({ audio: false, video: true })
-  //   .then(stream => {
-  //     localStream = stream;
-  //     document.getElementById("local-video").srcObject = localStream;
-  //     // stream.getTracks().forEach(track => pc.addTrack(track, stream));
-  //     started = true;
-  //   })
-  //   .catch(err => {
-  //     console.log("Error capturing stream.", err);
-  //   });
 
   return pc;
 };
@@ -140,7 +145,7 @@ const setAndSendLocalDescription = sdp => {
 
 const handlePeerClick = e => {
   peer_id = e.target.innerHTML;
-  addCamera().then(sendOffer);  
+  addCamera().then(sendOffer);
 };
 
 const addCamera = () => {
@@ -151,9 +156,6 @@ const addCamera = () => {
       document.getElementById("local-video").srcObject = localStream;
       stream.getTracks().forEach(track => pc.addTrack(track, stream));
       started = true;
-    })
-    .catch(err => {
-      console.log("Error capturing stream.", err);
     });
 };
 
@@ -162,6 +164,7 @@ websocket.on("open", data => {
   document.querySelector(".yourId").innerText = `your id: ${user_id}`;
   send({ type: "register", user_id: user_id });
   pc = createPeerConnection();
+  addCamera();
 });
 
 // when signaling server sends a message
