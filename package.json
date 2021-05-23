@@ -13,7 +13,10 @@
     "webrtc-adapter": "^7.7.1",
     "webpack": "^5.37.1",
     "webpack-cli": "^4.7.0",
-    "@mattkrick/fast-rtc-swarm": "^0.4.1"
+    "@mattkrick/fast-rtc-swarm": "^0.4.1",
+    "webrtc-swarm": "^2.9.0",
+    "signalhub": "^4.9.0",
+    "wrtc": "^0.4.7"
   },
   "engines": {
     "node": "12.x"
