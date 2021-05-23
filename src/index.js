@@ -244,27 +244,33 @@ const init = () => {
   document.querySelector(".center").innerText = "";
 };
 
+// composite final output
 const updateMainCanvas = () => {
   let v1 = document.querySelector("#local-video");
   let v2 = document.querySelector("#peerRemote");
 
   if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
-  if (v2) ctx.drawImage(v2, canvas.width / 2, 0, canvas.width, canvas.height);
+  
+  cameraCtx.save();
+  cameraCtx.globalCompositeOperation = "multiply";  
+  if (v2) ctx.drawImage(v2, 0, 0, canvas.width, canvas.height);
+  cameraCtx.restore();
 };
 
+// here I am masking out the video with the sketch
 const updateCameraCanvas = () => {
   let v1 = document.querySelector("#local-video");
   let v2 = document.querySelector("#local-sketch");
 
-//   if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
-  
   if (v1) cameraCtx.drawImage(v1, 0, 0, cameraCanvas.width, cameraCanvas.height);
+  
   cameraCtx.save();
-  cameraCtx.globalCompositeOperation = "xor";
+  cameraCtx.globalCompositeOperation = "destination-in";  
   if (v2) cameraCtx.drawImage(v2, 0, 0, canvas.width, canvas.height);
   cameraCtx.restore();
 };
 
+// draw sketch that can be later be used as a mask
 const drawOnSketchCanvas = () => {
   sketchCtx.fillStyle = "white";
   sketchCtx.beginPath();
