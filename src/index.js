@@ -131,7 +131,10 @@ const handlePeerClick = e => {
 
 const addCamera = () => {
   return navigator.mediaDevices
-    .getUserMedia({ audio: false, video: true })
+    .getUserMedia({ 
+      audio: false, 
+      video: {width: 640, height: 480} 
+    })
     .then(stream => {
       localStream = stream;
       document.getElementById("local-video").srcObject = localStream;
