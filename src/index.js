@@ -38,7 +38,6 @@ const createPeerConnection = (isOfferer = false) => {
 
   pc.onicecandidate = () => {
     if (event.candidate) {
-      console.log("ICE candidate", event);
       send({
         from_id: user_id,
         to_id: peer_id,
@@ -90,8 +89,8 @@ const createPeerConnection = (isOfferer = false) => {
 };
 
 const sendOffer = () => {
-  console.log("Send offer to " + peer_id);
-  if(peer_id)
+  if(!peer_id) return;
+  console.log("Send offer to " + peer_id);  
   return pc
     .createOffer()
     .then(sdp => {
@@ -104,6 +103,7 @@ const sendOffer = () => {
 };
 
 const sendAnswer = () => {
+  if(!peer_id) return;
   console.log("Send answer to " + peer_id);
   console.log("offer sent", offer_sent);
   return pc
@@ -147,7 +147,6 @@ websocket.on("open", data => {
 // when signaling server sends a message
 websocket.on("message", data => {
   data = JSON.parse(event.data);
-  console.log("data", data);
 
   switch (data.type) {
     case "count":
@@ -161,6 +160,7 @@ websocket.on("message", data => {
       });
 
       for (let i = 0; i < data.peers.length; i++) {
+        if(data.peers[i].user_id === user_id) break;
         let btn = document.createElement("button");
         btn.innerHTML = data.peers[i].user_id;
         btn.addEventListener("click", handlePeerClick);
@@ -177,7 +177,10 @@ websocket.on("message", data => {
           sendAnswer().then(() => {
             console.log("we are post answer", offer_sent);
             // sendOffer();
-            if(!offer_sent) sendOffer()
+            if(!offer_sent) {
+              // pc = createPeerConnection();
+              sendOffer()
+            }
           });
         })
         .catch(error => console.error(error));
@@ -187,11 +190,15 @@ websocket.on("message", data => {
       pc.setRemoteDescription(data.sdp)
         .then(() => {
           console.log("received answer from " + data.from_id, data);
+        
+            if(!answer_sent) {
+              // pc = createPeerConnection();
+              // sendAnswer()
+            }
         })
         .catch(error => console.error(error));
       break;
     case "candidate":
-      console.log("candidate");
       pc.addIceCandidate(data.ice);
       break;
     default:
