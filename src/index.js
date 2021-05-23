@@ -10,6 +10,7 @@ function guidGenerator() {
 let user_id = guidGenerator();
 
 let pc;
+let offer_sent = false;
 let peer_id = undefined;
 let localStream;
 
@@ -83,7 +84,10 @@ const createPeerConnection = () => {
 const sendOffer = () => {
   console.log("Send offer to " + peer_id);
   pc.createOffer()
-    .then(sdp => setAndSendLocalDescription(sdp))
+    .then(sdp => {
+      setAndSendLocalDescription(sdp);
+      offer_sent = true;
+    })
     .catch(error => {
       console.error("Send offer failed: ", error);
     });
@@ -91,8 +95,11 @@ const sendOffer = () => {
 
 const sendAnswer = () => {
   console.log("Send answer to " + peer_id);
+  console.log('offer sent', offer_sent)
   pc.createAnswer()
-    .then(sdp => setAndSendLocalDescription(sdp))
+    .then(sdp => {
+      setAndSendLocalDescription(sdp);      
+    })
     .catch(error => {
       console.error("Send answer failed: ", error);
     });
@@ -108,6 +115,12 @@ const setAndSendLocalDescription = sessionDescription => {
         type: sessionDescription.type,
         sdp: sessionDescription
       });
+    
+      // TODO NOT SURE WHY THIS ISN"T WORKING
+      if (!offer_sent) {
+        // peer_id = data.from_id;
+        // sendOffer();
+      }
       console.log("Local description set", sessionDescription);
     })
     .catch(error => {
@@ -139,14 +152,14 @@ websocket.on("message", data => {
         btn.innerHTML = data.peers[i].user_id;
         btn.addEventListener("click", e => {
           peer_id = e.target.innerHTML;
-          sendOffer(true);
+          sendOffer();
         });
         document.querySelector(".peers").appendChild(btn);
       }
       break;
     case "offer":
       console.log("receiving offer from " + data.from_id, data);
-      // peer_id = data.from_id;
+      peer_id = data.to_id;
 
       pc.setRemoteDescription(data.sdp)
         .then(() => {
@@ -155,13 +168,9 @@ websocket.on("message", data => {
         .catch(error => console.error(error));
       break;
     case "answer":
-      // peer_id = data.from_id;
+      peer_id = data.to_id;
       pc.setRemoteDescription(data.sdp)
         .then(() => {
-          if (!peer_id) {
-            peer_id = data.from_id;
-            sendOffer();
-          }
           console.log("received answer from " + data.from_id, data);
         })
         .catch(error => console.error(error));
