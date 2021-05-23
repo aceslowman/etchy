@@ -9,9 +9,8 @@ function guidGenerator() {
 
 let user_id = guidGenerator();
 
-let peer;
+let peer, mycon;
 let peer_id = "B";
-let pendingCandidates = {};
 let localStream;
 
 let started = false;
@@ -48,7 +47,7 @@ const createPeerConnection = () => {
 
 const sendOffer = () => {
   console.log("Send offer to " + peer_id);
-  peer
+  mycon
     .createOffer()
     .then(sdp => setAndSendLocalDescription(sdp))
     .catch(error => {
@@ -58,7 +57,7 @@ const sendOffer = () => {
 
 const sendAnswer = () => {
   console.log("Send answer to " + peer_id);
-  peer
+  mycon
     .createAnswer()
     .then(sdp => setAndSendLocalDescription(sdp))
     .catch(error => {
@@ -66,7 +65,7 @@ const sendAnswer = () => {
     });
 };
 
-const setAndSendLocalDescription = (sessionDescription) => {
+const setAndSendLocalDescription = sessionDescription => {
   console.log("sessionDescription", sessionDescription);
   peer
     .setLocalDescription(sessionDescription)
@@ -85,6 +84,7 @@ const setAndSendLocalDescription = (sessionDescription) => {
 };
 
 const onIceCandidate = event => {
+console.log('hit')
   if (event.candidate) {
     console.log("ICE candidate", event);
     send({
@@ -125,7 +125,7 @@ websocket.on("open", data => {
 // when signaling server sends a message
 websocket.on("message", data => {
   data = JSON.parse(event.data);
-  // console.log('data', data)
+  console.log("data", data);
 
   switch (data.type) {
     case "count":
@@ -140,11 +140,11 @@ websocket.on("message", data => {
         btn.innerHTML = data.peers[i].user_id;
         btn.addEventListener("click", e => {
           console.log("click", e.target.innerHTML);
-          
+
           // set peer
           peer = createPeerConnection();
           peer_id = e.target.innerHTML;
-          
+
           sendOffer(peer_id);
         });
         document.querySelector(".peers").appendChild(btn);
@@ -154,24 +154,36 @@ websocket.on("message", data => {
       console.log("receiving offer from " + data.from_id, data);
       peer = createPeerConnection();
       peer_id = data.from_id;
-      peer.setRemoteDescription(data.sdp).then(() => {
-        sendAnswer();
-        // addPendingCandidates();
-        peer.addIceCandidate(data.ice);
-        localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
-      }).catch(error => console.error(error));
+      peer
+        .setRemoteDescription(data.sdp)
+        .then(() => {
+          sendAnswer();
+          // addPendingCandidates();
+          peer.addIceCandidate(data.ice).catch(e => {
+            console.log("Failure during addIceCandidate(): " + e.name);
+          });
+          localStream
+            .getTracks()
+            .forEach(track => peer.addTrack(track, localStream));
+        })
+        .catch(error => console.error(error));
       break;
     case "answer":
       console.log("receiving answer from " + data.from_id, data);
-      peer.setRemoteDescription(data.sdp).then(() => {
-        // peer.addIceCandidate(data.ice);
-        localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
-      }).catch(error => console.error(error));
-      
+      peer
+        .setRemoteDescription(data.sdp)
+        .then(() => {
+          // peer.addIceCandidate(data.ice);
+          localStream
+            .getTracks()
+            .forEach(track => peer.addTrack(track, localStream));
+        })
+        .catch(error => console.error(error));
+
       // localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
       break;
     case "candidate":
-      console.log('candidate')
+      console.log("candidate");
       peer.addIceCandidate(data.ice);
       break;
     default:
@@ -193,11 +205,11 @@ const init = () => {
     .then(stream => {
       console.log("got user media", stream);
       localStream = stream;
-    
+
       // document.getElementById("local-video").srcObject = localStream;
 
       // initial connection
-      // peer = createPeerConnection();
+      mycon = createPeerConnection();
 
       // sendOffer(user_id);
 
