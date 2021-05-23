@@ -132,6 +132,9 @@ const handlePeerClick = e => {
   addCamera().then(sendOffer);
 };
 
+
+
+
 const addCamera = () => {
   return navigator.mediaDevices
     .getUserMedia({
@@ -146,11 +149,11 @@ const addCamera = () => {
       console.log("camera added");
     
       // startup the canvas loop
-      if(update_loop) {
-        update_loop = setInterval(updateCanvas, 100);
-      } else {
+      if(update_loop) {        
         clearInterval(update_loop);
         update_loop = setInterval(updateCanvas, 100);
+      } else {
+        update_loop = setInterval(updateCanvas, 1000);
       }
       
     });
@@ -226,7 +229,12 @@ const init = () => {
 };
 
 const updateCanvas = () => {
-  console.log('updating canvas')
+  console.log('updating canvas');
+  let v1 = document.querySelector('#local-video');
+  let v2 = document.querySelector('#peerRemote');
+  
+  if(v1) ctx.drawImage(v1, 0, 0, canvas.width/2, canvas.height);
+  if(v2) ctx.drawImage(v2, canvas.width/2, 0, canvas.width, canvas.height);
 };
 
 const drawOnCanvas = () => {};
