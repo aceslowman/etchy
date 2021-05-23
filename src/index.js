@@ -37,11 +37,6 @@ const createPeerConnection = () => {
 
   console.log("PeerConnection created");
 
-  // for (const track of localStream.getTracks()) {
-  //   console.log("adding track to peer connection", track);
-  //   pc.addTrack(track, localStream);
-  // }
-
   return pc;
 };
 
@@ -57,7 +52,7 @@ const sendOffer = () => {
 
 const sendAnswer = () => {
   console.log("Send answer to " + peer_id);
-  mycon
+  peer
     .createAnswer()
     .then(sdp => setAndSendLocalDescription(sdp))
     .catch(error => {
@@ -67,7 +62,7 @@ const sendAnswer = () => {
 
 const setAndSendLocalDescription = sessionDescription => {
   console.log("sessionDescription", sessionDescription);
-  peer
+  mycon
     .setLocalDescription(sessionDescription)
     .then(() => {
       send({
@@ -81,9 +76,11 @@ const setAndSendLocalDescription = sessionDescription => {
     .catch(error => {
       console.error("issue with setting local description: ", error);
     });
+  
+  peer.setRemoteDescription(sessionDescription)
 };
 
-const onIceCandidate = event => {
+const onIceCandidate = (event) => {
 console.log('hit')
   if (event.candidate) {
     console.log("ICE candidate", event);
@@ -159,7 +156,7 @@ websocket.on("message", data => {
         .then(() => {
           sendAnswer();
           // addPendingCandidates();
-          peer.addIceCandidate(data.ice).catch(e => {
+          mycon.addIceCandidate(data.ice).catch(e => {
             console.log("Failure during addIceCandidate(): " + e.name);
           });
           localStream
@@ -211,7 +208,7 @@ const init = () => {
       // initial connection
       mycon = createPeerConnection();
 
-      // sendOffer(user_id);
+      stream.getTracks().forEach(track => mycon.addTrack(track, stream));
 
       started = true;
     })
