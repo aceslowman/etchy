@@ -4,19 +4,20 @@ const ws = require("ws");
 
 const app = express();
 
+const { handlers, handleSignal } = require("./Signaling");
+console.log(handlers);
+
 const server = http.createServer(app);
 const wss = new ws.Server({ server });
 
 let connections = new Map();
-
-
 
 wss.on("connection", ws => {
   let id;
 
   ws.on("message", m => {
     let message = JSON.parse(m);
-    console.log(message)
+    console.log(message);
 
     switch (message.type) {
       case "init":
@@ -24,30 +25,29 @@ wss.on("connection", ws => {
         id = message.userId;
         connections.set(id, {
           id: id,
-          socket: ws,
+          socket: ws
         });
         updateCount();
         break;
       case "offer":
         console.log("OFFER", message);
-        if(connections[message.id])
+        if (connections[message.id])
           connections[message.id].socket.send(JSON.parse(message));
         break;
       case "answer":
         console.log("ANSWER", message);
-        if(connections[message.id])
-          connections[message.id].socket.send(JSON.parse(message));     
+        if (connections[message.id])
+          connections[message.id].socket.send(JSON.parse(message));
         break;
       case "candidate":
         console.log("CANDIDATE", message);
-        if(connections[message.id])
+        if (connections[message.id])
           connections[message.id].socket.send(JSON.parse(message));
         break;
       default:
         console.log("message received without TYPE");
         break;
     }
-
   });
 
   ws.on("close", () => {
