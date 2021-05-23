@@ -21,18 +21,16 @@ let ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let conConfig = {
-  iceServers: [{ url: "stun:stun.1.google.com:19302" }],
-  offerToReceiveAudio: false,
-  offerToReceiveVideo: true
-};
-
 // ------------------------------------------------------------
 // setting up websocket signaling server
 const websocket = new FriendlyWebSocket({ path: "/" });
 
 const createPeerConnection = () => {
-  const pc = new RTCPeerConnection(conConfig);
+  const pc = new RTCPeerConnection({
+    iceServers: [{ url: "stun:stun.1.google.com:19302" }],
+    offerToReceiveAudio: false,
+    offerToReceiveVideo: true
+  });
 
   pc.onicecandidate = () => {
     if (event.candidate) {
@@ -95,10 +93,10 @@ const sendOffer = () => {
 
 const sendAnswer = () => {
   console.log("Send answer to " + peer_id);
-  console.log('offer sent', offer_sent)
+  console.log("offer sent", offer_sent);
   pc.createAnswer()
     .then(sdp => {
-      setAndSendLocalDescription(sdp);      
+      setAndSendLocalDescription(sdp);
     })
     .catch(error => {
       console.error("Send answer failed: ", error);
@@ -115,12 +113,6 @@ const setAndSendLocalDescription = sessionDescription => {
         type: sessionDescription.type,
         sdp: sessionDescription
       });
-    
-      // TODO NOT SURE WHY THIS ISN"T WORKING
-      if (!offer_sent) {
-        // peer_id = data.from_id;
-        // sendOffer();
-      }
       console.log("Local description set", sessionDescription);
     })
     .catch(error => {
