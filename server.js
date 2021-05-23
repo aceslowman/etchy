@@ -14,35 +14,35 @@ wss.on("connection", ws => {
 
   ws.on("message", m => {
     let message = JSON.parse(m);
-    console.log("check here", message);
-
     
     switch (message.type) {
       case "offer":
-        console.log("OFFER", message.sid);
+        console.log("OFFER", message);
         // send offer to all *other* peers
-        connections.forEach(con => {          
-          // if (con.sid !== message.sid) {            
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });
+        connections[message.id].socket.send(JSON.stringify(message));
+        // connections.forEach(con => {          
+        //   // if (con.sid !== message.sid) {            
+        //     con.socket.send(
+        //       JSON.stringify(message)
+        //     );
+        //   // }
+        // });
         break;
       case "answer":
-        console.log("ANSWER", message.sid);
-        // send answer to all *other* peers
-        connections.forEach(con => {
-          // if (con.sid !== message.sid) {
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });        
+        console.log("ANSWER", message);
+        // send answer to all *other* peers\
+        connections[message.id].socket.send(JSON.stringify(message));
+        // connections.forEach(con => {
+        //   // if (con.sid !== message.sid) {
+        //     con.socket.send(
+        //       JSON.stringify(message)
+        //     );
+        //   // }
+        // });        
         break;
       case "candidate":
-        console.log("CANDIDATE", message.sid);
-        // send answer to all *other* peers
+        console.log("CANDIDATE", message);
+        // send ans5wer to all *other* peers
         connections.forEach(con => {
           // if (con.sid !== message.sid) {1
             con.socket.send(
@@ -52,13 +52,13 @@ wss.on("connection", ws => {
         });
         break;
       case "init":
-        console.log("initializing user", message.userId);
+        console.log("initializing user", message);
         id = message.userId;
         connections.set(id, {
-          userId: id,
+          id: id,
           socket: ws
         });
-        ws.send(JSON.stringify({type:'registered',userId:id}));
+        ws.send(JSON.stringify({type:'registered',id:id}));
         updateCount();
         break;
       default:

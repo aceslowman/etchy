@@ -26,7 +26,7 @@ socket.addEventListener("open", () => {
         switch (payload.type) {
           case "registered":
             user_id = payload.userId;
-            console.log("registered", payload.userId);
+            console.log("registered", payload.id);
             for (const track of localStream.getTracks()) {
               console.log("adding track to peer connection", track);
               swarm.addStreams({ track });
