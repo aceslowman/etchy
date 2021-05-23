@@ -33,7 +33,8 @@ const createPeerConnection = (isOfferer = false) => {
   const pc = new RTCPeerConnection({
     iceServers: [{ url: "stun:stun.1.google.com:19302" }],
     offerToReceiveAudio: false,
-    offerToReceiveVideo: true
+    offerToReceiveVideo: true,
+    voiceActivityDetection: false
   });
 
   pc.onicecandidate = () => {
@@ -66,24 +67,25 @@ const createPeerConnection = (isOfferer = false) => {
   };
 
   // if (isOfferer) {
-  pc.onnegotiationneeded = () => {
-    sendOffer();
-  };
+  // pc.onnegotiationneeded = () => {
+  //   sendOffer();
+  // };
   // }
 
   console.log("PeerConnection created");
 
-  navigator.mediaDevices
-    .getUserMedia({ audio: false, video: true })
-    .then(stream => {
-      localStream = stream;
-      document.getElementById("local-video").srcObject = localStream;
-      stream.getTracks().forEach(track => pc.addTrack(track, stream));
-      started = true;
-    })
-    .catch(err => {
-      console.log("Error capturing stream.", err);
-    });
+  // addCamera();
+  // navigator.mediaDevices
+  //   .getUserMedia({ audio: false, video: true })
+  //   .then(stream => {
+  //     localStream = stream;
+  //     document.getElementById("local-video").srcObject = localStream;
+  //     // stream.getTracks().forEach(track => pc.addTrack(track, stream));
+  //     started = true;
+  //   })
+  //   .catch(err => {
+  //     console.log("Error capturing stream.", err);
+  //   });
 
   return pc;
 };
@@ -92,7 +94,7 @@ const sendOffer = () => {
   if (!peer_id) return;
   console.log("Send offer to " + peer_id);
   return pc
-    .createOffer({ voiceActivityDetection: false })
+    .createOffer()
     .then(sdp => {
       setAndSendLocalDescription(sdp);
     })
@@ -108,7 +110,7 @@ const sendAnswer = () => {
   if (!peer_id) return;
   console.log("Send answer to " + peer_id);
   return pc
-    .createAnswer({ voiceActivityDetection: false })
+    .createAnswer()
     .then(sdp => {
       setAndSendLocalDescription(sdp);
     })
@@ -138,7 +140,21 @@ const setAndSendLocalDescription = sdp => {
 
 const handlePeerClick = e => {
   peer_id = e.target.innerHTML;
-  sendOffer();
+  addCamera().then(sendOffer);  
+};
+
+const addCamera = () => {
+  return navigator.mediaDevices
+    .getUserMedia({ audio: false, video: true })
+    .then(stream => {
+      localStream = stream;
+      document.getElementById("local-video").srcObject = localStream;
+      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+      started = true;
+    })
+    .catch(err => {
+      console.log("Error capturing stream.", err);
+    });
 };
 
 // REGISTER when connection opens
@@ -176,25 +192,10 @@ websocket.on("message", data => {
     case "offer":
       console.log("receiving offer from " + data.from_id, data);
       peer_id = data.from_id;
-
       pc.setRemoteDescription(data.sdp)
+        .then(addCamera)
         .then(() => {
           sendAnswer();
-
-          if (!offer_sent) {
-            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-            // navigator.mediaDevices
-            //   .getUserMedia({ audio: false, video: true })
-            //   .then(stream => {
-            //     localStream = stream;
-            //     document.getElementById("local-video").srcObject = localStream;
-            //     stream.getTracks().forEach(track => pc.addTrack(track, stream));
-            //     started = true;
-            //   })
-            //   .catch(err => {
-            //     console.log("Error capturing stream.", err);
-            //   });
-          }
         })
         .catch(error => console.error(error));
       break;
@@ -202,9 +203,7 @@ websocket.on("message", data => {
       console.log("received answer from " + data.from_id, data);
       peer_id = data.from_id;
       pc.setRemoteDescription(data.sdp)
-        .then(() => {
-          
-        })
+        .then(() => {})
         .catch(error => console.error(error));
       break;
     case "candidate":
@@ -221,10 +220,7 @@ const send = data => {
 
 const init = () => {
   if (started) return;
-
   document.querySelector(".center").innerText = "";
-
-  // pc = createPeerConnection();
 };
 
 const drawOnCanvas = () => {};
@@ -234,8 +230,6 @@ const onWindowResize = e => {
   canvas.height = window.innerHeight;
   drawOnCanvas();
 };
-
-// pc = createPeerConnection();
 
 drawOnCanvas();
 
