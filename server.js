@@ -14,6 +14,7 @@ wss.on("connection", ws => {
 
   ws.on("message", m => {
     let message = JSON.parse(m);
+    console.log(message)
 
     switch (message.type) {
       case "init":
@@ -27,15 +28,18 @@ wss.on("connection", ws => {
         break;
       case "offer":
         console.log("OFFER", message);
-        
+        if(connections[message.id])
+          connections[message.id].socket.send(JSON.parse(message));
         break;
       case "answer":
         console.log("ANSWER", message);
-             
+        if(connections[message.id])
+          connections[message.id].socket.send(JSON.parse(message));     
         break;
       case "candidate":
         console.log("CANDIDATE", message);
-        
+        if(connections[message.id])
+          connections[message.id].socket.send(JSON.parse(message));
         break;
       default:
         console.log("message received without TYPE");
