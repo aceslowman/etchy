@@ -10,7 +10,6 @@ function guidGenerator() {
 let user_id = guidGenerator();
 
 let pc;
-let offerer = false;
 let peer_id = undefined;
 let localStream;
 
@@ -140,8 +139,7 @@ websocket.on("message", data => {
         btn.innerHTML = data.peers[i].user_id;
         btn.addEventListener("click", e => {
           peer_id = e.target.innerHTML;
-          offerer = true;
-          sendOffer();
+          sendOffer(true);
         });
         document.querySelector(".peers").appendChild(btn);
       }
