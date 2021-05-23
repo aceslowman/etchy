@@ -10,7 +10,8 @@ function guidGenerator() {
 let user_id = guidGenerator();
 
 let pc;
-let peer_id = "";
+let offerer = false;
+let peer_id = undefined;
 let localStream;
 
 let started = false;
@@ -82,8 +83,7 @@ const createPeerConnection = () => {
 
 const sendOffer = () => {
   console.log("Send offer to " + peer_id);
-  pc
-    .createOffer()
+  pc.createOffer()
     .then(sdp => setAndSendLocalDescription(sdp))
     .catch(error => {
       console.error("Send offer failed: ", error);
@@ -92,8 +92,7 @@ const sendOffer = () => {
 
 const sendAnswer = () => {
   console.log("Send answer to " + peer_id);
-  pc
-    .createAnswer()
+  pc.createAnswer()
     .then(sdp => setAndSendLocalDescription(sdp))
     .catch(error => {
       console.error("Send answer failed: ", error);
@@ -102,8 +101,7 @@ const sendAnswer = () => {
 
 const setAndSendLocalDescription = sessionDescription => {
   console.log("sessionDescription", sessionDescription);
-  pc
-    .setLocalDescription(sessionDescription)
+  pc.setLocalDescription(sessionDescription)
     .then(() => {
       send({
         from_id: user_id,
@@ -142,32 +140,30 @@ websocket.on("message", data => {
         btn.innerHTML = data.peers[i].user_id;
         btn.addEventListener("click", e => {
           peer_id = e.target.innerHTML;
-          sendOffer(peer_id);
+          offerer = true;
+          sendOffer();
         });
         document.querySelector(".peers").appendChild(btn);
       }
       break;
     case "offer":
       console.log("receiving offer from " + data.from_id, data);
-      peer_id = data.from_id;
+      // peer_id = data.from_id;
 
-      pc
-        .setRemoteDescription(data.sdp)
+      pc.setRemoteDescription(data.sdp)
         .then(() => {
           sendAnswer();
-          // peer.addIceCandidate(data.ice).catch(e => {
-          //   console.log("Failure during addIceCandidate(): " + e.name);
-          // });
-          // localStream
-          //   .getTracks()
-          //   .forEach(track => peer.addTrack(track, localStream));
         })
         .catch(error => console.error(error));
       break;
     case "answer":
-      pc
-        .setRemoteDescription(data.sdp)
+      // peer_id = data.from_id;
+      pc.setRemoteDescription(data.sdp)
         .then(() => {
+          if (!peer_id) {
+            peer_id = data.from_id;
+            sendOffer();
+          }
           console.log("received answer from " + data.from_id, data);
         })
         .catch(error => console.error(error));
@@ -189,7 +185,7 @@ const init = () => {
   if (started) return;
 
   document.querySelector(".center").innerText = "";
-  
+
   pc = createPeerConnection();
 };
 
