@@ -13,7 +13,7 @@ let pc;
 let offer_sent = false;
 let answer_sent = false;
 let peer_id = undefined;
-let localStream;
+let localStream, sketchStream;
 
 let started = false;
 
@@ -62,6 +62,7 @@ const createPeerConnection = (isOfferer = false) => {
   };
 
   pc.ontrack = event => {
+    console.log('track add', event.streams)
     if (document.querySelector("#peerRemote")) {
       const ele = document.querySelector("#peerRemote");
       console.log("update streaming element", ele);
@@ -142,9 +143,6 @@ const handlePeerClick = e => {
   addCamera().then(sendOffer);
 };
 
-
-
-
 const addCamera = () => {
   return navigator.mediaDevices
     .getUserMedia({
@@ -154,16 +152,21 @@ const addCamera = () => {
     .then(stream => {
       localStream = stream;
       document.getElementById("local-video").srcObject = localStream;
-      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+    
+      sketchStream = sketchCanvas.captureStream(10); // 10 fps      
+    
+      sketchStream.getTracks().forEach(track => pc.addTrack(track, sketchStream));      
+      localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+      
       started = true;
       console.log("camera added");
     
       // startup the canvas loop
       if(update_loop) {        
         clearInterval(update_loop);
-        update_loop = setInterval(updateCanvas, 100);
+        update_loop = setInterval(updateCanvas, 700);
       } else {
-        update_loop = setInterval(updateCanvas, 1000);
+        update_loop = setInterval(updateCanvas, 700);
       }
       
     });
