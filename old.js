@@ -13,7 +13,7 @@ let pc;
 let offer_sent = false;
 let answer_sent = false;
 let peer_id = undefined;
-let localStream, sketchStream, cameraStream;
+let localStream, sketchStream;
 
 let started = false;
 
@@ -22,6 +22,8 @@ let peersElement = document.querySelector(".peers");
 
 let canvas = document.getElementById("mainCanvas");
 let ctx = canvas.getContext("2d");
+// canvas.width = window.innerWidth;
+// canvas.height = window.innerHeight;
 canvas.width = 640;
 canvas.height = 480;
 
@@ -29,16 +31,10 @@ let sketchCanvas = document.getElementById("sketchCanvas");
 let sketchCtx = sketchCanvas.getContext("2d");
 sketchCanvas.width = 640;
 sketchCanvas.height = 480;
-
-let cameraCanvas = document.getElementById("cameraCanvas");
-let cameraCtx = sketchCanvas.getContext("2d");
-cameraCanvas.width = 640;
-cameraCanvas.height = 480;
-
 let dragging = false;
 let mouse = { x: 0, y: 0 };
 
-let main_update_loop;
+let update_loop;
 
 // ------------------------------------------------------------
 // setting up websocket signaling server
@@ -68,9 +64,16 @@ const createPeerConnection = (isOfferer = false) => {
     let ele, sketch_ele;
     if (document.querySelector("#peerRemote")) {
       ele = document.querySelector("#peerRemote");
+      sketch_ele = document.querySelector("#sketchRemote");
+      console.log("update streaming element", ele);
+
     } else {
+      console.log("Add streaming element", event);
       ele = document.createElement("video");
+      sketch_ele = document.createElement("video");
+
       document.querySelector("#remoteStreams").appendChild(ele);
+      document.querySelector("#remoteStreams").appendChild(sketch_ele);
     }
 
     ele.id = "peerRemote";
@@ -82,6 +85,21 @@ const createPeerConnection = (isOfferer = false) => {
     } else {
       let inboundStream = new MediaStream(event.track);
       ele.srcObject = inboundStream;
+    }
+    
+    sketch_ele.id = "sketchRemote";
+    sketch_ele.autoplay = true;
+    sketch_ele.controls = true; // TEMP
+
+//     localStream
+//         .getTracks()
+//         .forEach(track => pc.addTrack(track, localStream, sketchStream));
+    
+    if (event.streams && event.streams[1]) {
+      sketch_ele.srcObject = event.streams[1];
+    } else {
+      // let inboundStream = new MediaStream(event.track);
+      // sketch_ele.srcObject = inboundStream;
     }
   };
 
@@ -142,34 +160,28 @@ const addCamera = () => {
     })
     .then(stream => {
       localStream = stream;
-      cameraStream = cameraCanvas.captureStream(10); // 10 fps
+      sketchStream = sketchCanvas.captureStream(10); // 10 fps
 
       document.getElementById("local-video").srcObject = localStream;
       document.getElementById("local-sketch").srcObject = sketchStream;
 
-      drawOnSketchCanvas();
+      drawOnCanvas();
 
-      cameraStream
+      
+      localStream
         .getTracks()
-        .forEach(track => pc.addTrack(track, cameraStream));
+        .forEach(track => pc.addTrack(track, localStream, sketchStream));
+      sketchStream.getTracks().forEach(track => pc.addTrack(track, localStream, sketchStream));
 
       started = true;
       console.log("camera added");
 
-      // startup the main output loop
-      if (main_update_loop) {
-        clearInterval(main_update_loop);
-        main_update_loop = setInterval(updateMainCanvas, 700);
+      // startup the canvas loop
+      if (update_loop) {
+        clearInterval(update_loop);
+        update_loop = setInterval(updateCanvas, 700);
       } else {
-        main_update_loop = setInterval(updateMainCanvas, 700);
-      }
-
-      // startup the main output loop
-      if (camera_update_loop) {
-        clearInterval(camera_update_loop);
-        camera_update_loop = setInterval(updateCameraCanvas, 700);
-      } else {
-        camera_update_loop = setInterval(updateCameraCanvas, 700);
+        update_loop = setInterval(updateCanvas, 700);
       }
     });
 };
@@ -243,15 +255,18 @@ const init = () => {
   document.querySelector(".center").innerText = "";
 };
 
-const updateMainCanvas = () => {
+const updateCanvas = () => {
+  // console.log('updating canvas');
   let v1 = document.querySelector("#local-video");
   let v2 = document.querySelector("#peerRemote");
+  let sk1 = document.querySelector("#local-sketch");
+  let sk2 = document.querySelector("#peerSketch");
 
   if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
   if (v2) ctx.drawImage(v2, canvas.width / 2, 0, canvas.width, canvas.height);
 };
 
-const drawOnSketchCanvas = () => {
+const drawOnCanvas = () => {
   sketchCtx.fillStyle = "white";
   sketchCtx.beginPath();
   sketchCtx.ellipse(100, 100, 50, 75, Math.PI / 4, 0, 2 * Math.PI);
@@ -261,7 +276,7 @@ const drawOnSketchCanvas = () => {
 const onWindowResize = e => {
   // canvas.width = window.innerWidth;
   // canvas.height = window.innerHeight;
-  drawOnSketchCanvas();
+  drawOnCanvas();
 };
 
 const handleMouseDown = e => {
@@ -282,7 +297,7 @@ const handleMouseUp = e => {
   dragging = false;
 };
 
-drawOnSketchCanvas();
+drawOnCanvas();
 
 document.addEventListener("click", init, false);
 document.addEventListener("mousedown", handleMouseDown, false);
