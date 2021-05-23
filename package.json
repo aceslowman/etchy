@@ -19,7 +19,8 @@
     "wrtc": "^0.4.7",
     "buffer": "^6.0.3",
     "stream": "^0.0.2",
-    "util": "^0.12.3"
+    "util": "^0.12.3",
+    "graphql-redis-subscriptions": "^2.4.0"
   },
   "engines": {
     "node": "12.x"

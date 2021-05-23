@@ -19,7 +19,7 @@ let connections = new Map();
 
 wss.on("connection", ws => {
   let id;
-  // let wsctx = new WebSocketContext(0);
+  let wsctx = {socket: ws, context: new WebSocketContext(0)}
 
   ws.on("message", m => {
     let message = JSON.parse(m);
@@ -29,13 +29,7 @@ wss.on("connection", ws => {
 
     switch (message.type) {
       case "init":
-        console.log("registering user", message);
-        id = message.userId;
-        connections.set(id, {
-          id: id,
-          socket: ws
-        });
-        updateCount();
+        handleInit(wsctx, message);
         break;
       default:
         console.log("message received without TYPE");

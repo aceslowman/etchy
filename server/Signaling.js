@@ -1,16 +1,16 @@
 // import getDotenv from '../../universal/utils/dotenv'
-// import {RedisPubSub} from 'graphql-redis-subscriptions'
+// const {RedisPubSub} = require('graphql-redis-subscriptions')
 
 // getDotenv()
 
-// let pubsub = RedisPubSub;
+// let pubsub = new RedisPubSub();
 let pubsub = undefined;
 const getPubSub = () => {
-  if (!pubsub) {
-    // pubsub = new RedisPubSub({
-    //   connection: process.env.REDIS_URL
-    // })
-  }
+  // if (!pubsub) {
+  //   pubsub = new RedisPubSub({
+  //     connection: process.env.REDIS_URL
+  //   })
+  // }
   return pubsub
 }
 
@@ -113,16 +113,16 @@ const handleInit = (ws, payload) => {
   ws.context.userId = userId
   const ps = getPubSub()
   const onMessage = handleMessage(ws)
-  ps.publish(
-    `signal/room/${roomId}`,
-    JSON.stringify({type: 'pubInit', userId, createdAt: ws.context.createdAt})
-  ).catch()
-  ps.subscribe(`signal/room/${roomId}`, onMessage)
-    .then((subId) => ws.context.subs.push(subId))
-    .catch()
-  ps.subscribe(`signal/user/${userId}`, onMessage)
-    .then((subId) => ws.context.subs.push(subId))
-    .catch()
+  // ps.publish(
+  //   `signal/room/${roomId}`,
+  //   JSON.stringify({type: 'pubInit', userId, createdAt: ws.context.createdAt})
+  // ).catch()
+  // ps.subscribe(`signal/room/${roomId}`, onMessage)
+  //   .then((subId) => ws.context.subs.push(subId))
+  //   .catch()
+  // ps.subscribe(`signal/user/${userId}`, onMessage)
+  //   .then((subId) => ws.context.subs.push(subId))
+  //   .catch()
 }
 
 const handleLeave = (ws, payload) => {
