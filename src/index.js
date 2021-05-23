@@ -28,7 +28,7 @@ canvas.height = window.innerHeight;
 // setting up websocket signaling server
 const websocket = new FriendlyWebSocket({ path: "/" });
 
-const createPeerConnection = () => {
+const createPeerConnection = (isOfferer = false) => {
   const pc = new RTCPeerConnection({
     iceServers: [{ url: "stun:stun.1.google.com:19302" }],
     offerToReceiveAudio: false,
@@ -65,6 +65,12 @@ const createPeerConnection = () => {
     document.querySelector("#remoteStreams").appendChild(ele);
   };
 
+  if (isOfferer) {
+    pc.onnegotiationneeded = () => {
+      sendOffer();
+    };
+  }
+
   console.log("PeerConnection created");
 
   navigator.mediaDevices
@@ -84,7 +90,8 @@ const createPeerConnection = () => {
 
 const sendOffer = () => {
   console.log("Send offer to " + peer_id);
-  pc.createOffer()
+  return pc
+    .createOffer()
     .then(sdp => {
       setAndSendLocalDescription(sdp);
       offer_sent = true;
@@ -97,7 +104,8 @@ const sendOffer = () => {
 const sendAnswer = () => {
   console.log("Send answer to " + peer_id);
   console.log("offer sent", offer_sent);
-  pc.createAnswer()
+  return pc
+    .createAnswer()
     .then(sdp => {
       setAndSendLocalDescription(sdp);
     })
@@ -106,17 +114,15 @@ const sendAnswer = () => {
     });
 };
 
-const setAndSendLocalDescription = sessionDescription => {
-  console.log("sessionDescription", sessionDescription);
-  pc.setLocalDescription(sessionDescription)
+const setAndSendLocalDescription = sdp => {
+  pc.setLocalDescription(sdp)
     .then(() => {
       send({
         from_id: user_id,
         to_id: peer_id,
-        type: sessionDescription.type,
-        sdp: sessionDescription
+        type: sdp.type,
+        sdp: sdp
       });
-      console.log("Local description set", sessionDescription);
     })
     .catch(error => {
       console.error("issue with setting local description: ", error);
@@ -132,6 +138,7 @@ const handlePeerClick = e => {
 websocket.on("open", data => {
   document.querySelector(".yourId").innerText = `your id: ${user_id}`;
   send({ type: "register", user_id: user_id });
+  pc = createPeerConnection();
 });
 
 // when signaling server sends a message
@@ -143,7 +150,7 @@ websocket.on("message", data => {
     case "count":
       countElement.innerText = `currently online: ${data.count}`;
       console.log(Array.from(peersElement.children));
-      
+
       // clear all buttons
       Array.from(peersElement.children).forEach(e => {
         e.removeEventListener("click", handlePeerClick);
@@ -164,7 +171,9 @@ websocket.on("message", data => {
 
       pc.setRemoteDescription(data.sdp)
         .then(() => {
-          sendAnswer();
+          sendAnswer().then(() => {
+            console.log("we are post answer");
+          });
         })
         .catch(error => console.error(error));
       break;
@@ -205,7 +214,7 @@ const onWindowResize = e => {
   drawOnCanvas();
 };
 
-pc = createPeerConnection();
+// pc = createPeerConnection();
 
 drawOnCanvas();
 
