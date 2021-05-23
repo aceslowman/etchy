@@ -77,8 +77,8 @@ const handleAnswer = (ws, payload) => {
 }
 
 const handleCandidate = (ws, payload) => {
-  const {candidate, id} = payload
-  const {context} = ws
+  const {candidate, id} = payload;
+  const {context} = ws;
   // if (!candidate) return
   const to = context.connectedPeers[id]
   if (to) {
@@ -216,6 +216,7 @@ const handlers = {
 };
 
 const handleSignal = (ws, payload) => {
+  // console.log('payload',payload)
   const {type} = payload
   const handler = handlers[type]
   if (handler && ws.context) {
@@ -262,6 +263,8 @@ const validateInit = (
 }
 
 module.exports = {
+  WebSocketContext,
   handlers,
-  handleSignal
+  handleSignal,
+  handleInit
 }

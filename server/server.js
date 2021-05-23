@@ -4,8 +4,13 @@ const ws = require("ws");
 
 const app = express();
 
-const { handlers, handleSignal } = require("./Signaling");
-console.log(handlers);
+const {
+  handleInit,
+  WebSocketContext,
+  handlers,
+  handleSignal
+} = require("./Signaling");
+// console.log(handlers);
 
 const server = http.createServer(app);
 const wss = new ws.Server({ server });
@@ -14,10 +19,13 @@ let connections = new Map();
 
 wss.on("connection", ws => {
   let id;
+  // let wsctx = new WebSocketContext(0);
 
   ws.on("message", m => {
     let message = JSON.parse(m);
     console.log(message);
+
+    // handleSignal(ws.socket, message);
 
     switch (message.type) {
       case "init":
@@ -28,21 +36,6 @@ wss.on("connection", ws => {
           socket: ws
         });
         updateCount();
-        break;
-      case "offer":
-        console.log("OFFER", message);
-        if (connections[message.id])
-          connections[message.id].socket.send(JSON.parse(message));
-        break;
-      case "answer":
-        console.log("ANSWER", message);
-        if (connections[message.id])
-          connections[message.id].socket.send(JSON.parse(message));
-        break;
-      case "candidate":
-        console.log("CANDIDATE", message);
-        if (connections[message.id])
-          connections[message.id].socket.send(JSON.parse(message));
         break;
       default:
         console.log("message received without TYPE");
