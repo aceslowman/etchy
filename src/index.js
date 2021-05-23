@@ -11,6 +11,7 @@ let user_id = guidGenerator();
 
 let pc;
 let offer_sent = false;
+let answer_sent = false;
 let peer_id = undefined;
 let localStream;
 
@@ -65,11 +66,11 @@ const createPeerConnection = (isOfferer = false) => {
     document.querySelector("#remoteStreams").appendChild(ele);
   };
 
-  if (isOfferer) {
+  // if (isOfferer) {
     pc.onnegotiationneeded = () => {
       sendOffer();
     };
-  }
+  // }
 
   console.log("PeerConnection created");
 
@@ -90,6 +91,7 @@ const createPeerConnection = (isOfferer = false) => {
 
 const sendOffer = () => {
   console.log("Send offer to " + peer_id);
+  if(peer_id)
   return pc
     .createOffer()
     .then(sdp => {
@@ -108,6 +110,7 @@ const sendAnswer = () => {
     .createAnswer()
     .then(sdp => {
       setAndSendLocalDescription(sdp);
+      answer_sent = true;
     })
     .catch(error => {
       console.error("Send answer failed: ", error);
@@ -172,7 +175,9 @@ websocket.on("message", data => {
       pc.setRemoteDescription(data.sdp)
         .then(() => {
           sendAnswer().then(() => {
-            console.log("we are post answer");
+            console.log("we are post answer", offer_sent);
+            // sendOffer();
+            if(!offer_sent) sendOffer()
           });
         })
         .catch(error => console.error(error));

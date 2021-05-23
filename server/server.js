@@ -48,29 +48,32 @@ wss.on("connection", ws => {
         connections.set(id, {
           user_id: id,
           peer_id: null,
-          socket: ws,
+          socket: ws
         });
         updateCount();
         break;
       case "offer":
-        console.log("OFFER", [message.from_id,message.to_id]);
-        connections.get(message.to_id).peer_id = message.from_id;
-        // console.log("CHECK", connections.get(message.to_id))
-        // if(connections.get(message.to_id))
-          connections.get(message.to_id).socket.send(JSON.stringify(message))
+        console.log("OFFER", [message.from_id, message.to_id]);
+        if (connections.get(message.to_id)) {
+          connections.get(message.to_id).peer_id = message.from_id;
+          connections.get(message.to_id).socket.send(JSON.stringify(message));
+        }
+
         break;
       case "answer":
-        console.log("ANSWER", [message.from_id,message.to_id]);
-        connections.get(message.to_id).peer_id = message.from_id;
-        // console.log("CHECK", connections.get(message.to_id))
-        // if(connections.get(message.to_id))
-          connections.get(message.to_id).socket.send(JSON.stringify(message))       
+        console.log("ANSWER", [message.from_id, message.to_id]);
+        if (connections.get(message.to_id)) {
+          connections.get(message.to_id).peer_id = message.from_id;
+          connections.get(message.to_id).socket.send(JSON.stringify(message));
+        }
+
         break;
       case "candidate":
-        console.log("CANDIDATE", [message.from_id,message.to_id]);
-        // console.log("CHECK", connections.get(message.to_id))
-        // if(connections.get(message.to_id))
-          connections.get(message.to_id).socket.send(JSON.stringify(message))
+        console.log("CANDIDATE", [message.from_id, message.to_id]);
+        if (connections.get(message.to_id)) {
+          connections.get(message.to_id).socket.send(JSON.stringify(message));
+        }
+
         break;
       default:
         console.log("message received without TYPE");
@@ -93,7 +96,10 @@ function updateCount() {
       JSON.stringify({
         type: "count",
         count: connections.size,
-        peers: Array.from(connections.values()).map(e => ({user_id: e.user_id,peer_id: e.peer_id}))
+        peers: Array.from(connections.values()).map(e => ({
+          user_id: e.user_id,
+          peer_id: e.peer_id
+        }))
       })
     );
   });
