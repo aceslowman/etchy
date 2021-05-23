@@ -73,17 +73,17 @@ const createPeerConnection = (isOfferer = false) => {
 
   console.log("PeerConnection created");
 
-  navigator.mediaDevices
-    .getUserMedia({ audio: false, video: true })
-    .then(stream => {
-      localStream = stream;
-      document.getElementById("local-video").srcObject = localStream;
-      stream.getTracks().forEach(track => pc.addTrack(track, stream));
-      started = true;
-    })
-    .catch(err => {
-      console.log("Error capturing stream.", err);
-    });
+  // navigator.mediaDevices
+  //   .getUserMedia({ audio: false, video: true })
+  //   .then(stream => {
+  //     localStream = stream;
+  //     document.getElementById("local-video").srcObject = localStream;
+  //     stream.getTracks().forEach(track => pc.addTrack(track, stream));
+  //     started = true;
+  //   })
+  //   .catch(err => {
+  //     console.log("Error capturing stream.", err);
+  //   });
 
   return pc;
 };
@@ -113,7 +113,7 @@ const sendAnswer = () => {
       setAndSendLocalDescription(sdp);
     })
     .then(() => {
-      answer_sent = true;      
+      answer_sent = true;
     })
     .catch(error => {
       console.error("Send answer failed: ", error);
@@ -180,6 +180,21 @@ websocket.on("message", data => {
       pc.setRemoteDescription(data.sdp)
         .then(() => {
           sendAnswer();
+
+          if (!offer_sent) {
+            // localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+            navigator.mediaDevices
+              .getUserMedia({ audio: false, video: true })
+              .then(stream => {
+                localStream = stream;
+                document.getElementById("local-video").srcObject = localStream;
+                stream.getTracks().forEach(track => pc.addTrack(track, stream));
+                started = true;
+              })
+              .catch(err => {
+                console.log("Error capturing stream.", err);
+              });
+          }
         })
         .catch(error => console.error(error));
       break;
@@ -187,7 +202,9 @@ websocket.on("message", data => {
       console.log("received answer from " + data.from_id, data);
       peer_id = data.from_id;
       pc.setRemoteDescription(data.sdp)
-        .then(() => {})
+        .then(() => {
+          
+        })
         .catch(error => console.error(error));
       break;
     case "candidate":
