@@ -156,7 +156,7 @@ const addCamera = () => {
       document.getElementById("local-video").srcObject = localStream;
       document.getElementById("local-sketch").srcObject = sketchStream;
     
-      
+      drawOnCanvas();
     
       // sketchStream.getTracks().forEach(track => pc.addTrack(track, sketchStream));      
       localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
@@ -266,7 +266,17 @@ const onWindowResize = e => {
   drawOnCanvas();
 };
 
+
+const handleMouseDown = e => {}
+const handleMouseMove = e => {}
+const handleMouseUp = e => {}
+
+
+
+
+
 drawOnCanvas();
 
 document.addEventListener("click", init, false);
+document.addEventListener("onmouseup", handleMouseUp, false);
 window.addEventListener("resize", onWindowResize, false);
