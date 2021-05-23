@@ -38,10 +38,10 @@ const createPeerConnection = () => {
 
   console.log("PeerConnection created");
 
-  for (const track of localStream.getTracks()) {
-    console.log("adding track to peer connection", track);
-    pc.addTrack(track, localStream);
-  }
+  // for (const track of localStream.getTracks()) {
+  //   console.log("adding track to peer connection", track);
+  //   pc.addTrack(track, localStream);
+  // }
 
   return pc;
 };
@@ -156,11 +156,19 @@ websocket.on("message", data => {
         sendAnswer();
         // addPendingCandidates();
         // peer.addIceCandidate(data.ice);
-      });
+        localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
+      }).catch(error => console.error(error));
       break;
     case "answer":
       console.log("receiving answer from " + data.from_id, data);
-      peer.setRemoteDescription(data.sdp);
+      peer.setRemoteDescription(data.sdp).then(() => {
+        // sendAnswer();
+        // addPendingCandidates();
+        // peer.addIceCandidate(data.ice);
+        localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
+      }).catch(error => console.error(error));
+      
+      // localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
       break;
     case "candidate":
       peer.addIceCandidate(data.ice);
@@ -184,6 +192,8 @@ const init = () => {
     .then(stream => {
       console.log("got user media", stream);
       localStream = stream;
+    
+      // document.getElementById("local-video").srcObject = localStream;
 
       // initial connection
       // peer = createPeerConnection();
