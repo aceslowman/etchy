@@ -16,20 +16,20 @@ body,
 
 #APP,
 #mainCanvas,
-.center {
+.center, #info {
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0px;
-  left: 0px;
+  left: 0px;  
 }
 
 #APP {
   padding: 15px;
 }
 
-.paired {
-  font-size: 3em;
+#info {
+  z-index: 2;
 }
 
 .center {
@@ -39,6 +39,7 @@ body,
   color: white;
   flex-flow: column;
   text-align: center;
+  z-index:1;
 }
 
 .center > * {

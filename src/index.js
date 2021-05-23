@@ -46,32 +46,37 @@ const createPeerConnection = () => {
   return pc;
 };
 
-const sendOffer = sid => {
-  console.log("Send offer to " + sid);
+const sendOffer = () => {
+  console.log("Send offer to " + peer_id);
   peer
     .createOffer()
-    .then(sdp => setAndSendLocalDescription(sid, sdp))
+    .then(sdp => setAndSendLocalDescription(sdp))
     .catch(error => {
       console.error("Send offer failed: ", error);
     });
 };
 
-const sendAnswer = sid => {
-  console.log("Send answer to " + sid);
+const sendAnswer = () => {
+  console.log("Send answer to " + peer_id);
   peer
     .createAnswer()
-    .then(sdp => setAndSendLocalDescription(sid, sdp))
+    .then(sdp => setAndSendLocalDescription(sdp))
     .catch(error => {
       console.error("Send answer failed: ", error);
     });
 };
 
-const setAndSendLocalDescription = (sid, sessionDescription) => {
-  console.log("sessionDescription", sessionDescription);  
+const setAndSendLocalDescription = (sessionDescription) => {
+  console.log("sessionDescription", sessionDescription);
   peer
     .setLocalDescription(sessionDescription)
     .then(() => {
-      send({ fromId: user_id, toId: sid, type: sessionDescription.type, sdp: sessionDescription });
+      send({
+        fromId: user_id,
+        toId: peer_id,
+        type: sessionDescription.type,
+        sdp: sessionDescription
+      });
       console.log("Local description set", sessionDescription);
     })
     .catch(error => {
@@ -83,7 +88,7 @@ const onIceCandidate = event => {
   if (event.candidate) {
     console.log("ICE candidate", event);
     send({
-      fromId: user_id, 
+      fromId: user_id,
       toId: peer_id,
       type: "candidate",
       candidate: event.candidate
@@ -123,7 +128,6 @@ const addPendingCandidates = sid => {
 websocket.on("open", data => {
   document.querySelector(".yourId").innerText = `your id: ${user_id}`;
   send({ type: "register", user_id: user_id });
-  peer = createPeerConnection();
 });
 
 // when signaling server sends a message
@@ -140,15 +144,18 @@ websocket.on("message", data => {
       document.querySelector(
         ".peers"
       ).innerText = `currently online: [${JSON.stringify(data.peers)}]`;
-      for(let i = 0; i < data.peers.length; i++) {
-        let btn = document.createElement('button');
+      for (let i = 0; i < data.peers.length; i++) {
+        let btn = document.createElement("button");
         btn.innerHTML = data.peers[i].user_id;
-        btn.addEventListener('click', (e) => {
-          console.log('click', e.target.innerHTML)
-        })
-        document.querySelector(
-        ".peers"
-      ).appendChild(btn)
+        btn.addEventListener("click", e => {
+          console.log("click", e.target.innerHTML);
+          
+          // set peer
+          peer = createPeerConnection();
+          peer_id = e.target.innerHTML;
+          sendOffer(peer_id);
+        });
+        document.querySelector(".peers").appendChild(btn);
       }
       break;
     case "offer":
@@ -166,7 +173,7 @@ websocket.on("message", data => {
       break;
     case "candidate":
       // if (sid in peers) {
-        peer.addIceCandidate(data.ice);
+      peer.addIceCandidate(data.ice);
       // } else {
       //   if (!(sid in pendingCandidates)) {
       //     pendingCandidates[sid] = [];
@@ -195,9 +202,9 @@ const init = () => {
       localStream = stream;
 
       // initial connection
-      peer = createPeerConnection();
+      // peer = createPeerConnection();
 
-      sendOffer(user_id);
+      // sendOffer(user_id);
 
       started = true;
     })
