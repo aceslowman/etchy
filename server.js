@@ -2,7 +2,6 @@ const http = require("http");
 const express = require("express");
 const ws = require("ws");
 
-const swarm = require('webrtc-swarm');
 const signalhub = require("signalhub");
 const hub = signalhub('etchy', ['https://etchy.glitch.me:3000']);
 
