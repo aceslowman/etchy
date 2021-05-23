@@ -10,6 +10,7 @@ function guidGenerator() {
 let user_id = guidGenerator();
 
 let peer;
+let peer_id = "B";
 let pendingCandidates = {};
 let localStream;
 
@@ -66,11 +67,11 @@ const sendAnswer = sid => {
 };
 
 const setAndSendLocalDescription = (sid, sessionDescription) => {
-  console.log("sessionDescription", sessionDescription);
+  console.log("sessionDescription", sessionDescription);  
   peer
     .setLocalDescription(sessionDescription)
     .then(() => {
-      send({ sid, type: sessionDescription.type, sdp: sessionDescription });
+      send({ fromId: user_id, toId: sid, type: sessionDescription.type, sdp: sessionDescription });
       console.log("Local description set", sessionDescription);
     })
     .catch(error => {
@@ -82,7 +83,8 @@ const onIceCandidate = event => {
   if (event.candidate) {
     console.log("ICE candidate", event);
     send({
-      sid: user_id,
+      fromId: user_id, 
+      toId: peer_id,
       type: "candidate",
       candidate: event.candidate
     });
@@ -138,6 +140,9 @@ websocket.on("message", data => {
       document.querySelector(
         ".peers"
       ).innerText = `currently online: [${data.peers}]`;
+      for(let i = 0; i < data.peers.length; i++) {
+        
+      }
       break;
     case "offer":
       console.log("receiving offer from " + sid, data);
@@ -154,7 +159,7 @@ websocket.on("message", data => {
       break;
     case "candidate":
       // if (sid in peers) {
-      peer.addIceCandidate(data.ice);
+        peer.addIceCandidate(data.ice);
       // } else {
       //   if (!(sid in pendingCandidates)) {
       //     pendingCandidates[sid] = [];
