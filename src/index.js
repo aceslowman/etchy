@@ -42,7 +42,7 @@ const createPeerConnection = () => {
 
 const sendOffer = () => {
   console.log("Send offer to " + peer_id);
-  mycon
+  peer
     .createOffer()
     .then(sdp => setAndSendLocalDescription(sdp))
     .catch(error => {
@@ -62,7 +62,7 @@ const sendAnswer = () => {
 
 const setAndSendLocalDescription = sessionDescription => {
   console.log("sessionDescription", sessionDescription);
-  mycon
+  peer
     .setLocalDescription(sessionDescription)
     .then(() => {
       send({
@@ -76,12 +76,10 @@ const setAndSendLocalDescription = sessionDescription => {
     .catch(error => {
       console.error("issue with setting local description: ", error);
     });
-  
-  peer.setRemoteDescription(sessionDescription)
 };
 
-const onIceCandidate = (event) => {
-console.log('hit')
+const onIceCandidate = event => {
+  console.log("hit");
   if (event.candidate) {
     console.log("ICE candidate", event);
     send({
@@ -151,33 +149,27 @@ websocket.on("message", data => {
       console.log("receiving offer from " + data.from_id, data);
       peer = createPeerConnection();
       peer_id = data.from_id;
+
       peer
         .setRemoteDescription(data.sdp)
         .then(() => {
           sendAnswer();
-          // addPendingCandidates();
-          mycon.addIceCandidate(data.ice).catch(e => {
-            console.log("Failure during addIceCandidate(): " + e.name);
-          });
-          localStream
-            .getTracks()
-            .forEach(track => peer.addTrack(track, localStream));
+          // peer.addIceCandidate(data.ice).catch(e => {
+          //   console.log("Failure during addIceCandidate(): " + e.name);
+          // });
+          // localStream
+          //   .getTracks()
+          //   .forEach(track => peer.addTrack(track, localStream));
         })
         .catch(error => console.error(error));
       break;
-    case "answer":
-      console.log("receiving answer from " + data.from_id, data);
+    case "answer":      
       peer
         .setRemoteDescription(data.sdp)
         .then(() => {
-          // peer.addIceCandidate(data.ice);
-          localStream
-            .getTracks()
-            .forEach(track => peer.addTrack(track, localStream));
+          console.log("received answer from " + data.from_id, data);
         })
         .catch(error => console.error(error));
-
-      // localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
       break;
     case "candidate":
       console.log("candidate");
@@ -206,9 +198,9 @@ const init = () => {
       // document.getElementById("local-video").srcObject = localStream;
 
       // initial connection
-      mycon = createPeerConnection();
+      peer = createPeerConnection();
 
-      stream.getTracks().forEach(track => mycon.addTrack(track, stream));
+      stream.getTracks().forEach(track => peer.addTrack(track, stream));
 
       started = true;
     })
