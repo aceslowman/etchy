@@ -115,6 +115,7 @@ const sendAnswer = () => {
     .then(() => {
       answer_sent = true;
       if(!offer_sent) {
+        // this feels like it should work?
         sendOffer();
       }
     })
@@ -124,7 +125,7 @@ const sendAnswer = () => {
 };
 
 const setAndSendLocalDescription = sdp => {
-  pc.setLocalDescription(sdp)
+  return pc.setLocalDescription(sdp)
     .then(() => {
       send({
         from_id: user_id,
