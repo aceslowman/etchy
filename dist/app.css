@@ -49,5 +49,10 @@ body,
 
 #feeds {
   display: flex;
-  
+  height: 200px;
+}
+
+#remoteStreams {
+  height:100%;
+  display: flex;
 }

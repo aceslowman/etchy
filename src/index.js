@@ -22,8 +22,11 @@ let peersElement = document.querySelector(".peers");
 
 let canvas = document.getElementById("mainCanvas");
 let ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = 640;
+canvas.height = 480;
+let update_loop;
+// canvas.width = window.innerWidth;
+// canvas.height = window.innerHeight;
 
 // ------------------------------------------------------------
 // setting up websocket signaling server
@@ -131,9 +134,9 @@ const handlePeerClick = e => {
 
 const addCamera = () => {
   return navigator.mediaDevices
-    .getUserMedia({ 
-      audio: false, 
-      video: {width: 640, height: 480} 
+    .getUserMedia({
+      audio: false,
+      video: { width: 640, height: 480 }
     })
     .then(stream => {
       localStream = stream;
@@ -141,6 +144,15 @@ const addCamera = () => {
       stream.getTracks().forEach(track => pc.addTrack(track, stream));
       started = true;
       console.log("camera added");
+    
+      // startup the canvas loop
+      if(update_loop) {
+        update_loop = setInterval(updateCanvas, 100);
+      } else {
+        clearInterval(update_loop);
+        update_loop = setInterval(updateCanvas, 100);
+      }
+      
     });
 };
 
@@ -213,11 +225,15 @@ const init = () => {
   document.querySelector(".center").innerText = "";
 };
 
+const updateCanvas = () => {
+  console.log('updating canvas')
+};
+
 const drawOnCanvas = () => {};
 
 const onWindowResize = e => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  // canvas.width = window.innerWidth;
+  // canvas.height = window.innerHeight;
   drawOnCanvas();
 };
 
