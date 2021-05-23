@@ -15,8 +15,9 @@ socket.addEventListener("open", () => {
       localStream = stream;
       started = true;
 
-      swarm.on("signal", signal => {
+      swarm.on("signal", (signal, peer) => {
         console.log('sending signal', signal)
+        console.log('peer', peer)
         socket.send(JSON.stringify(signal));
       });
 
