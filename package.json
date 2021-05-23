@@ -16,7 +16,10 @@
     "@mattkrick/fast-rtc-swarm": "^0.4.1",
     "webrtc-swarm": "^2.9.0",
     "signalhub": "^4.9.0",
-    "wrtc": "^0.4.7"
+    "wrtc": "^0.4.7",
+    "buffer": "^6.0.3",
+    "stream": "^0.0.2",
+    "util": "^0.12.3"
   },
   "engines": {
     "node": "12.x"
