@@ -31,14 +31,14 @@ sketchCanvas.width = 640;
 sketchCanvas.height = 480;
 
 let cameraCanvas = document.getElementById("cameraCanvas");
-let cameraCtx = sketchCanvas.getContext("2d");
+let cameraCtx = cameraCanvas.getContext("2d");
 cameraCanvas.width = 640;
 cameraCanvas.height = 480;
 
 let dragging = false;
 let mouse = { x: 0, y: 0 };
 
-let main_update_loop;
+let main_update_loop, camera_update_loop;
 
 // ------------------------------------------------------------
 // setting up websocket signaling server
@@ -143,6 +143,7 @@ const addCamera = () => {
     .then(stream => {
       localStream = stream;
       cameraStream = cameraCanvas.captureStream(10); // 10 fps
+      sketchStream = sketchCanvas.captureStream(10);
 
       document.getElementById("local-video").srcObject = localStream;
       document.getElementById("local-sketch").srcObject = sketchStream;
@@ -249,6 +250,19 @@ const updateMainCanvas = () => {
 
   if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
   if (v2) ctx.drawImage(v2, canvas.width / 2, 0, canvas.width, canvas.height);
+};
+
+const updateCameraCanvas = () => {
+  let v1 = document.querySelector("#local-video");
+  let v2 = document.querySelector("#local-sketch");
+
+//   if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
+  
+  if (v1) cameraCtx.drawImage(v1, 0, 0, cameraCanvas.width, cameraCanvas.height);
+  cameraCtx.save();
+  cameraCtx.globalCompositeOperation = "xor";
+  if (v2) cameraCtx.drawImage(v2, 0, 0, canvas.width, canvas.height);
+  cameraCtx.restore();
 };
 
 const drawOnSketchCanvas = () => {
