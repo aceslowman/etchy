@@ -9,8 +9,8 @@ function guidGenerator() {
 
 let user_id = guidGenerator();
 
-let peer, mycon;
-let peer_id = "B";
+let pc;
+let peer_id = "";
 let localStream;
 
 let started = false;
@@ -32,17 +32,57 @@ const websocket = new FriendlyWebSocket({ path: "/" });
 
 const createPeerConnection = () => {
   const pc = new RTCPeerConnection(conConfig);
-  pc.onicecandidate = onIceCandidate;
-  pc.ontrack = handleOnTrack;
+
+  pc.onicecandidate = () => {
+    if (event.candidate) {
+      console.log("ICE candidate", event);
+      send({
+        from_id: user_id,
+        to_id: peer_id,
+        type: "candidate",
+        candidate: event.candidate
+      });
+    }
+  };
+
+  pc.ontrack = event => {
+    console.log("Add streaming element", event);
+    const ele = document.createElement("video");
+    ele.autoplay = true;
+    ele.controls = true; // TEMP
+
+    if (event.streams && event.streams[0]) {
+      ele.srcObject = event.streams[0];
+    } else {
+      let inboundStream = new MediaStream(event.track);
+      ele.srcObject = inboundStream;
+    }
+
+    ele.play();
+
+    document.querySelector("#remoteStreams").appendChild(ele);
+  };
 
   console.log("PeerConnection created");
+
+  navigator.mediaDevices
+    .getUserMedia({ audio: false, video: true })
+    .then(stream => {
+      localStream = stream;
+      document.getElementById("local-video").srcObject = localStream;
+      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+      started = true;
+    })
+    .catch(err => {
+      console.log("Error capturing stream.", err);
+    });
 
   return pc;
 };
 
 const sendOffer = () => {
   console.log("Send offer to " + peer_id);
-  peer
+  pc
     .createOffer()
     .then(sdp => setAndSendLocalDescription(sdp))
     .catch(error => {
@@ -52,7 +92,7 @@ const sendOffer = () => {
 
 const sendAnswer = () => {
   console.log("Send answer to " + peer_id);
-  peer
+  pc
     .createAnswer()
     .then(sdp => setAndSendLocalDescription(sdp))
     .catch(error => {
@@ -62,7 +102,7 @@ const sendAnswer = () => {
 
 const setAndSendLocalDescription = sessionDescription => {
   console.log("sessionDescription", sessionDescription);
-  peer
+  pc
     .setLocalDescription(sessionDescription)
     .then(() => {
       send({
@@ -76,39 +116,6 @@ const setAndSendLocalDescription = sessionDescription => {
     .catch(error => {
       console.error("issue with setting local description: ", error);
     });
-};
-
-const onIceCandidate = event => {
-  console.log("hit");
-  if (event.candidate) {
-    console.log("ICE candidate", event);
-    send({
-      from_id: user_id,
-      to_id: peer_id,
-      type: "candidate",
-      candidate: event.candidate
-    });
-  } else {
-    console.log("All ICE candidates have been sent");
-  }
-};
-
-const handleOnTrack = event => {
-  console.log("Add streaming element", event);
-  const newRemoteStreamElem = document.createElement("video");
-  newRemoteStreamElem.autoplay = true;
-  newRemoteStreamElem.controls = true; // TEMP
-
-  if (event.streams && event.streams[0]) {
-    newRemoteStreamElem.srcObject = event.streams[0];
-  } else {
-    let inboundStream = new MediaStream(event.track);
-    newRemoteStreamElem.srcObject = inboundStream;
-  }
-
-  newRemoteStreamElem.play();
-
-  document.querySelector("#remoteStreams").appendChild(newRemoteStreamElem);
 };
 
 // REGISTER when connection opens
@@ -134,12 +141,7 @@ websocket.on("message", data => {
         let btn = document.createElement("button");
         btn.innerHTML = data.peers[i].user_id;
         btn.addEventListener("click", e => {
-          console.log("click", e.target.innerHTML);
-
-          // set peer
-          peer = createPeerConnection();
           peer_id = e.target.innerHTML;
-
           sendOffer(peer_id);
         });
         document.querySelector(".peers").appendChild(btn);
@@ -147,10 +149,9 @@ websocket.on("message", data => {
       break;
     case "offer":
       console.log("receiving offer from " + data.from_id, data);
-      peer = createPeerConnection();
       peer_id = data.from_id;
 
-      peer
+      pc
         .setRemoteDescription(data.sdp)
         .then(() => {
           sendAnswer();
@@ -163,8 +164,8 @@ websocket.on("message", data => {
         })
         .catch(error => console.error(error));
       break;
-    case "answer":      
-      peer
+    case "answer":
+      pc
         .setRemoteDescription(data.sdp)
         .then(() => {
           console.log("received answer from " + data.from_id, data);
@@ -173,7 +174,7 @@ websocket.on("message", data => {
       break;
     case "candidate":
       console.log("candidate");
-      peer.addIceCandidate(data.ice);
+      pc.addIceCandidate(data.ice);
       break;
     default:
       break;
@@ -188,25 +189,8 @@ const init = () => {
   if (started) return;
 
   document.querySelector(".center").innerText = "";
-
-  navigator.mediaDevices
-    .getUserMedia({ audio: false, video: true })
-    .then(stream => {
-      console.log("got user media", stream);
-      localStream = stream;
-
-      // document.getElementById("local-video").srcObject = localStream;
-
-      // initial connection
-      peer = createPeerConnection();
-
-      stream.getTracks().forEach(track => peer.addTrack(track, stream));
-
-      started = true;
-    })
-    .catch(err => {
-      console.log("Error capturing stream.", err);
-    });
+  
+  pc = createPeerConnection();
 };
 
 const drawOnCanvas = () => {};
