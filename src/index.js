@@ -96,9 +96,7 @@ const sendOffer = () => {
   console.log("Send offer to " + peer_id);
   return pc
     .createOffer()
-    .then(sdp => {
-      setAndSendLocalDescription(sdp);
-    })
+    .then(setAndSendLocalDescription)
     .then(() => {
       offer_sent = true;
     });
@@ -109,25 +107,21 @@ const sendAnswer = () => {
   console.log("Send answer to " + peer_id);
   return pc
     .createAnswer()
-    .then(sdp => {
-      setAndSendLocalDescription(sdp);
-    })
+    .then(setAndSendLocalDescription)
     .then(() => {
       answer_sent = true;
     });
 };
 
 const setAndSendLocalDescription = sdp => {
-  return pc
-    .setLocalDescription(sdp)
-    .then(() => {
-      send({
-        from_id: user_id,
-        to_id: peer_id,
-        type: sdp.type,
-        sdp: sdp
-      });
+  return pc.setLocalDescription(sdp).then(() => {
+    send({
+      from_id: user_id,
+      to_id: peer_id,
+      type: sdp.type,
+      sdp: sdp
     });
+  });
 };
 
 const handlePeerClick = e => {
@@ -143,7 +137,7 @@ const addCamera = () => {
       document.getElementById("local-video").srcObject = localStream;
       stream.getTracks().forEach(track => pc.addTrack(track, stream));
       started = true;
-      console.log('camera added')
+      console.log("camera added");
     });
 };
 
@@ -152,7 +146,6 @@ websocket.on("open", data => {
   document.querySelector(".yourId").innerText = `your id: ${user_id}`;
   send({ type: "register", user_id: user_id });
   pc = createPeerConnection();
-  // addCamera();
 });
 
 // when signaling server sends a message
@@ -184,10 +177,12 @@ websocket.on("message", data => {
       console.log("receiving offer from " + data.from_id, data);
       peer_id = data.from_id;
       pc.setRemoteDescription(data.sdp)
+        .then(sendAnswer)
         .then(addCamera)
         .then(() => {
-          console.log('about to send answer')
-          sendAnswer();
+          if (!offer_sent) {
+            sendOffer();
+          }
         })
         .catch(error => console.error(error));
       break;
@@ -195,11 +190,7 @@ websocket.on("message", data => {
       console.log("received answer from " + data.from_id, data);
       peer_id = data.from_id;
       pc.setRemoteDescription(data.sdp)
-        .then(() => {
-          if(offer_sent) {
-            sendOffer();
-          }
-        })
+        .then(addCamera)
         .catch(error => console.error(error));
       break;
     case "candidate":
