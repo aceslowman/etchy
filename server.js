@@ -27,36 +27,15 @@ wss.on("connection", ws => {
         break;
       case "offer":
         console.log("OFFER", message);
-        // send offer to all *other* peers
-        connections.forEach(con => {          
-          // if (con.sid !== message.sid) {            
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });
+        
         break;
       case "answer":
         console.log("ANSWER", message);
-        // send answer to all *other* peers
-        connections.forEach(con => {
-          // if (con.sid !== message.sid) {
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });        
+             
         break;
       case "candidate":
         console.log("CANDIDATE", message);
-        // send answer to all *other* peers
-        connections.forEach(con => {
-          // if (con.sid !== message.sid) {1
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });
+        
         break;
       default:
         console.log("message received without TYPE");
