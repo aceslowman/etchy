@@ -16,8 +16,8 @@ let localStream;
 
 let started = false;
 
-let countElement = document.querySelector(".count")
-let peersElement = document.querySelector(".peers")
+let countElement = document.querySelector(".count");
+let peersElement = document.querySelector(".peers");
 
 let canvas = document.getElementById("mainCanvas");
 let ctx = canvas.getContext("2d");
@@ -123,10 +123,15 @@ const setAndSendLocalDescription = sessionDescription => {
     });
 };
 
+const handlePeerClick = e => {
+  peer_id = e.target.innerHTML;
+  sendOffer();
+};
+
 // REGISTER when connection opens
 websocket.on("open", data => {
-  // document.querySelector(".yourId").innerText = `your id: ${user_id}`;
-  // send({ type: "register", user_id: user_id });
+  document.querySelector(".yourId").innerText = `your id: ${user_id}`;
+  send({ type: "register", user_id: user_id });
 });
 
 // when signaling server sends a message
@@ -137,16 +142,21 @@ websocket.on("message", data => {
   switch (data.type) {
     case "count":
       countElement.innerText = `currently online: ${data.count}`;
-      // peersElement.innerText = `currently online: [${JSON.stringify(data.peers)}]`;
+      console.log(Array.from(peersElement.children));
+      
+      // clear all buttons
+      Array.from(peersElement.children).forEach(e => {
+        e.removeEventListener("click", handlePeerClick);
+        peersElement.removeChild(e);
+      });
+
       for (let i = 0; i < data.peers.length; i++) {
         let btn = document.createElement("button");
         btn.innerHTML = data.peers[i].user_id;
-        btn.addEventListener("click", e => {
-          peer_id = e.target.innerHTML;
-          sendOffer();
-        });
+        btn.addEventListener("click", handlePeerClick);
         peersElement.appendChild(btn);
       }
+
       break;
     case "offer":
       console.log("receiving offer from " + data.from_id, data);
@@ -184,10 +194,7 @@ const init = () => {
 
   document.querySelector(".center").innerText = "";
 
-  pc = await createPeerConnection();
-  
-  document.querySelector(".yourId").innerText = `your id: ${user_id}`;
-  send({ type: "register", user_id: user_id });
+  // pc = createPeerConnection();
 };
 
 const drawOnCanvas = () => {};
@@ -197,6 +204,8 @@ const onWindowResize = e => {
   canvas.height = window.innerHeight;
   drawOnCanvas();
 };
+
+pc = createPeerConnection();
 
 drawOnCanvas();
 
