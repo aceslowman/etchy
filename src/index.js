@@ -66,9 +66,9 @@ const createPeerConnection = (isOfferer = false) => {
   };
 
   // if (isOfferer) {
-    pc.onnegotiationneeded = () => {
-      sendOffer();
-    };
+  pc.onnegotiationneeded = () => {
+    sendOffer();
+  };
   // }
 
   console.log("PeerConnection created");
@@ -89,12 +89,12 @@ const createPeerConnection = (isOfferer = false) => {
 };
 
 const sendOffer = () => {
-  if(!peer_id) return;
-  console.log("Send offer to " + peer_id);  
+  if (!peer_id) return;
+  console.log("Send offer to " + peer_id);
   return pc
-    .createOffer({voiceActivityDetection: false})
+    .createOffer({ voiceActivityDetection: false })
     .then(sdp => {
-      setAndSendLocalDescription(sdp);      
+      setAndSendLocalDescription(sdp);
     })
     .then(() => {
       offer_sent = true;
@@ -105,19 +105,15 @@ const sendOffer = () => {
 };
 
 const sendAnswer = () => {
-  if(!peer_id) return;
+  if (!peer_id) return;
   console.log("Send answer to " + peer_id);
   return pc
-    .createAnswer({voiceActivityDetection: false})
+    .createAnswer({ voiceActivityDetection: false })
     .then(sdp => {
-      setAndSendLocalDescription(sdp);      
+      setAndSendLocalDescription(sdp);
     })
     .then(() => {
-      answer_sent = true;
-      if(!offer_sent) {
-        // this feels like it should work?
-        sendOffer();
-      }
+      answer_sent = true;      
     })
     .catch(error => {
       console.error("Send answer failed: ", error);
@@ -125,7 +121,8 @@ const sendAnswer = () => {
 };
 
 const setAndSendLocalDescription = sdp => {
-  return pc.setLocalDescription(sdp)
+  return pc
+    .setLocalDescription(sdp)
     .then(() => {
       send({
         from_id: user_id,
@@ -167,11 +164,11 @@ websocket.on("message", data => {
       });
 
       for (let i = 0; i < data.peers.length; i++) {
-        if(data.peers[i].user_id !== user_id) {          
+        if (data.peers[i].user_id !== user_id) {
           let btn = document.createElement("button");
           btn.innerHTML = data.peers[i].user_id;
           btn.addEventListener("click", handlePeerClick);
-          peersElement.appendChild(btn);  
+          peersElement.appendChild(btn);
         }
       }
 
@@ -186,12 +183,11 @@ websocket.on("message", data => {
         })
         .catch(error => console.error(error));
       break;
-    case "answer":      
-      console.log("received answer from " + data.from_id, data);  
+    case "answer":
+      console.log("received answer from " + data.from_id, data);
       peer_id = data.from_id;
       pc.setRemoteDescription(data.sdp)
-        .then(() => {      
-        })
+        .then(() => {})
         .catch(error => console.error(error));
       break;
     case "candidate":
