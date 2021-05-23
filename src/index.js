@@ -16,6 +16,9 @@ let localStream;
 
 let started = false;
 
+let countElement = document.querySelector(".count")
+let peersElement = document.querySelector(".peers")
+
 let canvas = document.getElementById("mainCanvas");
 let ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -122,8 +125,8 @@ const setAndSendLocalDescription = sessionDescription => {
 
 // REGISTER when connection opens
 websocket.on("open", data => {
-  document.querySelector(".yourId").innerText = `your id: ${user_id}`;
-  send({ type: "register", user_id: user_id });
+  // document.querySelector(".yourId").innerText = `your id: ${user_id}`;
+  // send({ type: "register", user_id: user_id });
 });
 
 // when signaling server sends a message
@@ -133,12 +136,8 @@ websocket.on("message", data => {
 
   switch (data.type) {
     case "count":
-      document.querySelector(
-        ".count"
-      ).innerText = `currently online: ${data.count}`;
-      document.querySelector(
-        ".peers"
-      ).innerText = `currently online: [${JSON.stringify(data.peers)}]`;
+      countElement.innerText = `currently online: ${data.count}`;
+      // peersElement.innerText = `currently online: [${JSON.stringify(data.peers)}]`;
       for (let i = 0; i < data.peers.length; i++) {
         let btn = document.createElement("button");
         btn.innerHTML = data.peers[i].user_id;
@@ -146,7 +145,7 @@ websocket.on("message", data => {
           peer_id = e.target.innerHTML;
           sendOffer();
         });
-        document.querySelector(".peers").appendChild(btn);
+        peersElement.appendChild(btn);
       }
       break;
     case "offer":
@@ -185,7 +184,10 @@ const init = () => {
 
   document.querySelector(".center").innerText = "";
 
-  pc = createPeerConnection();
+  pc = await createPeerConnection();
+  
+  document.querySelector(".yourId").innerText = `your id: ${user_id}`;
+  send({ type: "register", user_id: user_id });
 };
 
 const drawOnCanvas = () => {};
