@@ -122,7 +122,7 @@ const addPendingCandidates = sid => {
 // REGISTER when connection opens
 websocket.on("open", data => {
   document.querySelector(".yourId").innerText = `your id: ${user_id}`;
-  send({ type: "register", sid: user_id });
+  send({ type: "register", user_id: user_id });
   peer = createPeerConnection();
 });
 
@@ -139,9 +139,16 @@ websocket.on("message", data => {
       ).innerText = `currently online: ${data.count}`;
       document.querySelector(
         ".peers"
-      ).innerText = `currently online: [${data.peers}]`;
+      ).innerText = `currently online: [${JSON.stringify(data.peers)}]`;
       for(let i = 0; i < data.peers.length; i++) {
-        
+        let btn = document.createElement('button');
+        btn.innerHTML = data.peers[i].user_id;
+        btn.addEventListener('click', (e) => {
+          console.log('click', e.target.innerHTML)
+        })
+        document.querySelector(
+        ".peers"
+      ).appendChild(btn)
       }
       break;
     case "offer":

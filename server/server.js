@@ -43,52 +43,31 @@ wss.on("connection", ws => {
 
     switch (message.type) {
       case "register":
-        console.log("registering user", message.sid);
-        id = message.sid;
+        console.log("registering user", message.user_id);
+        id = message.user_id;
         connections.set(id, {
-          sid: id,
+          user_id: id,
+          peer_id: null,
           socket: ws,
         });
         updateCount();
         break;
       case "offer":
-        console.log("OFFER", message.sid);
-        // send offer to all *other* peers
-        connections.forEach(con => {          
-          // if (con.sid !== message.sid) {            
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });
+        console.log("OFFER", [message.from_id,message.to_id]);
+        connections[message.to_id].socket.send(JSON.stringify(message))
         break;
       case "answer":
-        console.log("ANSWER", message.sid);
-        // send answer to all *other* peers
-        connections.forEach(con => {
-          // if (con.sid !== message.sid) {
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });        
+        console.log("ANSWER", [message.from_id,message.to_id]);
+        connections[message.to_id].socket.send(JSON.stringify(message))       
         break;
       case "candidate":
-        console.log("CANDIDATE", message.sid);
-        // send answer to all *other* peers
-        connections.forEach(con => {
-          // if (con.sid !== message.sid) {1
-            con.socket.send(
-              JSON.stringify(message)
-            );
-          // }
-        });
+        console.log("CANDIDATE", [message.from_id,message.to_id]);
+        connections[message.to_id].socket.send(JSON.stringify(message))
         break;
       default:
         console.log("message received without TYPE");
         break;
     }
-
   });
 
   ws.on("close", () => {
@@ -106,7 +85,7 @@ function updateCount() {
       JSON.stringify({
         type: "count",
         count: connections.size,
-        peers: Array.from(connections.values()).map(e => e.sid)
+        peers: Array.from(connections.values()).map(e => ({user_id: e.user_id,peer_id: e.peer_id}))
       })
     );
   });
