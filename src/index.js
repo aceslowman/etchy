@@ -73,17 +73,17 @@ const createPeerConnection = (isOfferer = false) => {
 
   console.log("PeerConnection created");
 
-  // navigator.mediaDevices
-  //   .getUserMedia({ audio: false, video: true })
-  //   .then(stream => {
-  //     localStream = stream;
-  //     document.getElementById("local-video").srcObject = localStream;
-  //     stream.getTracks().forEach(track => pc.addTrack(track, stream));
-  //     started = true;
-  //   })
-  //   .catch(err => {
-  //     console.log("Error capturing stream.", err);
-  //   });
+  navigator.mediaDevices
+    .getUserMedia({ audio: false, video: true })
+    .then(stream => {
+      localStream = stream;
+      document.getElementById("local-video").srcObject = localStream;
+      // stream.getTracks().forEach(track => pc.addTrack(track, stream));
+      started = true;
+    })
+    .catch(err => {
+      console.log("Error capturing stream.", err);
+    });
 
   return pc;
 };
@@ -91,13 +91,14 @@ const createPeerConnection = (isOfferer = false) => {
 const sendOffer = () => {
   if (!peer_id) return;
   console.log("Send offer to " + peer_id);
+  
   return pc
     .createOffer({ voiceActivityDetection: false })
     .then(sdp => {
-      setAndSendLocalDescription(sdp);
+      setAndSendLocalDescription(sdp);        
     })
     .then(() => {
-      offer_sent = true;
+      offer_sent = true;      
     })
     .catch(error => {
       console.error("Send offer failed: ", error);
@@ -138,7 +139,9 @@ const setAndSendLocalDescription = sdp => {
 
 const handlePeerClick = e => {
   peer_id = e.target.innerHTML;
+  
   sendOffer();
+  
 };
 
 // REGISTER when connection opens
@@ -178,22 +181,11 @@ websocket.on("message", data => {
       peer_id = data.from_id;
 
       pc.setRemoteDescription(data.sdp)
-        .then(() => {
-          sendAnswer();
+        .then(() => sendAnswer())
 
-          if (!offer_sent) {
-            // localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-            navigator.mediaDevices
-              .getUserMedia({ audio: false, video: true })
-              .then(stream => {
-                localStream = stream;
-                document.getElementById("local-video").srcObject = localStream;
-                stream.getTracks().forEach(track => pc.addTrack(track, stream));
-                started = true;
-              })
-              .catch(err => {
-                console.log("Error capturing stream.", err);
-              });
+          if (!offer_sent) {            
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+            sendOffer();
           }
         })
         .catch(error => console.error(error));
