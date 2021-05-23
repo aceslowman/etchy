@@ -29,8 +29,8 @@ let ctx = canvas.getContext("2d");
 canvas.width = 640;
 canvas.height = 480;
 
-let sketchCanvas = document.getElementById("mainCanvas");
-let sketchCtx = canvas.getContext("2d");
+let sketchCanvas = document.getElementById("sketchCanvas");
+let sketchCtx = sketchCanvas.getContext("2d");
 sketchCanvas.width = 640;
 sketchCanvas.height = 480;
 let dragging = false;
@@ -150,12 +150,15 @@ const addCamera = () => {
       video: { width: 640, height: 480 }
     })
     .then(stream => {
-      localStream = stream;
+      localStream = stream;    
+      sketchStream = sketchCanvas.captureStream(10); // 10 fps  
+    
       document.getElementById("local-video").srcObject = localStream;
+      document.getElementById("local-sketch").srcObject = sketchStream;
     
-      sketchStream = sketchCanvas.captureStream(10); // 10 fps      
+      
     
-      sketchStream.getTracks().forEach(track => pc.addTrack(track, sketchStream));      
+      // sketchStream.getTracks().forEach(track => pc.addTrack(track, sketchStream));      
       localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
       
       started = true;
@@ -250,7 +253,12 @@ const updateCanvas = () => {
   if(v2) ctx.drawImage(v2, canvas.width/2, 0, canvas.width, canvas.height);
 };
 
-const drawOnCanvas = () => {};
+const drawOnCanvas = () => {
+  sketchCtx.fillStyle = 'white';
+  sketchCtx.beginPath();
+  sketchCtx.ellipse(100, 100, 50, 75, Math.PI / 4, 0, 2 * Math.PI);
+  sketchCtx.fill();
+};
 
 const onWindowResize = e => {
   // canvas.width = window.innerWidth;
