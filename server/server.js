@@ -54,18 +54,22 @@ wss.on("connection", ws => {
         break;
       case "offer":
         console.log("OFFER", [message.from_id,message.to_id]);
-        console.log("CHECK", connections.get(message.to_id))
-        if(connections.get(message.to_id))
+        connections.get(message.to_id).peer_id = message.from_id;
+        // console.log("CHECK", connections.get(message.to_id))
+        // if(connections.get(message.to_id))
           connections.get(message.to_id).socket.send(JSON.stringify(message))
         break;
       case "answer":
         console.log("ANSWER", [message.from_id,message.to_id]);
-        if(connections.get(message.to_id))
+        connections.get(message.to_id).peer_id = message.from_id;
+        // console.log("CHECK", connections.get(message.to_id))
+        // if(connections.get(message.to_id))
           connections.get(message.to_id).socket.send(JSON.stringify(message))       
         break;
       case "candidate":
         console.log("CANDIDATE", [message.from_id,message.to_id]);
-        if(connections.get(message.to_id))
+        // console.log("CHECK", connections.get(message.to_id))
+        // if(connections.get(message.to_id))
           connections.get(message.to_id).socket.send(JSON.stringify(message))
         break;
       default:

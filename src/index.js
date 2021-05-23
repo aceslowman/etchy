@@ -116,10 +116,6 @@ const handleOnTrack = event => {
   document.querySelector("#remoteStreams").appendChild(newRemoteStreamElem);
 };
 
-const addPendingCandidates = () => {
-  peer.addIceCandidate(candidate);
-};
-
 // REGISTER when connection opens
 websocket.on("open", data => {
   document.querySelector(".yourId").innerText = `your id: ${user_id}`;
@@ -164,18 +160,10 @@ websocket.on("message", data => {
       break;
     case "answer":
       console.log("receiving answer from " + data.from_id, data);
-      // if (sid !== user_id) peers[sid].setRemoteDescription(data.sdp);
       peer.setRemoteDescription(data.sdp);
       break;
     case "candidate":
-      // if (sid in peers) {
       peer.addIceCandidate(data.ice);
-      // } else {
-      //   if (!(sid in pendingCandidates)) {
-      //     pendingCandidates[sid] = [];
-      //   }
-      //   pendingCandidates[sid].push(data.candidate);
-      // }
       break;
     default:
       break;
