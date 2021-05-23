@@ -9,7 +9,7 @@ const hub = signalhub('etchy', ['https://etchy.glitch.me']);
 const app = express();
 
 var sw = swarm(hub, { 
-  wrtc: require('wrtc') // don't need this if used in the browser
+  // wrtc: require('wrtc') // don't need this if used in the browser
 })
 
 sw.on('peer', function (peer, id) {
@@ -22,7 +22,7 @@ sw.on('disconnect', function (peer, id) {
   console.log('total peers:', sw.peers.length)
 })
 
-// const server = http.createServer(app);
+const server = http.createServer(app);
 // const wss = new ws.Server({ server });
 
 // let connections = new Map();
