@@ -60,7 +60,7 @@ const createPeerConnection = (isOfferer = false) => {
   };
 
   pc.ontrack = event => {
-    console.log("track add", event.streams);
+    console.log("track add", event);
     let ele, sketch_ele;
     if (document.querySelector("#peerRemote")) {
       ele = document.querySelector("#peerRemote");
@@ -91,11 +91,15 @@ const createPeerConnection = (isOfferer = false) => {
     sketch_ele.autoplay = true;
     sketch_ele.controls = true; // TEMP
 
+//     localStream
+//         .getTracks()
+//         .forEach(track => pc.addTrack(track, localStream, sketchStream));
+    
     if (event.streams && event.streams[1]) {
       sketch_ele.srcObject = event.streams[1];
     } else {
-      let inboundStream = new MediaStream(event.track);
-      sketch_ele.srcObject = inboundStream;
+      // let inboundStream = new MediaStream(event.track);
+      // sketch_ele.srcObject = inboundStream;
     }
   };
 
@@ -163,10 +167,11 @@ const addCamera = () => {
 
       drawOnCanvas();
 
-      // sketchStream.getTracks().forEach(track => pc.addTrack(track, sketchStream));
+      
       localStream
         .getTracks()
         .forEach(track => pc.addTrack(track, localStream, sketchStream));
+      sketchStream.getTracks().forEach(track => pc.addTrack(track, localStream, sketchStream));
 
       started = true;
       console.log("camera added");
