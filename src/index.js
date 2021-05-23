@@ -16,12 +16,13 @@ socket.addEventListener("open", () => {
       started = true;
 
       swarm.on("signal", signal => {
+        console.log('sending signal', signal)
         socket.send(JSON.stringify(signal));
       });
 
-      socket.addEventListener("message", event => {
-        // console.log("got a message", event.data);
+      socket.addEventListener("message", event => {        
         const payload = JSON.parse(event.data);
+        console.log("got a message", payload);
 
         switch (payload.type) {
           case "registered":
@@ -80,6 +81,10 @@ socket.addEventListener("open", () => {
       swarm.on("error", (error, peer) => {
         console.error(error);
       });
+    
+      swarm.on('connection', (stream, peer) => {
+        console.log('connection change', peer)
+      })
     })
     .catch(err => {
       console.log("Error capturing stream.", err);

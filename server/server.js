@@ -23,16 +23,77 @@ wss.on("connection", ws => {
 
   ws.on("message", m => {
     let message = JSON.parse(m);
-    console.log(message);
+    console.log('incoming type:',message.type);
 
     // handleSignal(ws.socket, message);
 
+    // switch (message.type) {
+    //   case "init":
+    //     handleInit(wsctx, message);
+    //     break;
+    //   default:
+    //     console.log("message received without TYPE");
+    //     break;
+    // }
+    
     switch (message.type) {
+      case "offer":
+        console.log("OFFER", message.id);
+        // send offer to all *other* peers        
+        // if(connections[message.id])
+        //   connections[message.id].socket.send(JSON.stringify(message));
+        connections.forEach(con => {
+          // if (con.sid !== message.sid) {
+            con.socket.send(
+              JSON.stringify(message)
+            );
+          // }
+        });  
+        break;
+      case "answer":
+        console.log("ANSWER", message.id);
+        // send answer to all *other* peers\
+        // console.log('connections', connections)
+        // if(connections[message.id])
+        //   connections[message.id].socket.send(JSON.stringify(message));
+        connections.forEach(con => {
+          // if (con.sid !== message.sid) {
+            con.socket.send(
+              JSON.stringify(message)
+            );
+          // }
+        });        
+        break;
+      case "candidate":
+        console.log("CANDIDATE", message.id);
+        // send ans5wer to all *other* peers
+        // console.log('connections', connections)
+        // if(connections[message.id])
+        //   connections[message.id].socket.send(JSON.stringify(message));        
+        connections.forEach(con => {
+          // if (con.sid !== message.sid) {1
+            con.socket.send(
+              JSON.stringify(message)
+            );
+          // }
+        });
+        break;
       case "init":
-        handleInit(wsctx, message);
+        console.log("initializing user", message.userId);
+        id = message.userId;
+        connections.set(id, {
+          id: id,
+          socket: ws
+        });
+        ws.send(JSON.stringify({type:'registered',id:id}));
+        updateCount();
         break;
       default:
-        console.log("message received without TYPE");
+        connections.forEach(con => {
+          // if (con.userId !== message.userId) {
+            con.socket.send(JSON.stringify(message));
+          // }
+        });
         break;
     }
   });
