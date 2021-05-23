@@ -17,16 +17,26 @@ let localStream;
 
 let started = false;
 
+
+
 let countElement = document.querySelector(".count");
 let peersElement = document.querySelector(".peers");
 
 let canvas = document.getElementById("mainCanvas");
 let ctx = canvas.getContext("2d");
-canvas.width = 640;
-canvas.height = 480;
-let update_loop;
 // canvas.width = window.innerWidth;
 // canvas.height = window.innerHeight;
+canvas.width = 640;
+canvas.height = 480;
+
+let sketchCanvas = document.getElementById("mainCanvas");
+let sketchCtx = canvas.getContext("2d");
+sketchCanvas.width = 640;
+sketchCanvas.height = 480;
+let dragging = false;
+let mouse = {x: 0, y: 0};
+
+let update_loop;
 
 // ------------------------------------------------------------
 // setting up websocket signaling server
@@ -229,11 +239,11 @@ const init = () => {
 };
 
 const updateCanvas = () => {
-  console.log('updating canvas');
+  // console.log('updating canvas');
   let v1 = document.querySelector('#local-video');
   let v2 = document.querySelector('#peerRemote');
   
-  if(v1) ctx.drawImage(v1, 0, 0, canvas.width/2, canvas.height);
+  if(v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
   if(v2) ctx.drawImage(v2, canvas.width/2, 0, canvas.width, canvas.height);
 };
 
