@@ -125,6 +125,7 @@ websocket.on("open", data => {
 // when signaling server sends a message
 websocket.on("message", data => {
   data = JSON.parse(event.data);
+  // console.log('data', data)
 
   switch (data.type) {
     case "count":
@@ -143,6 +144,7 @@ websocket.on("message", data => {
           // set peer
           peer = createPeerConnection();
           peer_id = e.target.innerHTML;
+          
           sendOffer(peer_id);
         });
         document.querySelector(".peers").appendChild(btn);
@@ -155,15 +157,13 @@ websocket.on("message", data => {
       peer.setRemoteDescription(data.sdp).then(() => {
         sendAnswer();
         // addPendingCandidates();
-        // peer.addIceCandidate(data.ice);
+        peer.addIceCandidate(data.ice);
         localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
       }).catch(error => console.error(error));
       break;
     case "answer":
       console.log("receiving answer from " + data.from_id, data);
       peer.setRemoteDescription(data.sdp).then(() => {
-        // sendAnswer();
-        // addPendingCandidates();
         // peer.addIceCandidate(data.ice);
         localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
       }).catch(error => console.error(error));
@@ -171,6 +171,7 @@ websocket.on("message", data => {
       // localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
       break;
     case "candidate":
+      console.log('candidate')
       peer.addIceCandidate(data.ice);
       break;
     default:
