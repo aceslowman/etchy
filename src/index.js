@@ -159,7 +159,7 @@ websocket.on("message", data => {
       break;
     case "offer":
       console.log("receiving offer from " + data.from_id, data);
-      peer_id = data.to_id;
+      peer_id = data.from_id;
 
       pc.setRemoteDescription(data.sdp)
         .then(() => {
@@ -168,7 +168,7 @@ websocket.on("message", data => {
         .catch(error => console.error(error));
       break;
     case "answer":
-      peer_id = data.to_id;
+      peer_id = data.from_id;
       pc.setRemoteDescription(data.sdp)
         .then(() => {
           console.log("received answer from " + data.from_id, data);
