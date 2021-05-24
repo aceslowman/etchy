@@ -36,7 +36,6 @@ cameraCanvas.width = 640;
 cameraCanvas.height = 480;
 
 let dragging = false;
-let mouse = { x: 0, y: 0 };
 
 let main_update_loop, camera_update_loop;
 
@@ -142,8 +141,8 @@ const addCamera = () => {
     })
     .then(stream => {
       localStream = stream;
-      cameraStream = cameraCanvas.captureStream(10); // 10 fps
-      sketchStream = sketchCanvas.captureStream(10);
+      cameraStream = cameraCanvas.captureStream(30); // 10 fps
+      sketchStream = sketchCanvas.captureStream(30);
 
       document.getElementById("local-video").srcObject = localStream;
       document.getElementById("local-sketch").srcObject = sketchStream;
@@ -157,21 +156,23 @@ const addCamera = () => {
 
       started = true;
       console.log("camera added");
+    
+      let update_rate = 100;
 
       // startup the main output loop
       if (main_update_loop) {
         clearInterval(main_update_loop);
-        main_update_loop = setInterval(updateMainCanvas, 700);
+        main_update_loop = setInterval(updateMainCanvas, update_rate);
       } else {
-        main_update_loop = setInterval(updateMainCanvas, 700);
+        main_update_loop = setInterval(updateMainCanvas, update_rate);
       }
 
       // startup the main output loop
       if (camera_update_loop) {
         clearInterval(camera_update_loop);
-        camera_update_loop = setInterval(updateCameraCanvas, 700);
+        camera_update_loop = setInterval(updateCameraCanvas, update_rate);
       } else {
-        camera_update_loop = setInterval(updateCameraCanvas, 700);
+        camera_update_loop = setInterval(updateCameraCanvas, update_rate);
       }
     });
 };
@@ -293,7 +294,9 @@ const handleMouseDown = e => {
 
 const handleMouseMove = e => {
   if (dragging) {
-    mouse = { x: e.offsetX, y: e.offsetY };
+    let bounds = canvas.getBoundingClientRect();
+    console.log(bounds)
+    let mouse = { x: e.pageX - bounds.x, y: e.pageY - bounds.y };
     sketchCtx.fillStyle = "white";
     sketchCtx.beginPath();
     sketchCtx.ellipse(mouse.x, mouse.y, 50, 50, Math.PI / 4, 0, 2 * Math.PI);
