@@ -18,7 +18,7 @@ let localStream, sketchStream, cameraStream;
 let started = false;
 
 let countElement = document.querySelector(".count");
-let peersElement = document.querySelector(".peers");
+let peersElement = document.querySelector("#peers");
 
 let canvas = document.getElementById("mainCanvas");
 let ctx = canvas.getContext("2d");
@@ -133,6 +133,7 @@ const setAndSendLocalDescription = sdp => {
 const handlePeerClick = e => {
   peer_id = e.target.innerHTML;
   addCamera().then(sendOffer);
+  init();
 };
 
 const addCamera = () => {
@@ -267,7 +268,11 @@ const updateMainCanvas = () => {
 // this fades away the sketch while drawing
 const updateSketchCanvas = () => {
   sketchCtx.save();
-  sketchCtx.globalAlpha = 0.2;
+  
+  // I can't decide what value this should be at  
+  // a longer tail on the fade looks better but
+  // leaves the background with artifacts
+  sketchCtx.globalAlpha = 0.1;
   sketchCtx.fillStyle = "black";
   sketchCtx.fillRect(0,0,sketchCanvas.width,sketchCanvas.height)
   sketchCtx.restore();
@@ -321,7 +326,7 @@ const handleMouseUp = e => (dragging = false);
 
 initializeSketchCanvas();
 
-document.addEventListener("click", init, false);
+// document.addEventListener("click", init, false);
 document.addEventListener("mousedown", handleMouseDown, false);
 document.addEventListener("mousemove", handleMouseMove, false);
 document.addEventListener("mouseup", handleMouseUp, false);
