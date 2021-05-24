@@ -92,14 +92,14 @@ const createPeerConnection = (isOfferer = false) => {
   // };
   // }
 
-  console.log("PeerConnection created");
+  // console.log("PeerConnection created");
 
   return pc;
 };
 
 const sendOffer = () => {
   if (!peer_id) return;
-  console.log("Send offer to " + peer_id);
+  // console.log("Send offer to " + peer_id);
   return pc
     .createOffer()
     .then(setAndSendLocalDescription)
@@ -110,7 +110,7 @@ const sendOffer = () => {
 
 const sendAnswer = () => {
   if (!peer_id) return;
-  console.log("Send answer to " + peer_id);
+  // console.log("Send answer to " + peer_id);
   return pc
     .createAnswer()
     .then(setAndSendLocalDescription)
@@ -166,13 +166,13 @@ const addCamera = () => {
         main_update_loop = setInterval(updateMainCanvas, update_rate);
       }
 
-      // startup the main output loop
-      if (camera_update_loop) {
-        clearInterval(camera_update_loop);
-        camera_update_loop = setInterval(updateCameraCanvas, update_rate);
-      } else {
-        camera_update_loop = setInterval(updateCameraCanvas, update_rate);
-      }
+      // // startup the main output loop
+      // if (camera_update_loop) {
+      //   clearInterval(camera_update_loop);
+      //   camera_update_loop = setInterval(updateCameraCanvas, update_rate);
+      // } else {
+      //   camera_update_loop = setInterval(updateCameraCanvas, update_rate);
+      // }
     });
 };
 
@@ -246,17 +246,26 @@ const init = () => {
 
 // composite final output
 const updateMainCanvas = () => {
+  updateCameraCanvas();
+  updateSketchCanvas();
+  
   let v1 = document.querySelector("#local-composite");
   let v2 = document.querySelector("#peerRemote");
 
   if (v2) ctx.drawImage(v2, 0, 0, canvas.width, canvas.height);
-  
-  
+
   cameraCtx.save();
-  cameraCtx.globalCompositeOperation = "multiply";  
+  cameraCtx.globalCompositeOperation = "multiply";
   if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
-  
+
   cameraCtx.restore();
+};
+
+// this fades away the sketch while drawing
+const updateSketchCanvas = () => {
+  sketchCtx.globalAlpha = 0.2;
+  sketchCtx.fillColor = "black";
+  sketchCtx.globalAlpha = 1;
 };
 
 // here I am masking out the video with the sketch (composite)
@@ -264,21 +273,18 @@ const updateCameraCanvas = () => {
   let v1 = document.querySelector("#local-video");
   let v2 = document.querySelector("#local-sketch");
 
-  if (v1) cameraCtx.drawImage(v1, 0, 0, cameraCanvas.width, cameraCanvas.height);
-  
+  if (v1)
+    cameraCtx.drawImage(v1, 0, 0, cameraCanvas.width, cameraCanvas.height);
+
   cameraCtx.save();
-  cameraCtx.globalCompositeOperation = "destination-in";  
+  cameraCtx.globalCompositeOperation = "destination-in";
   if (v2) cameraCtx.drawImage(v2, 0, 0, canvas.width, canvas.height);
   cameraCtx.restore();
 };
 
 // draw sketch that can be later be used as a mask
 const initializeSketchCanvas = () => {
-  sketchCtx.clearRect(0,0,sketchCanvas.width,sketchCanvas.height);  
-};
-
-const handleMouseDown = e => {
-  dragging = true;
+  sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
 };
 
 const handleMouseMove = e => {
@@ -287,14 +293,21 @@ const handleMouseMove = e => {
     let mouse = { x: e.pageX - bounds.x, y: e.pageY - bounds.y };
     sketchCtx.fillStyle = "white";
     sketchCtx.beginPath();
-    sketchCtx.ellipse(mouse.x, mouse.y, brush_radius, brush_radius, Math.PI / 4, 0, 2 * Math.PI);
+    sketchCtx.ellipse(
+      mouse.x,
+      mouse.y,
+      brush_radius,
+      brush_radius,
+      Math.PI / 4,
+      0,
+      2 * Math.PI
+    );
     sketchCtx.fill();
   }
 };
 
-const handleMouseUp = e => {
-  dragging = false;
-};
+const handleMouseDown = e => (dragging = true);
+const handleMouseUp = e => (dragging = false);
 
 initializeSketchCanvas();
 
