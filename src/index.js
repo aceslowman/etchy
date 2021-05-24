@@ -246,8 +246,9 @@ const init = () => {
 
 // composite final output
 const updateMainCanvas = () => {
-  updateCameraCanvas();
+  
   updateSketchCanvas();
+  updateCameraCanvas();
   
   let v1 = document.querySelector("#local-composite");
   let v2 = document.querySelector("#peerRemote");
@@ -263,9 +264,11 @@ const updateMainCanvas = () => {
 
 // this fades away the sketch while drawing
 const updateSketchCanvas = () => {
-  sketchCtx.globalAlpha = 0.2;
+  sketchCtx.save();
+  sketchCtx.globalAlpha = 0.1;
   sketchCtx.fillColor = "black";
-  sketchCtx.globalAlpha = 1;
+  sketchCtx.fillRect(0,0,sketchCanvas.width,sketchCanvas.height)
+  sketchCtx.restore();
 };
 
 // here I am masking out the video with the sketch (composite)
@@ -277,7 +280,8 @@ const updateCameraCanvas = () => {
     cameraCtx.drawImage(v1, 0, 0, cameraCanvas.width, cameraCanvas.height);
 
   cameraCtx.save();
-  cameraCtx.globalCompositeOperation = "destination-in";
+  // cameraCtx.globalCompositeOperation = "destination-in";
+  cameraCtx.globalCompositeOperation = "multiply";
   if (v2) cameraCtx.drawImage(v2, 0, 0, canvas.width, canvas.height);
   cameraCtx.restore();
 };
