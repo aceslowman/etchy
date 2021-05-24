@@ -85,7 +85,12 @@ const createPeerConnection = (isOfferer = false) => {
     if (pc.iceConnectionState == "disconnected") {
       console.log("Disconnected");
       // alert("the person you were connected to has disappeared");
-      // reset();
+      // showLobby();
+      // hideLoading();
+      // hideControls();
+      // peer_id = undefined;
+      // offer_sent = false;
+      // answer_sent = false;
     }
   };
 
@@ -155,6 +160,8 @@ const setAndSendLocalDescription = sdp => {
 };
 
 const handlePeerClick = e => {
+  offer_sent = false;
+  answer_sent = false;
   peer_id = e.target.innerHTML;
   addCamera().then(sendOffer);
   hideLobby();
@@ -325,7 +332,7 @@ const hideControls = () => {
 
 // composite final output
 const updateMainCanvas = () => {
-  updateSketchCanvas();
+  // updateSketchCanvas();
   updateCameraCanvas();
 
   let v1 = document.querySelector("#local-composite");
