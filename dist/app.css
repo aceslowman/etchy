@@ -28,6 +28,8 @@ body,
 }
 
 #info {
+  
+  display:none;
   z-index: 1;
 }
 

@@ -209,17 +209,32 @@ websocket.on("message", data => {
 
       break;
     case "offer":
+      /* 
+        when an offer is received, the user on the receiving end
+        should be given the opportunity to accept or deny
+      */
+
       // console.log("receiving offer from " + data.from_id, data);
-      peer_id = data.from_id;
-      pc.setRemoteDescription(data.sdp)
-        .then(sendAnswer)
-        .then(addCamera)
-        .then(() => {
-          if (!offer_sent) {
-            sendOffer();
-          }
-        })
-        .catch(error => console.error(error));
+      if (window.confirm(data.from_id + " wants to connect")) {
+        peer_id = data.from_id;
+        pc.setRemoteDescription(data.sdp)
+          .then(sendAnswer)
+          .then(addCamera)
+          .then(() => {
+            init();
+            if (!offer_sent) {
+              sendOffer();
+            }
+          })
+          .catch(error => console.error(error));
+      } else {
+        // tell sender no thank you
+        send({
+          from_id: user_id,
+          to_id: data.from_id,
+          type: 'rejectOffer'
+        });
+      }
       break;
     case "answer":
       // console.log("received answer from " + data.from_id, data);
@@ -231,6 +246,10 @@ websocket.on("message", data => {
     case "candidate":
       pc.addIceCandidate(data.ice);
       break;
+    case "rejectOffer":
+      console.log('the other user rejected your offer')
+      document.querySelector(".center").style.display = "none";
+      break;
     default:
       break;
   }
@@ -241,16 +260,14 @@ const send = data => {
 };
 
 const init = () => {
-  if (started) return;
-  document.querySelector(".center").innerText = "";
+  document.querySelector(".center").style.display = "none";
 };
 
 // composite final output
 const updateMainCanvas = () => {
-  
   updateSketchCanvas();
   updateCameraCanvas();
-  
+
   let v1 = document.querySelector("#local-composite");
   let v2 = document.querySelector("#peerRemote");
 
@@ -258,8 +275,6 @@ const updateMainCanvas = () => {
 
   ctx.save();
   ctx.globalCompositeOperation = "screen";
-  // ctx.globalCompositeOperation = "overlay";
-  // ctx.globalCompositeOperation = "multiply";
   if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
 
   ctx.restore();
@@ -268,15 +283,15 @@ const updateMainCanvas = () => {
 // this fades away the sketch while drawing
 const updateSketchCanvas = () => {
   sketchCtx.save();
-  
-  // I can't decide what value this should be at  
+
+  // I can't decide what value this should be at
   // a longer tail on the fade looks better but
   // leaves the background with artifacts
   sketchCtx.globalAlpha = 0.1;
   sketchCtx.fillStyle = "black";
-  sketchCtx.fillRect(0,0,sketchCanvas.width,sketchCanvas.height)
+  sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
   sketchCtx.restore();
-  
+
   sketchCtx.globalAlpha = 1.0;
 };
 
@@ -289,6 +304,7 @@ const updateCameraCanvas = () => {
     cameraCtx.drawImage(v1, 0, 0, cameraCanvas.width, cameraCanvas.height);
 
   cameraCtx.save();
+  // this is for when there is no 'fade' effect
   // cameraCtx.globalCompositeOperation = "destination-in";
   cameraCtx.globalCompositeOperation = "multiply";
   if (v2) cameraCtx.drawImage(v2, 0, 0, canvas.width, canvas.height);
@@ -299,7 +315,7 @@ const updateCameraCanvas = () => {
 const initializeSketchCanvas = () => {
   sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
   sketchCtx.fillStyle = "black";
-  sketchCtx.fillRect(0,0,sketchCanvas.width,sketchCanvas.height)
+  sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
 };
 
 const handleMouseMove = e => {

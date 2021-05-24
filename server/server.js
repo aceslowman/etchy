@@ -75,6 +75,13 @@ wss.on("connection", ws => {
         }
 
         break;
+      case "rejectOffer":
+        console.log("REJECTOFFER", [message.from_id, message.to_id]);
+        if (connections.get(message.to_id)) {
+          connections.get(message.to_id).socket.send(JSON.stringify(message));
+        }
+
+        break;
       default:
         console.log("message received without TYPE");
         break;
