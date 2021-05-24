@@ -255,22 +255,24 @@ const updateMainCanvas = () => {
 
   if (v2) ctx.drawImage(v2, 0, 0, canvas.width, canvas.height);
 
-  cameraCtx.save();
-  // cameraCtx.globalCompositeOperation = "screen";
-  cameraCtx.globalCompositeOperation = "multiply";
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  // ctx.globalCompositeOperation = "overlay";
+  // ctx.globalCompositeOperation = "multiply";
   if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
 
-  cameraCtx.restore();
+  ctx.restore();
 };
 
 // this fades away the sketch while drawing
-// TO DO this isnt working
 const updateSketchCanvas = () => {
-  // sketchCtx.save();
-  // sketchCtx.globalAlpha = 0.1;
-  // sketchCtx.fillStyle = "black";
-  // sketchCtx.fillRect(0,0,sketchCanvas.width,sketchCanvas.height)
-  // sketchCtx.restore();
+  sketchCtx.save();
+  sketchCtx.globalAlpha = 0.2;
+  sketchCtx.fillStyle = "black";
+  sketchCtx.fillRect(0,0,sketchCanvas.width,sketchCanvas.height)
+  sketchCtx.restore();
+  
+  sketchCtx.globalAlpha = 1.0;
 };
 
 // here I am masking out the video with the sketch (composite)
@@ -282,8 +284,8 @@ const updateCameraCanvas = () => {
     cameraCtx.drawImage(v1, 0, 0, cameraCanvas.width, cameraCanvas.height);
 
   cameraCtx.save();
-  cameraCtx.globalCompositeOperation = "destination-in";
-  // cameraCtx.globalCompositeOperation = "multiply";
+  // cameraCtx.globalCompositeOperation = "destination-in";
+  cameraCtx.globalCompositeOperation = "multiply";
   if (v2) cameraCtx.drawImage(v2, 0, 0, canvas.width, canvas.height);
   cameraCtx.restore();
 };
@@ -291,8 +293,8 @@ const updateCameraCanvas = () => {
 // draw sketch that can be later be used as a mask
 const initializeSketchCanvas = () => {
   sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-  // sketchCtx.fillStyle = "black";
-  // sketchCtx.fillRect(0,0,sketchCanvas.width,sketchCanvas.height)
+  sketchCtx.fillStyle = "black";
+  sketchCtx.fillRect(0,0,sketchCanvas.width,sketchCanvas.height)
 };
 
 const handleMouseMove = e => {
