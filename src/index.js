@@ -40,7 +40,7 @@ let dragging = false;
 let main_update_loop, camera_update_loop;
 
 let update_rate = 100;
-let sketch
+let brush_radius = 20;
 
 // ------------------------------------------------------------
 // setting up websocket signaling server
@@ -66,7 +66,6 @@ const createPeerConnection = (isOfferer = false) => {
   };
 
   pc.ontrack = event => {
-    console.log("track add", event);
     let ele, sketch_ele;
     if (document.querySelector("#peerRemote")) {
       ele = document.querySelector("#peerRemote");
@@ -151,16 +150,13 @@ const addCamera = () => {
       document.getElementById("local-sketch").srcObject = sketchStream;
       document.getElementById("local-composite").srcObject = cameraStream;
 
-      drawOnSketchCanvas();
+      initializeSketchCanvas();
 
       cameraStream
         .getTracks()
         .forEach(track => pc.addTrack(track, cameraStream));
 
       started = true;
-      console.log("camera added");
-    
-      
 
       // startup the main output loop
       if (main_update_loop) {
@@ -194,7 +190,6 @@ websocket.on("message", data => {
   switch (data.type) {
     case "count":
       countElement.innerText = `currently online: ${data.count}`;
-      console.log(Array.from(peersElement.children));
 
       // clear all buttons
       Array.from(peersElement.children).forEach(e => {
@@ -213,7 +208,7 @@ websocket.on("message", data => {
 
       break;
     case "offer":
-      console.log("receiving offer from " + data.from_id, data);
+      // console.log("receiving offer from " + data.from_id, data);
       peer_id = data.from_id;
       pc.setRemoteDescription(data.sdp)
         .then(sendAnswer)
@@ -226,7 +221,7 @@ websocket.on("message", data => {
         .catch(error => console.error(error));
       break;
     case "answer":
-      console.log("received answer from " + data.from_id, data);
+      // console.log("received answer from " + data.from_id, data);
       peer_id = data.from_id;
       pc.setRemoteDescription(data.sdp)
         .then(addCamera)
@@ -278,17 +273,8 @@ const updateCameraCanvas = () => {
 };
 
 // draw sketch that can be later be used as a mask
-const drawOnSketchCanvas = () => {
-  sketchCtx.fillStyle = "white";
-  sketchCtx.beginPath();
-  sketchCtx.ellipse(100, 100, 50, 75, Math.PI / 4, 0, 2 * Math.PI);
-  sketchCtx.fill();
-};
-
-const onWindowResize = e => {
-  // canvas.width = window.innerWidth;
-  // canvas.height = window.innerHeight;
-  drawOnSketchCanvas();
+const initializeSketchCanvas = () => {
+  sketchCtx.clearRect(0,0,sketchCanvas.width,sketchCanvas.height);  
 };
 
 const handleMouseDown = e => {
@@ -301,7 +287,7 @@ const handleMouseMove = e => {
     let mouse = { x: e.pageX - bounds.x, y: e.pageY - bounds.y };
     sketchCtx.fillStyle = "white";
     sketchCtx.beginPath();
-    sketchCtx.ellipse(mouse.x, mouse.y, 50, 50, Math.PI / 4, 0, 2 * Math.PI);
+    sketchCtx.ellipse(mouse.x, mouse.y, brush_radius, brush_radius, Math.PI / 4, 0, 2 * Math.PI);
     sketchCtx.fill();
   }
 };
@@ -310,10 +296,9 @@ const handleMouseUp = e => {
   dragging = false;
 };
 
-drawOnSketchCanvas();
+initializeSketchCanvas();
 
 document.addEventListener("click", init, false);
 document.addEventListener("mousedown", handleMouseDown, false);
 document.addEventListener("mousemove", handleMouseMove, false);
 document.addEventListener("mouseup", handleMouseUp, false);
-window.addEventListener("resize", onWindowResize, false);
