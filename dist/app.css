@@ -75,7 +75,8 @@ body,
 }
 
 #mainCanvas {
-  border: 3px double #272727;
+  border: 1px solid #333333;
+  box-shadow: 3px 3px 3px #333;
 }
 
 #sketchCanvas {

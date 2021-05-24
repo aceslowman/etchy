@@ -1,3 +1,20 @@
+/*
+  ETCHY
+  
+  This project uses webrtc to establish a connection between two users.
+  server/server.js contains the webrtc signaling server
+  
+  When a user establishes a connection, each webcam turns on. Each user
+  can sketch on a canvas, which is used to mask the raw video. The composite
+  canvas (sketch + raw video) is then made into a stream and sent to the other 
+  user.
+  
+  TODO:
+  
+  multiple peers
+  drawing customization
+*/
+
 import FriendlyWebSocket from "./FriendlyWebSocket";
 // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
 function guidGenerator() {
@@ -269,6 +286,7 @@ const reset = () => {
   peer_id = undefined;
   offer_sent = false;
   answer_sent = false;
+  // pc = createPeerConnection();
 };
 
 const send = data => {
