@@ -35,7 +35,7 @@ let answer_sent = false;
 let peer_id = undefined;
 let localStream, sketchStream, cameraStream;
 
-let fade = false;
+let fade = true;
 let fadeAmount = 0.1;
 
 let countElement = document.querySelector(".count");
@@ -425,9 +425,9 @@ const handleClearButton = () => {
 const handleToggleFade = () => {
   fade = !fade;
   if(fade) {
-    document.querySelector("#fadeToggle").innerHTML = 'nofade';
+    document.querySelector("#fadeToggle").innerHTML = 'dont fade away';
   } else {
-    document.querySelector("#fadeToggle").innerHTML = 'fade';
+    document.querySelector("#fadeToggle").innerHTML = 'fade away';
   }
 }
 

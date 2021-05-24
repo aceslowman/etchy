@@ -64,6 +64,7 @@ wss.on("connection", ws => {
         console.log("ANSWER", [message.from_id, message.to_id]);
         if (connections.get(message.to_id)) {
           connections.get(message.to_id).peer_id = message.from_id;
+          connections.get(message.to_id).paired = true;          
           connections.get(message.to_id).socket.send(JSON.stringify(message));
         }
 
@@ -78,6 +79,8 @@ wss.on("connection", ws => {
       case "rejectOffer":
         console.log("REJECTOFFER", [message.from_id, message.to_id]);
         if (connections.get(message.to_id)) {
+          connections.get(message.to_id).peer_id = undefined;
+          connections.get(message.to_id).paired = false;  
           connections.get(message.to_id).socket.send(JSON.stringify(message));
         }
 
@@ -103,7 +106,7 @@ function updateCount() {
       JSON.stringify({
         type: "count",
         count: connections.size,
-        peers: Array.from(connections.values()).map(e => ({
+        peers: Array.from(connections.values()).filter(a => !a.paired).map(e => ({
           user_id: e.user_id,
           peer_id: e.peer_id
         }))
