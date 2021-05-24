@@ -32,9 +32,10 @@ let answer_sent = false;
 let peer_id = undefined;
 let localStream, sketchStream, cameraStream;
 
+let fade = false;
+
 let countElement = document.querySelector(".count");
 let peersElement = document.querySelector("#peers");
-let brushRadiusElement = document.querySelector("#brushRadius");
 
 let canvas = document.getElementById("mainCanvas");
 let ctx = canvas.getContext("2d");
@@ -332,7 +333,7 @@ const hideControls = () => {
 
 // composite final output
 const updateMainCanvas = () => {
-  // updateSketchCanvas();
+  if(fade) updateSketchCanvas();
   updateCameraCanvas();
 
   let v1 = document.querySelector("#local-composite");
@@ -380,9 +381,11 @@ const updateCameraCanvas = () => {
 
 // draw sketch that can be later be used as a mask
 const initializeSketchCanvas = () => {
+  sketchCtx.save();
   sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
   sketchCtx.fillStyle = "black";
   sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+  sketchCtx.restore();
 };
 
 const handleMouseMove = e => {
@@ -412,6 +415,12 @@ const handleBrushRadiusChange = e => {
   brush_radius = e.target.value;
 }
 
+const handleClearButton = () => {
+  initializeSketchCanvas();
+  // sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+
+}
+
 initializeSketchCanvas();
 
 // document.addEventListener("click", init, false);
@@ -421,4 +430,6 @@ document.addEventListener("mouseup", handleMouseUp, false);
 
 document.querySelector('#brushRadiusValue').innerHTML = brush_radius;
 document.querySelector('#brushRadiusValue').value = brush_radius;
-brushRadiusElement.addEventListener("input", handleBrushRadiusChange, false);
+
+document.querySelector("#brushRadius").addEventListener("input", handleBrushRadiusChange, false);
+document.querySelector("#clearButton").addEventListener("click", handleClearButton, false);
