@@ -34,6 +34,7 @@ let localStream, sketchStream, cameraStream;
 
 let countElement = document.querySelector(".count");
 let peersElement = document.querySelector("#peers");
+let brushRadiusElement = document.querySelector("#brushRadius");
 
 let canvas = document.getElementById("mainCanvas");
 let ctx = canvas.getContext("2d");
@@ -386,9 +387,18 @@ const handleMouseMove = e => {
 const handleMouseDown = e => (dragging = true);
 const handleMouseUp = e => (dragging = false);
 
+const handleBrushRadiusChange = e => {
+  console.log(e.target.value)
+  document.querySelector('#brushRadiusValue').innerHTML = e.target.value;
+  brush_radius = e.target.value;
+}
+
 initializeSketchCanvas();
 
 // document.addEventListener("click", init, false);
 document.addEventListener("mousedown", handleMouseDown, false);
 document.addEventListener("mousemove", handleMouseMove, false);
 document.addEventListener("mouseup", handleMouseUp, false);
+
+document.querySelector('#brushRadiusValue').innerHTML = brush_radius;
+brushRadiusElement.addEventListener("input", handleBrushRadiusChange, false);
