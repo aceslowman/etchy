@@ -9,6 +9,9 @@
   canvas (sketch + raw video) is then made into a stream and sent to the other 
   user.
   
+  Disconnections are frequent which I think is more of a webrtc problem,
+  if they occur it's best to just wait it out or refresh.
+  
   TODO:
   
   multiple peers
@@ -33,6 +36,7 @@ let peer_id = undefined;
 let localStream, sketchStream, cameraStream;
 
 let fade = false;
+let fadeAmount = 0.1;
 
 let countElement = document.querySelector(".count");
 let peersElement = document.querySelector("#peers");
@@ -198,14 +202,6 @@ const addCamera = () => {
       } else {
         main_update_loop = setInterval(updateMainCanvas, update_rate);
       }
-
-      // // startup the main output loop
-      // if (camera_update_loop) {
-      //   clearInterval(camera_update_loop);
-      //   camera_update_loop = setInterval(updateCameraCanvas, update_rate);
-      // } else {
-      //   camera_update_loop = setInterval(updateCameraCanvas, update_rate);
-      // }
     });
 };
 
@@ -355,7 +351,7 @@ const updateSketchCanvas = () => {
   // I can't decide what value this should be at
   // a longer tail on the fade looks better but
   // leaves the background with artifacts
-  sketchCtx.globalAlpha = 0.1;
+  sketchCtx.globalAlpha = fadeAmount;
   sketchCtx.fillStyle = "black";
   sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
   sketchCtx.restore();
@@ -415,10 +411,24 @@ const handleBrushRadiusChange = e => {
   brush_radius = e.target.value;
 }
 
+const handleFadeAmountChange = e => {  
+  document.querySelector('#fadeAmountValue').innerHTML = e.target.value;
+  fadeAmount = e.target.value;
+}
+
 const handleClearButton = () => {
   initializeSketchCanvas();
   // sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
 
+}
+
+const handleToggleFade = () => {
+  fade = !fade;
+  if(fade) {
+    document.querySelector("#fadeToggle").innerHTML = 'nofade';
+  } else {
+    document.querySelector("#fadeToggle").innerHTML = 'fade';
+  }
 }
 
 initializeSketchCanvas();
@@ -433,3 +443,9 @@ document.querySelector('#brushRadiusValue').value = brush_radius;
 
 document.querySelector("#brushRadius").addEventListener("input", handleBrushRadiusChange, false);
 document.querySelector("#clearButton").addEventListener("click", handleClearButton, false);
+document.querySelector("#fadeToggle").addEventListener("click", handleToggleFade, false);
+document.querySelector("#fadeAmount").addEventListener("input", handleFadeAmountChange, false);
+
+document.querySelector('#fadeAmountValue').innerHTML = fadeAmount;
+document.querySelector('#fadeAmountValue').value = fadeAmount;
+// document.querySelector("#fadeAmountValue").addEventListener

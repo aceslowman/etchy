@@ -33,8 +33,13 @@
           </div>
           <div>
             <button id="fadeToggle">
-              clear
+              fade
             </button>
+          </div>
+          <div>
+            <label>fade amount</label>
+            <input id="fadeAmount" type="range" min="0" max="1" step="0.01" value="0.1" />
+            <div id="fadeAmountValue"></div>
           </div>
         </div>
       </div>
@@ -52,9 +57,16 @@
         </h1>
         <p class="centerText">
           <em
-            ><strong
+            ><small
               >select someone to share your camera with. <br />click and drag to
-              draw.</strong
+              draw.</small
+            ></em
+          >
+        </p>
+        <p class="centerText">
+          <em
+            ><strong
+              >if your friend disappears, they might come back after a second. if they don't refresh and try again</strong
             ></em
           >
         </p>
