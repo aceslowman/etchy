@@ -84,8 +84,8 @@ const createPeerConnection = (isOfferer = false) => {
   pc.oniceconnectionstatechange = function() {
     if (pc.iceConnectionState == "disconnected") {
       console.log("Disconnected");
-      alert("the person you were connected to has disappeared");
-      reset();
+      // alert("the person you were connected to has disappeared");
+      // reset();
     }
   };
 
@@ -159,6 +159,7 @@ const handlePeerClick = e => {
   addCamera().then(sendOffer);
   hideLobby();
   showLoading();
+  // showControls();  
 };
 
 const addCamera = () => {
@@ -245,6 +246,7 @@ websocket.on("message", data => {
           .then(addCamera)
           .then(() => {
             hideLobby();
+            showControls();
             if (!offer_sent) {
               sendOffer();
             }
@@ -266,6 +268,7 @@ websocket.on("message", data => {
         .then(addCamera)
         .then(() => {
           hideLoading();
+          showControls();
         })
         .catch(error => console.error(error));
       break;
@@ -284,6 +287,7 @@ websocket.on("message", data => {
 const reset = () => {
   showLobby();
   hideLoading();
+  hideControls();
   peer_id = undefined;
   offer_sent = false;
   answer_sent = false;
@@ -309,6 +313,15 @@ const showLoading = () => {
 const hideLoading = () => {
   document.querySelector(".loading").style.display = "none";
 };
+
+const showControls = () => {
+  document.querySelector("#controls").style.display = "flex";
+};
+
+const hideControls = () => {
+  document.querySelector("#controls").style.display = "none";
+};
+
 
 // composite final output
 const updateMainCanvas = () => {
@@ -387,8 +400,7 @@ const handleMouseMove = e => {
 const handleMouseDown = e => (dragging = true);
 const handleMouseUp = e => (dragging = false);
 
-const handleBrushRadiusChange = e => {
-  console.log(e.target.value)
+const handleBrushRadiusChange = e => {  
   document.querySelector('#brushRadiusValue').innerHTML = e.target.value;
   brush_radius = e.target.value;
 }
@@ -401,4 +413,5 @@ document.addEventListener("mousemove", handleMouseMove, false);
 document.addEventListener("mouseup", handleMouseUp, false);
 
 document.querySelector('#brushRadiusValue').innerHTML = brush_radius;
+document.querySelector('#brushRadiusValue').value = brush_radius;
 brushRadiusElement.addEventListener("input", handleBrushRadiusChange, false);

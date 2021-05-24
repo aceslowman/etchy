@@ -15,35 +15,39 @@
   </head>
   <body>
     <div id="APP">
-      
-      
       <div id="canvasContainer">
-        
         <canvas id="sketchCanvas"></canvas>
         <canvas id="cameraCanvas"></canvas>
         <canvas id="mainCanvas"></canvas>
         <br />
-        <div style="display:flex;">
-          <label>brush size</label>  <div id="brushRadiusValue" style="padding-left:5px;"></div>
+        <div id="controls">
+<!--           <div style="display:flex;"> -->
+            <label>brush size</label>
+            
+<!--           </div> -->
+          <input id="brushRadius" type="range" min="1" max="100" value="20" />
+          <div id="brushRadiusValue" ></div>
         </div>
-        <input id="brushRadius" type="range" min="1" max="100" value="50" />
       </div>
-      
-      
+
       <div id="info">
         <p class="count"></p>
         <p class="yourId"></p>
-        
       </div>
 
       <div class="loading">connecting......</div>
-      
+
       <div class="center">
         <h1>
           <em>etchy</em>
         </h1>
         <p class="centerText">
-          <em><strong>select someone to share your camera with. <br />click and drag to draw.</strong></em>
+          <em
+            ><strong
+              >select someone to share your camera with. <br />click and drag to
+              draw.</strong
+            ></em
+          >
         </p>
         <div id="peerList">
           <p>
@@ -57,7 +61,6 @@
           </small>
         </p>
       </div>
-
 
       <div id="feeds">
         <video id="local-video" controls autoplay></video>
