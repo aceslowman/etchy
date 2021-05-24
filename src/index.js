@@ -64,6 +64,16 @@ const createPeerConnection = (isOfferer = false) => {
       });
     }
   };
+  
+  pc.oniceconnectionstatechange = function() {
+    if(pc.iceConnectionState == 'disconnected') {
+        console.log('Disconnected');
+      alert('the person you were connected to has disappeared')
+      peer_id = undefined;
+      showLobby();
+      hideLoading();
+    }
+  }
 
   pc.ontrack = event => {
     let ele, sketch_ele;
@@ -133,7 +143,8 @@ const setAndSendLocalDescription = sdp => {
 const handlePeerClick = e => {
   peer_id = e.target.innerHTML;
   addCamera().then(sendOffer);
-  init();
+  hideLobby();
+  showLoading();
 };
 
 const addCamera = () => {
@@ -221,7 +232,7 @@ websocket.on("message", data => {
           .then(sendAnswer)
           .then(addCamera)
           .then(() => {
-            init();
+            hideLobby();
             if (!offer_sent) {
               sendOffer();
             }
@@ -241,14 +252,19 @@ websocket.on("message", data => {
       peer_id = data.from_id;
       pc.setRemoteDescription(data.sdp)
         .then(addCamera)
+        .then(() => {
+          hideLoading();
+        })
         .catch(error => console.error(error));
       break;
     case "candidate":
       pc.addIceCandidate(data.ice);
       break;
     case "rejectOffer":
-      console.log('the other user rejected your offer')
-      document.querySelector(".center").style.display = "none";
+      alert('the other user rejected your offer')
+      showLobby();
+      hideLoading();
+      peer_id = undefined;
       break;
     default:
       break;
@@ -259,9 +275,21 @@ const send = data => {
   websocket.send(JSON.stringify(data));
 };
 
-const init = () => {
-  document.querySelector(".center").style.display = "none";
+const showLobby = () => {
+  document.querySelector(".center").style.display = "flex";
 };
+
+const hideLobby = () => {
+  document.querySelector(".center").style.display = "none";
+}
+
+const showLoading = () => {
+  document.querySelector(".loading").style.display = "flex";
+};
+
+const hideLoading = () => {
+  document.querySelector(".loading").style.display = "none";
+}
 
 // composite final output
 const updateMainCanvas = () => {
