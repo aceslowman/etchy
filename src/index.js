@@ -39,6 +39,9 @@ let dragging = false;
 
 let main_update_loop, camera_update_loop;
 
+let update_rate = 100;
+let sketch
+
 // ------------------------------------------------------------
 // setting up websocket signaling server
 const websocket = new FriendlyWebSocket({ path: "/" });
@@ -157,7 +160,7 @@ const addCamera = () => {
       started = true;
       console.log("camera added");
     
-      let update_rate = 100;
+      
 
       // startup the main output loop
       if (main_update_loop) {
@@ -295,7 +298,6 @@ const handleMouseDown = e => {
 const handleMouseMove = e => {
   if (dragging) {
     let bounds = canvas.getBoundingClientRect();
-    console.log(bounds)
     let mouse = { x: e.pageX - bounds.x, y: e.pageY - bounds.y };
     sketchCtx.fillStyle = "white";
     sketchCtx.beginPath();
