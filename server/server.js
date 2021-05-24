@@ -48,7 +48,8 @@ wss.on("connection", ws => {
         connections.set(id, {
           user_id: id,
           peer_id: null,
-          socket: ws
+          socket: ws,
+          paired: false
         });
         updateCount();
         break;
