@@ -61,3 +61,13 @@ body,
   align-items: center;
   justify-content: center;
 }
+
+#sketchCanvas {
+/*   visibility:hidden;  */
+  display:none;
+}
+
+#cameraCanvas {
+/*   visibility:hidden;   */
+  display:none;
+}

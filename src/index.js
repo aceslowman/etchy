@@ -147,6 +147,7 @@ const addCamera = () => {
 
       document.getElementById("local-video").srcObject = localStream;
       document.getElementById("local-sketch").srcObject = sketchStream;
+      document.getElementById("local-composite").srcObject = cameraStream;
 
       drawOnSketchCanvas();
 
@@ -246,18 +247,20 @@ const init = () => {
 
 // composite final output
 const updateMainCanvas = () => {
-  let v1 = document.querySelector("#local-video");
+  let v1 = document.querySelector("#local-composite");
   let v2 = document.querySelector("#peerRemote");
 
-  if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
+  if (v2) ctx.drawImage(v2, 0, 0, canvas.width, canvas.height);
+  
   
   cameraCtx.save();
   cameraCtx.globalCompositeOperation = "multiply";  
-  if (v2) ctx.drawImage(v2, 0, 0, canvas.width, canvas.height);
+  if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
+  
   cameraCtx.restore();
 };
 
-// here I am masking out the video with the sketch
+// here I am masking out the video with the sketch (composite)
 const updateCameraCanvas = () => {
   let v1 = document.querySelector("#local-video");
   let v2 = document.querySelector("#local-sketch");
