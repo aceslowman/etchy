@@ -74,6 +74,10 @@ body,
   justify-content: center;
 }
 
+#mainCanvas {
+  border: 3px double #272727;
+}
+
 #sketchCanvas {
 /*   visibility:hidden;  */
   display:none;

@@ -15,8 +15,6 @@ let answer_sent = false;
 let peer_id = undefined;
 let localStream, sketchStream, cameraStream;
 
-let started = false;
-
 let countElement = document.querySelector(".count");
 let peersElement = document.querySelector("#peers");
 
@@ -64,16 +62,14 @@ const createPeerConnection = (isOfferer = false) => {
       });
     }
   };
-  
+
   pc.oniceconnectionstatechange = function() {
-    if(pc.iceConnectionState == 'disconnected') {
-        console.log('Disconnected');
-      alert('the person you were connected to has disappeared')
-      peer_id = undefined;
-      showLobby();
-      hideLoading();
+    if (pc.iceConnectionState == "disconnected") {
+      console.log("Disconnected");
+      alert("the person you were connected to has disappeared");
+      reset();
     }
-  }
+  };
 
   pc.ontrack = event => {
     let ele, sketch_ele;
@@ -168,8 +164,6 @@ const addCamera = () => {
         .getTracks()
         .forEach(track => pc.addTrack(track, cameraStream));
 
-      started = true;
-
       // startup the main output loop
       if (main_update_loop) {
         clearInterval(main_update_loop);
@@ -226,7 +220,7 @@ websocket.on("message", data => {
       */
 
       // console.log("receiving offer from " + data.from_id, data);
-      if (window.confirm(data.from_id + " wants to connect")) {
+      if (offer_sent || window.confirm(data.from_id + " wants to connect")) {
         peer_id = data.from_id;
         pc.setRemoteDescription(data.sdp)
           .then(sendAnswer)
@@ -243,7 +237,7 @@ websocket.on("message", data => {
         send({
           from_id: user_id,
           to_id: data.from_id,
-          type: 'rejectOffer'
+          type: "rejectOffer"
         });
       }
       break;
@@ -261,15 +255,21 @@ websocket.on("message", data => {
       pc.addIceCandidate(data.ice);
       break;
     case "rejectOffer":
-      alert('the other user rejected your offer')
-      showLobby();
-      hideLoading();
-      peer_id = undefined;
+      alert("the other user rejected your offer");
+      reset();
       break;
     default:
       break;
   }
 });
+
+const reset = () => {
+  showLobby();
+  hideLoading();
+  peer_id = undefined;
+  offer_sent = false;
+  answer_sent = false;
+};
 
 const send = data => {
   websocket.send(JSON.stringify(data));
@@ -281,7 +281,7 @@ const showLobby = () => {
 
 const hideLobby = () => {
   document.querySelector(".center").style.display = "none";
-}
+};
 
 const showLoading = () => {
   document.querySelector(".loading").style.display = "flex";
@@ -289,7 +289,7 @@ const showLoading = () => {
 
 const hideLoading = () => {
   document.querySelector(".loading").style.display = "none";
-}
+};
 
 // composite final output
 const updateMainCanvas = () => {
