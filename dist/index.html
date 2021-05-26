@@ -15,37 +15,45 @@
   </head>
   <body>
     <div id="APP">
-      <div id="CODEOFCONDUCT" style="text-align: left; background-color:black; z-index:5;">
-        <h1>
-          <em>Code of Conduct</em>
-        </h1>
-        <p>
-          Etchy is meant to be a collaborative, experimental art tool, and I
-          don't want anyone to feel unsafe or uncomfortable while using it.
-        </p>
-        <p>
-          Above all, if you want to use Etchy, you have to agree:
-        </p>
-        <ul>
-          <li>never share unwelcome or non-consensual sexual content. </li>
-          <li>never harass or make another user feel unsafe or unwelcome. </li>
-          <li>never threaten or intimidate another user. </li>
-          <li>no sexist, racist, homophobic, transphobic, ableist or otherwise discriminatory jokes and language</li>
-        </ul>
-        <h3><strong>No tolerance for bigots and creeps</strong></h3>
-        <p>
-          If you have any issues or have suggestions or comments or anything,
-          let me know, either at austin(dot)slominski(at)gmail(dotcom) or on
-          Twitter (@aceslowman)
-        </p>
-        <br />
-        <button id="agreeCC">
-          okay, I agree
-        </button>
-        <br />
-        <button id="disagreeCC">
-          I don't agree and am leaving
-        </button>
+      <div
+        id="CODEOFCONDUCT"
+        style="text-align: left; background-color:black; z-index:5;"
+      >
+        <div>
+          <h1>
+            <em>Code of Conduct</em>
+          </h1>
+          <p>
+            Etchy is meant to be a collaborative, experimental art tool, and I
+            don't want anyone to feel unsafe or uncomfortable while using it.
+          </p>
+          <p>
+            Above all, if you want to use Etchy, you have to agree:
+          </p>
+          <ul>
+            <li>never share unwelcome or non-consensual sexual content.</li>
+            <li>never harass or make another user feel unsafe or unwelcome.</li>
+            <li>never threaten or intimidate another user.</li>
+            <li>
+              no sexist, racist, homophobic, transphobic, ableist or otherwise
+              discriminatory jokes and language
+            </li>
+          </ul>
+          <h3><strong>No tolerance for bigots and creeps</strong></h3>
+          <p>
+            If you have any issues or have suggestions or comments or anything,
+            let me know, either at austin(dot)slominski(at)gmail(dotcom) or on
+            Twitter (@aceslowman)
+          </p>
+          <br />
+          <button id="agreeCC">
+            okay, I agree
+          </button>
+          <br />
+          <button id="disagreeCC">
+            I don't agree and am leaving
+          </button>
+        </div>
       </div>
       <div id="canvasContainer">
         <canvas id="sketchCanvas"></canvas>
@@ -70,7 +78,14 @@
           </div>
           <div>
             <label>fade amount</label>
-            <input id="fadeAmount" type="range" min="0" max="1" step="0.01" value="0.1" />
+            <input
+              id="fadeAmount"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value="0.1"
+            />
             <div id="fadeAmountValue"></div>
           </div>
         </div>
@@ -98,7 +113,8 @@
         <p class="centerText">
           <em
             ><strong
-              >if your friend disappears, they might come back after a second. if they don't refresh and try again</strong
+              >if your friend disappears, they might come back after a second.
+              if they don't refresh and try again</strong
             ></em
           >
         </p>
@@ -122,6 +138,6 @@
         <div id="remoteStreams"></div>
       </div>
     </div>
-    <noscript>You need to enable JavaScript to run this app.</noscript>    
+    <noscript>You need to enable JavaScript to run this app.</noscript>
   </body>
 </html>
