@@ -125,3 +125,20 @@ body,
   margin-left:5px;
   margin-right:5px;
 }
+
+#CODEOFCONDUCT {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  max-width:400px;
+  background-color: black;
+  justify-content: flex-start;
+  padding:30px;
+  display: flex;
+  align-items: center;
+/*   justify-content: center; */
+  color: white;
+  flex-flow: column;
+/*   text-align: center; */
+  z-index:6;
+}
