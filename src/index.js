@@ -109,12 +109,10 @@ const createPeerConnection = (isOfferer = false) => {
       pc,
       pc.iceConnectionState
     );
-    console.log("is permanent", isDisconnectPermanent);
+
     if (isDisconnectPermanent) {
       alert("the person you were connected to has disappeared");
       reset();
-      // reregister?
-      send({ type: "register", user_id: user_id });
     }
   };
 
@@ -285,7 +283,6 @@ websocket.on("message", data => {
       }
       break;
     case "answer":
-      // console.log("received answer from " + data.from_id, data);
       peer_id = data.from_id;
       pc.setRemoteDescription(data.sdp)
         .then(addCamera)
@@ -299,7 +296,7 @@ websocket.on("message", data => {
       pc.addIceCandidate(data.ice);
       break;
     case "rejectOffer":
-      alert("the other user rejected your offer");
+      alert("the other user declined (or just closed their tab, something like that)");
       reset();
       break;
     default:
@@ -314,7 +311,9 @@ const reset = () => {
   peer_id = undefined;
   offer_sent = false;
   answer_sent = false;
-  // pc = createPeerConnection();
+  
+  // reregister?
+  send({ type: "register", user_id: user_id });
 };
 
 const send = data => {
