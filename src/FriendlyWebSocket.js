@@ -40,11 +40,11 @@ export default class FriendlyWebSocket {
     });
 
     this.socket.addEventListener("close", event => {
-      console.log("disconnected");
+      console.log("disconnected, trying to reconnect");
       this.connected = false;
-      // the server went away, try re-connecting in 2 seconds.
+      // the server went away, try re-connecting in 1 seconds.
       this._emit('close');
-      setTimeout(() => this.connect(), 2000);
+      setTimeout(() => this.connect(), 1000);
     });
 
     // Listen for messages

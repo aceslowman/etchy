@@ -99,8 +99,7 @@ const createPeerConnection = (isOfferer = false) => {
         // offer_sent = false;
         // answer_sent = false;
         break;
-      case "closed":
-        
+      case "closed":        
         /*  */
         break;
       case "failed":
