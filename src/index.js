@@ -25,6 +25,14 @@
 import FriendlyWebSocket from "./FriendlyWebSocket";
 import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 
+// CODE OF CONDUCT
+document.getElementById('agreeCOC').addEventListener('click', () => {
+  
+});
+document.getElementById('disagreeCOC').addEventListener('click', () => {
+  window.open('https://www.google.com/search?q=am+i+an+asshole');
+});
+
 // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
 function guidGenerator() {
   var S4 = function() {
