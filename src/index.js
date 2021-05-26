@@ -23,7 +23,7 @@
 */
 
 import FriendlyWebSocket from "./FriendlyWebSocket";
-import {isPermanentDisconnect, checkStatePermanent} from "./webrtc_utils";
+import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 
 // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
 function guidGenerator() {
@@ -94,34 +94,27 @@ const createPeerConnection = (isOfferer = false) => {
 
   pc.oniceconnectionstatechange = async function() {
     console.log("ice connection state changed", pc.iceConnectionState);
-    let isDisconnectPermanent;
+
     switch (pc.iceConnectionState) {
       case "disconnected":
         /* this changes often and shouldn't block a reconnect */
-        // alert("the person you were connected to has disappeared");
-        // showLobby();
-        // hideLoading();
-        // hideControls();
-        // peer_id = undefined;
-        // offer_sent = false;
-        // answer_sent = false;
-        isDisconnectPermanent = await checkStatePermanent(pc, pc.iceConnectionState);
-        console.log('is permanent', isDisconnectPermanent)
-        if(isDisconnectPermanent) {
-          
-        }
         break;
-      case "closed":        
-        /*  */
-        // checkStatePermanent(pc, pc.iceConnectionState);
+      case "closed":
         break;
       case "failed":
-        isDisconnectPermanent = await checkStatePermanent(pc, pc.iceConnectionState);
-        console.log('is permanent', isDisconnectPermanent)
-        if(isDisconnectPermanent) {
-          
-        }
         break;
+    }
+
+    let isDisconnectPermanent = await checkStatePermanent(
+      pc,
+      pc.iceConnectionState
+    );
+    console.log("is permanent", isDisconnectPermanent);
+    if (isDisconnectPermanent) {
+      alert("the person you were connected to has disappeared");
+      reset();
+      // reregister?
+      send({ type: "register", user_id: user_id });
     }
   };
 
