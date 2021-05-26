@@ -86,8 +86,13 @@ const createPeerConnection = (isOfferer = false) => {
     }
   };
 
+
+   
+  
   pc.oniceconnectionstatechange = function() {
-    if (pc.iceConnectionState == "disconnected") {
+    
+    /* this changes often and shouldn't block a reconnect */      
+    if (pc.iceConnectionState == "disconnected") {      
       console.log("Disconnected");
       // alert("the person you were connected to has disappeared");
       // showLobby();
