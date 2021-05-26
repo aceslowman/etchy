@@ -55,6 +55,10 @@ body,
 
 .center > * {
   max-width: 300px;
+/*   cursor: pointer; */
+}
+
+.center button {
   cursor: pointer;
 }
 
