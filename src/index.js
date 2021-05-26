@@ -86,21 +86,24 @@ const createPeerConnection = (isOfferer = false) => {
     }
   };
 
-
-   
-  
   pc.oniceconnectionstatechange = function() {
-    
-    /* this changes often and shouldn't block a reconnect */      
-    if (pc.iceConnectionState == "disconnected") {      
-      console.log("Disconnected");
-      // alert("the person you were connected to has disappeared");
-      // showLobby();
-      // hideLoading();
-      // hideControls();
-      // peer_id = undefined;
-      // offer_sent = false;
-      // answer_sent = false;
+    console.log("ice connection state changed", pc.iceConnectionState);
+    switch (pc.iceConnectionState) {
+      case "disconnected":
+        /* this changes often and shouldn't block a reconnect */
+        // alert("the person you were connected to has disappeared");
+        // showLobby();
+        // hideLoading();
+        // hideControls();
+        // peer_id = undefined;
+        // offer_sent = false;
+        // answer_sent = false;
+        break;
+      case "closed":
+        /*  */
+        break;
+      case "failed":
+        break;
     }
   };
 
@@ -176,7 +179,7 @@ const handlePeerClick = e => {
   addCamera().then(sendOffer);
   hideLobby();
   showLoading();
-  // showControls();  
+  // showControls();
 };
 
 const addCamera = () => {
@@ -331,10 +334,9 @@ const hideControls = () => {
   document.querySelector("#controls").style.display = "none";
 };
 
-
 // composite final output
 const updateMainCanvas = () => {
-  if(fade) updateSketchCanvas();
+  if (fade) updateSketchCanvas();
   updateCameraCanvas();
 
   let v1 = document.querySelector("#local-composite");
@@ -411,30 +413,29 @@ const handleMouseMove = e => {
 const handleMouseDown = e => (dragging = true);
 const handleMouseUp = e => (dragging = false);
 
-const handleBrushRadiusChange = e => {  
-  document.querySelector('#brushRadiusValue').innerHTML = e.target.value;
+const handleBrushRadiusChange = e => {
+  document.querySelector("#brushRadiusValue").innerHTML = e.target.value;
   brush_radius = e.target.value;
-}
+};
 
-const handleFadeAmountChange = e => {  
-  document.querySelector('#fadeAmountValue').innerHTML = e.target.value;
+const handleFadeAmountChange = e => {
+  document.querySelector("#fadeAmountValue").innerHTML = e.target.value;
   fadeAmount = e.target.value;
-}
+};
 
 const handleClearButton = () => {
   initializeSketchCanvas();
   // sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-
-}
+};
 
 const handleToggleFade = () => {
   fade = !fade;
-  if(fade) {
-    document.querySelector("#fadeToggle").innerHTML = 'dont fade away';
+  if (fade) {
+    document.querySelector("#fadeToggle").innerHTML = "dont fade away";
   } else {
-    document.querySelector("#fadeToggle").innerHTML = 'fade away';
+    document.querySelector("#fadeToggle").innerHTML = "fade away";
   }
-}
+};
 
 initializeSketchCanvas();
 
@@ -443,14 +444,22 @@ document.addEventListener("mousedown", handleMouseDown, false);
 document.addEventListener("mousemove", handleMouseMove, false);
 document.addEventListener("mouseup", handleMouseUp, false);
 
-document.querySelector('#brushRadiusValue').innerHTML = brush_radius;
-document.querySelector('#brushRadiusValue').value = brush_radius;
+document.querySelector("#brushRadiusValue").innerHTML = brush_radius;
+document.querySelector("#brushRadiusValue").value = brush_radius;
 
-document.querySelector("#brushRadius").addEventListener("input", handleBrushRadiusChange, false);
-document.querySelector("#clearButton").addEventListener("click", handleClearButton, false);
-document.querySelector("#fadeToggle").addEventListener("click", handleToggleFade, false);
-document.querySelector("#fadeAmount").addEventListener("input", handleFadeAmountChange, false);
+document
+  .querySelector("#brushRadius")
+  .addEventListener("input", handleBrushRadiusChange, false);
+document
+  .querySelector("#clearButton")
+  .addEventListener("click", handleClearButton, false);
+document
+  .querySelector("#fadeToggle")
+  .addEventListener("click", handleToggleFade, false);
+document
+  .querySelector("#fadeAmount")
+  .addEventListener("input", handleFadeAmountChange, false);
 
-document.querySelector('#fadeAmountValue').innerHTML = fadeAmount;
-document.querySelector('#fadeAmountValue').value = fadeAmount;
+document.querySelector("#fadeAmountValue").innerHTML = fadeAmount;
+document.querySelector("#fadeAmountValue").value = fadeAmount;
 // document.querySelector("#fadeAmountValue").addEventListener
