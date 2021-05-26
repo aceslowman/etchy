@@ -100,6 +100,7 @@ const createPeerConnection = (isOfferer = false) => {
         // answer_sent = false;
         break;
       case "closed":
+        
         /*  */
         break;
       case "failed":
