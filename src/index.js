@@ -16,6 +16,10 @@
   
   multiple peers
   drawing customization
+  
+  HELPFUL LINKS:
+  recognizing temporary or full disconnects
+  https://stackoverflow.com/questions/63582725/webrtc-differentiate-between-temporary-disconnect-or-failure-and-permanant
 */
 
 import FriendlyWebSocket from "./FriendlyWebSocket";
