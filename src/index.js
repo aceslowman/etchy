@@ -23,6 +23,8 @@
 */
 
 import FriendlyWebSocket from "./FriendlyWebSocket";
+import {isPermanentDisconnect, checkStatePermanent} from "./webrtc_utils";
+
 // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
 function guidGenerator() {
   var S4 = function() {
@@ -90,8 +92,9 @@ const createPeerConnection = (isOfferer = false) => {
     }
   };
 
-  pc.oniceconnectionstatechange = function() {
+  pc.oniceconnectionstatechange = async function() {
     console.log("ice connection state changed", pc.iceConnectionState);
+    let isDisconnectPermanent;
     switch (pc.iceConnectionState) {
       case "disconnected":
         /* this changes often and shouldn't block a reconnect */
@@ -102,11 +105,22 @@ const createPeerConnection = (isOfferer = false) => {
         // peer_id = undefined;
         // offer_sent = false;
         // answer_sent = false;
+        isDisconnectPermanent = await checkStatePermanent(pc, pc.iceConnectionState);
+        console.log('is permanent', isDisconnectPermanent)
+        if(isDisconnectPermanent) {
+          
+        }
         break;
       case "closed":        
         /*  */
+        // checkStatePermanent(pc, pc.iceConnectionState);
         break;
       case "failed":
+        isDisconnectPermanent = await checkStatePermanent(pc, pc.iceConnectionState);
+        console.log('is permanent', isDisconnectPermanent)
+        if(isDisconnectPermanent) {
+          
+        }
         break;
     }
   };
