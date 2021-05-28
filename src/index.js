@@ -16,6 +16,9 @@
   
   multiple peers
   drawing customization
+  add image!
+  variable blend mode 
+  (connection-level) blend modes?
   
   HELPFUL LINKS:
   recognizing temporary or full disconnects
@@ -44,9 +47,6 @@ if (localStorage.getItem("agreeToCC")) {
   let peer_id = undefined;
   let localStream, sketchStream, cameraStream;
 
-  let fade = true;
-  let fadeAmount = 0.1;
-
   let countElement = document.querySelector(".count");
   let peersElement = document.querySelector("#peers");
 
@@ -69,9 +69,11 @@ if (localStorage.getItem("agreeToCC")) {
 
   let main_update_loop, camera_update_loop;
 
+  let fade = true;
+  let fadeAmount = 0.1;
   let update_rate = 100;
   let brush_radius = 20;
-
+  
   // ------------------------------------------------------------
   // setting up websocket signaling server
   const websocket = new FriendlyWebSocket({ path: "/" });

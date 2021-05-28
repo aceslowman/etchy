@@ -86,7 +86,6 @@ body,
 }
 
 #cameraCanvas {
-  /*   visibility:hidden;   */
   display: none;
 }
 
@@ -97,7 +96,6 @@ body,
 #peerList {
   display: flex;
   align-items: center;
-  /*   justify-content: center; */
 }
 
 #peers {
@@ -109,15 +107,15 @@ body,
   display: none;
   z-index: 4;
   align-items: center;
-      display: flex;
-    flex-flow: wrap;
-    justify-content: space-between;
+  flex-flow: wrap;
+  justify-content: space-between;
 }
 
 #controls > div {
   display: flex;
-  padding: 0px 15px;
+  padding: 5px 15px;
   align-items: center;
+  justify-content: space-evenly;
 }
 
 #brushRadius {
