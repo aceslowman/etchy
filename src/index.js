@@ -416,9 +416,12 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleMouseMove = e => {
+    e.preventDefault();
+    let event = e.touches ? e.touches[0] : e;
+
     if (dragging) {
       let bounds = canvas.getBoundingClientRect();
-      let mouse = { x: e.pageX - bounds.x, y: e.pageY - bounds.y };
+      let mouse = { x: event.pageX - bounds.x, y: event.pageY - bounds.y };
       sketchCtx.fillStyle = "white";
       sketchCtx.beginPath();
       sketchCtx.ellipse(
@@ -434,8 +437,14 @@ if (localStorage.getItem("agreeToCC")) {
     }
   };
 
-  const handleMouseDown = e => (dragging = true);
-  const handleMouseUp = e => (dragging = false);
+  const handleMouseDown = e => {
+    e.preventDefault();
+    dragging = true;    
+  };
+  const handleMouseUp = e => {
+    e.preventDefault();
+    dragging = false;    
+  };
 
   const handleBrushRadiusChange = e => {
     document.querySelector("#brushRadiusValue").innerHTML = e.target.value;
@@ -493,6 +502,10 @@ if (localStorage.getItem("agreeToCC")) {
   document.addEventListener("mousedown", handleMouseDown, false);
   document.addEventListener("mousemove", handleMouseMove, false);
   document.addEventListener("mouseup", handleMouseUp, false);
+  
+  document.addEventListener("touchstart", handleMouseDown, false);
+  document.addEventListener("touchmove", handleMouseMove, false);
+  document.addEventListener("touchend", handleMouseUp, false);
 
   document.querySelector("#brushRadiusValue").innerHTML = brush_radius;
   document.querySelector("#brushRadiusValue").value = brush_radius;
@@ -515,7 +528,6 @@ if (localStorage.getItem("agreeToCC")) {
 
   document.querySelector("#fadeAmountValue").innerHTML = fadeAmount;
   document.querySelector("#fadeAmountValue").value = fadeAmount;
-  // document.querySelector("#fadeAmountValue").addEventListener
 } else {
   document.getElementById("CODEOFCONDUCT").style.display = "flex";
 
