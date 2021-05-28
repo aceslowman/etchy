@@ -19,6 +19,7 @@
   add image!
   variable blend mode 
   (connection-level) blend modes?
+  variable brushes (different types)
   
   HELPFUL LINKS:
   recognizing temporary or full disconnects
@@ -74,6 +75,9 @@ if (localStorage.getItem("agreeToCC")) {
   let update_rate = 100;
   let brush_radius = 20;
   
+  let main_blend_mode = "screen";
+  let local_blend_mode = "multiply";
+  
   // ------------------------------------------------------------
   // setting up websocket signaling server
   const websocket = new FriendlyWebSocket({ path: "/" });
@@ -105,7 +109,6 @@ if (localStorage.getItem("agreeToCC")) {
 
       switch (pc.iceConnectionState) {
         case "disconnected":
-          /* this changes often and shouldn't block a reconnect */
           break;
         case "closed":
           break;
@@ -150,8 +153,6 @@ if (localStorage.getItem("agreeToCC")) {
     //   sendOffer();
     // };
     // }
-
-    // console.log("PeerConnection created");
 
     return pc;
   };
@@ -368,7 +369,7 @@ if (localStorage.getItem("agreeToCC")) {
     if (v2) ctx.drawImage(v2, 0, 0, canvas.width, canvas.height);
 
     ctx.save();
-    ctx.globalCompositeOperation = "screen";
+    ctx.globalCompositeOperation = main_blend_mode;
     if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
 
     ctx.restore();
@@ -400,7 +401,7 @@ if (localStorage.getItem("agreeToCC")) {
     cameraCtx.save();
     // this is for when there is no 'fade' effect
     // cameraCtx.globalCompositeOperation = "destination-in";
-    cameraCtx.globalCompositeOperation = "multiply";
+    cameraCtx.globalCompositeOperation = local_blend_mode;
     if (v2) cameraCtx.drawImage(v2, 0, 0, canvas.width, canvas.height);
     cameraCtx.restore();
   };
