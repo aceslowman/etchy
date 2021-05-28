@@ -79,8 +79,8 @@ if (localStorage.getItem("agreeToCC")) {
   const createPeerConnection = (isOfferer = false) => {
     const pc = new RTCPeerConnection({
       iceServers: [
-        { url: "stun:stun.1.google.com:19302" },
-        { url: "turn:quickturn.glitch.me" }
+        { urls: "stun:stun.1.google.com:19302" },
+        { urls: "turn:quickturn.glitch.me", username: 'na', credential: 'na' }
       ],
       offerToReceiveAudio: false,
       offerToReceiveVideo: true,
@@ -299,7 +299,12 @@ if (localStorage.getItem("agreeToCC")) {
           .catch(error => console.error(error));
         break;
       case "candidate":
-        pc.addIceCandidate(data.ice);
+        if(data.ice) {
+         
+          pc.addIceCandidate(data.ice); 
+        } else {
+          console.log('no ice', data)
+        }
         break;
       case "rejectOffer":
         alert(
