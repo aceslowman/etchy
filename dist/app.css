@@ -105,9 +105,13 @@ body,
 }
 
 #controls {
+  max-width: 700px;
   display: none;
   z-index: 4;
   align-items: center;
+      display: flex;
+    flex-flow: wrap;
+    justify-content: space-between;
 }
 
 #controls > div {
@@ -143,7 +147,6 @@ body,
 }
 
 #info {
-  position: absolute;
-  bottom: 0px;
+  font-style: italic;
   font-family: monospace;
 }
