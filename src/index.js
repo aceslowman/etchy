@@ -205,7 +205,7 @@ if (localStorage.getItem("agreeToCC")) {
       })
       .then(stream => {
         localStream = stream;
-        cameraStream = cameraCanvas.captureStream(30); // 10 fps
+        cameraStream = cameraCanvas.captureStream(30);
         sketchStream = sketchCanvas.captureStream(30);
 
         document.getElementById("local-video").srcObject = localStream;
@@ -241,7 +241,7 @@ if (localStorage.getItem("agreeToCC")) {
 
     switch (data.type) {
       case "count":
-        countElement.innerText = `currently online: ${data.count}`;
+        // countElement.innerText = `currently online: ${data.count}`;
 
         // clear all buttons
         Array.from(peersElement.children).forEach(e => {
@@ -261,11 +261,9 @@ if (localStorage.getItem("agreeToCC")) {
         break;
       case "offer":
         /* 
-        when an offer is received, the user on the receiving end
-        should be given the opportunity to accept or deny
-      */
-
-        // console.log("receiving offer from " + data.from_id, data);
+          when an offer is received, the user on the receiving end
+          should be given the opportunity to accept or deny
+        */
         if (offer_sent || window.confirm(data.from_id + " wants to connect")) {
           peer_id = data.from_id;
           pc.setRemoteDescription(data.sdp)
@@ -298,9 +296,7 @@ if (localStorage.getItem("agreeToCC")) {
           })
           .catch(error => console.error(error));
         break;
-      case "candidate":
-        console.log(data);
-        
+      case "candidate":1        
         if (!pc || !pc.remoteDescription.type) {
           pc.addIceCandidate(data.candidate);
         }
@@ -458,6 +454,32 @@ if (localStorage.getItem("agreeToCC")) {
       document.querySelector("#fadeToggle").innerHTML = "fade away";
     }
   };
+  
+  const handleSnapButton = () => {
+    /*
+        saves an image of the current scene
+      */
+      console.log("saving snapshot");
+      let uri = canvas.toDataURL("image/png");
+
+      let link = document.createElement("a");
+      link.download = `${user_id}`;
+
+      if (window.webkitURL != null) {
+        // Chrome allows the link to be clicked without actually adding it to the DOM.
+        link.href = uri;
+      } else {
+        // Firefox requires the link to be added to the DOM before it can be clicked.
+        link.href = uri;
+        link.onclick = e => {
+          document.body.removeChild(e.target);
+        };
+        link.style.display = "none";
+        document.body.appendChild(link);
+      }
+
+      link.click();
+  }
 
   initializeSketchCanvas();
 
@@ -481,6 +503,9 @@ if (localStorage.getItem("agreeToCC")) {
   document
     .querySelector("#fadeAmount")
     .addEventListener("input", handleFadeAmountChange, false);
+  document
+    .querySelector("#snapButton")
+    .addEventListener("click", handleSnapButton, false);
 
   document.querySelector("#fadeAmountValue").innerHTML = fadeAmount;
   document.querySelector("#fadeAmountValue").value = fadeAmount;
