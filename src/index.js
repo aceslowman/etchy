@@ -230,7 +230,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   // REGISTER when connection opens
   websocket.on("open", data => {
-    document.querySelector(".yourId").innerText = `your id: ${user_id}`;
+    document.querySelector(".yourId").innerText = user_id;
     send({ type: "register", user_id: user_id });
     pc = createPeerConnection();
   });

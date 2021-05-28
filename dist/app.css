@@ -17,7 +17,6 @@ body,
 #APP,
 .center,
 .loading,
-#info,
 #canvasContainer {
   width: 100%;
   height: 100%;
@@ -28,11 +27,6 @@ body,
 
 #APP {
   padding: 15px;
-}
-
-#info {
-  display: none;
-  z-index: 1;
 }
 
 .loading {
@@ -146,4 +140,10 @@ body,
 #CODEOFCONDUCT > div {
   max-width: 400px;
   align-items: center;
+}
+
+#info {
+  position: absolute;
+  bottom: 0px;
+  font-family: monospace;
 }
