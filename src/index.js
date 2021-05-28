@@ -230,7 +230,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   // REGISTER when connection opens
   websocket.on("open", data => {
-    document.querySelector(".yourId").innerText = user_id;
+    document.querySelector(".yourId").innerText = `(you) ${user_id}`;
     send({ type: "register", user_id: user_id });
     pc = createPeerConnection();
   });
@@ -266,6 +266,7 @@ if (localStorage.getItem("agreeToCC")) {
         */
         if (offer_sent || window.confirm(data.from_id + " wants to connect")) {
           peer_id = data.from_id;
+          document.querySelector(".peerId").innerText = `connected to: ${peer_id}`;
           pc.setRemoteDescription(data.sdp)
             .then(sendAnswer)
             .then(addCamera)
@@ -288,6 +289,7 @@ if (localStorage.getItem("agreeToCC")) {
         break;
       case "answer":
         peer_id = data.from_id;
+        document.querySelector(".peerId").innerText = `connected to: ${peer_id}`;
         pc.setRemoteDescription(data.sdp)
           .then(addCamera)
           .then(() => {
@@ -296,7 +298,7 @@ if (localStorage.getItem("agreeToCC")) {
           })
           .catch(error => console.error(error));
         break;
-      case "candidate":1        
+      case "candidate":        
         if (!pc || !pc.remoteDescription.type) {
           pc.addIceCandidate(data.candidate);
         }
