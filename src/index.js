@@ -26,8 +26,8 @@ import FriendlyWebSocket from "./FriendlyWebSocket";
 import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 
 if (localStorage.getItem("agreeToCC")) {
-  document.getElementById("CODEOFCONDUCT").style.display = 'none';
-  
+  document.getElementById("CODEOFCONDUCT").style.display = "none";
+
   // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
   function guidGenerator() {
     var S4 = function() {
@@ -78,7 +78,10 @@ if (localStorage.getItem("agreeToCC")) {
 
   const createPeerConnection = (isOfferer = false) => {
     const pc = new RTCPeerConnection({
-      iceServers: [{ url: "stun:stun.1.google.com:19302" }],
+      iceServers: [
+        { url: "stun:stun.1.google.com:19302" },
+        { url: "turn:quickturn.glitch.me" }
+      ],
       offerToReceiveAudio: false,
       offerToReceiveVideo: true,
       voiceActivityDetection: false
@@ -479,16 +482,16 @@ if (localStorage.getItem("agreeToCC")) {
   document.querySelector("#fadeAmountValue").value = fadeAmount;
   // document.querySelector("#fadeAmountValue").addEventListener
 } else {
-  document.getElementById("CODEOFCONDUCT").style.display = 'flex';
-  
+  document.getElementById("CODEOFCONDUCT").style.display = "flex";
+
   // CODE OF CONDUCT
   document.getElementById("agreeCC").addEventListener("click", () => {
     localStorage.setItem("agreeToCC", true);
-    window.location.reload()
+    window.location.reload();
   });
 
   document.getElementById("disagreeCC").addEventListener("click", () => {
     localStorage.setItem("agreeToCC", false);
-    window.open("https://www.google.com/search?q=am+i+an+asshole");    
+    window.open("https://www.google.com/search?q=am+i+an+asshole");
   });
 }
