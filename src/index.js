@@ -29,6 +29,7 @@
 import FriendlyWebSocket from "./FriendlyWebSocket";
 import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 
+// if the code of conduct has been agreed to
 if (localStorage.getItem("agreeToCC")) {
   document.getElementById("CODEOFCONDUCT").style.display = "none";
 
@@ -499,10 +500,12 @@ if (localStorage.getItem("agreeToCC")) {
 
   const handleLocalBlendMode = e => {
     console.log("handleLocalBlendMode", e.target.value);
+    local_blend_mode = e.target.value;
   };
 
   const handleGlobalBlendMode = e => {
     console.log("handleGlobalBlendMode", e.target.value);
+    main_blend_mode = e.target.value;
   };
 
   initializeSketchCanvas();
