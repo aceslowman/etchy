@@ -417,7 +417,7 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleMouseMove = e => {
-    e.preventDefault();
+    // e.preventDefault();
     let event = e.touches ? e.touches[0] : e;
 
     if (dragging) {
@@ -497,6 +497,14 @@ if (localStorage.getItem("agreeToCC")) {
     link.click();
   };
 
+  const handleLocalBlendMode = e => {
+    console.log("handleLocalBlendMode", e.target.value);
+  };
+
+  const handleGlobalBlendMode = e => {
+    console.log("handleGlobalBlendMode", e.target.value);
+  };
+
   initializeSketchCanvas();
 
   document.addEventListener("mousedown", handleMouseDown, false);
@@ -528,9 +536,16 @@ if (localStorage.getItem("agreeToCC")) {
 
   document.querySelector("#fadeAmountValue").innerHTML = fadeAmount;
   document.querySelector("#fadeAmountValue").value = fadeAmount;
-  
-} else {  // FOR CODE OF CONDUCT
-  
+
+  document
+    .querySelector("#localBlendMode")
+    .addEventListener("change", handleLocalBlendMode, false);
+  document
+    .querySelector("#globalBlendMode")
+    .addEventListener("change", handleGlobalBlendMode, false);
+} else {
+  // FOR CODE OF CONDUCT
+
   document.getElementById("CODEOFCONDUCT").style.display = "flex";
 
   // CODE OF CONDUCT

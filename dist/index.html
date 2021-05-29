@@ -109,7 +109,49 @@
               snap
             </button>
           </div>
-        </div>
+          <div>
+            <p style="padding-right:5px;">
+              local
+            </p>
+            <select id="localBlendMode">
+              <option value="screen">screen</option>
+              <option value="xor">xor</option>
+            </select>
+          </div>
+          <div>
+            <p style="padding-right:5px;">
+              global
+            </p>
+            <select id="globalBlendMode">
+
+"source-over"
+"source-in"
+"source-out"
+"source-atop"
+"destination-over"
+"destination-in"
+"destination-out"
+"destination-atop"
+"lighter"
+"copy"
+"xor"
+"multiply"
+"screen"
+"overlay"
+"darken"
+"color-dodge"
+"color-burn"
+"hard-light"
+"soft-light"
+"difference"
+"exclusion"
+"hue"
+"saturation"
+"color"
+"luminosity"
+            </select>
+          </div>
+        </div>        
       </div>
 
       <div class="loading">connecting......</div>
@@ -120,16 +162,17 @@
         </h1>
         <p class="centerText">
           select someone to share your camera with. <br />click and drag to
-              draw.
-           
+          draw.
         </p>
         <p class="centerText">
           <small>
-          <em><strong
-              >if your friend disappears, they might come back after a second.
-              if they don't refresh and try again</strong
-            ></em>
-          </small>          
+            <em
+              ><strong
+                >if your friend disappears, they might come back after a second.
+                if they don't refresh and try again</strong
+              ></em
+            >
+          </small>
         </p>
         <div id="peerList">
           <p>
@@ -137,7 +180,6 @@
           </p>
           <div id="peers"></div>
         </div>
-        
         <p>
           <small class="credit">
             <em>austin slominski 2021</em>
