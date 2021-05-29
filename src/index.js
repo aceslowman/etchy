@@ -74,10 +74,10 @@ if (localStorage.getItem("agreeToCC")) {
   let fadeAmount = 0.1;
   let update_rate = 100;
   let brush_radius = 20;
-  
+
   let main_blend_mode = "screen";
   let local_blend_mode = "multiply";
-  
+
   // ------------------------------------------------------------
   // setting up websocket signaling server
   const websocket = new FriendlyWebSocket({ path: "/" });
@@ -86,7 +86,7 @@ if (localStorage.getItem("agreeToCC")) {
     const pc = new RTCPeerConnection({
       iceServers: [
         { urls: "stun:stun.1.google.com:19302" },
-        { urls: "turn:quickturn.glitch.me", username: "na", credential: "na" }
+        { urls: "turn:quickturn.glitch.me", username: "n/a", credential: "n/a" }
       ],
       offerToReceiveAudio: false,
       offerToReceiveVideo: true,
@@ -148,6 +148,7 @@ if (localStorage.getItem("agreeToCC")) {
       }
     };
 
+    // TODO: probably still needs to be added
     // if (isOfferer) {
     // pc.onnegotiationneeded = () => {
     //   sendOffer();
@@ -301,7 +302,7 @@ if (localStorage.getItem("agreeToCC")) {
           })
           .catch(error => console.error(error));
         break;
-      case "candidate":        
+      case "candidate":
         if (!pc || !pc.remoteDescription.type) {
           pc.addIceCandidate(data.candidate);
         }
@@ -438,12 +439,12 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleMouseDown = e => {
-    e.preventDefault();
-    dragging = true;    
+    // e.preventDefault();
+    dragging = true;
   };
   const handleMouseUp = e => {
-    e.preventDefault();
-    dragging = false;    
+    // e.preventDefault();
+    dragging = false;
   };
 
   const handleBrushRadiusChange = e => {
@@ -469,40 +470,39 @@ if (localStorage.getItem("agreeToCC")) {
       document.querySelector("#fadeToggle").innerHTML = "fade away";
     }
   };
-  
+
   const handleSnapButton = () => {
     /*
-        saves an image of the current scene
-      */
-      console.log("saving snapshot");
-      let uri = canvas.toDataURL("image/png");
+      saves an image of the current canvas
+    */
+    console.log("saving snapshot");
+    let uri = canvas.toDataURL("image/png");
 
-      let link = document.createElement("a");
-      link.download = `${user_id}`;
+    let link = document.createElement("a");
+    link.download = `${user_id}`;
 
-      if (window.webkitURL != null) {
-        // Chrome allows the link to be clicked without actually adding it to the DOM.
-        link.href = uri;
-      } else {
-        // Firefox requires the link to be added to the DOM before it can be clicked.
-        link.href = uri;
-        link.onclick = e => {
-          document.body.removeChild(e.target);
-        };
-        link.style.display = "none";
-        document.body.appendChild(link);
-      }
+    if (window.webkitURL != null) {
+      // Chrome allows the link to be clicked without actually adding it to the DOM.
+      link.href = uri;
+    } else {
+      // Firefox requires the link to be added to the DOM before it can be clicked.
+      link.href = uri;
+      link.onclick = e => {
+        document.body.removeChild(e.target);
+      };
+      link.style.display = "none";
+      document.body.appendChild(link);
+    }
 
-      link.click();
-  }
+    link.click();
+  };
 
   initializeSketchCanvas();
 
-  // document.addEventListener("click", init, false);
   document.addEventListener("mousedown", handleMouseDown, false);
   document.addEventListener("mousemove", handleMouseMove, false);
   document.addEventListener("mouseup", handleMouseUp, false);
-  
+
   document.addEventListener("touchstart", handleMouseDown, false);
   document.addEventListener("touchmove", handleMouseMove, false);
   document.addEventListener("touchend", handleMouseUp, false);
@@ -528,7 +528,9 @@ if (localStorage.getItem("agreeToCC")) {
 
   document.querySelector("#fadeAmountValue").innerHTML = fadeAmount;
   document.querySelector("#fadeAmountValue").value = fadeAmount;
-} else {
+  
+} else {  // FOR CODE OF CONDUCT
+  
   document.getElementById("CODEOFCONDUCT").style.display = "flex";
 
   // CODE OF CONDUCT
