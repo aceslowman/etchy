@@ -92,7 +92,11 @@ body,
 }
 
 #feeds {
-/*   display: none; */
+  display: none;
+/*   display:flex; */
+  flex-flow:column;
+  width:25%;
+  height:25%;
   position:absolute;
   overflow-x: scroll;
   z-index:20;

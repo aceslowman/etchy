@@ -148,8 +148,6 @@ if (localStorage.getItem("agreeToCC")) {
         let inboundStream = new MediaStream(event.track);
         ele.srcObject = inboundStream;
       }
-      
-//       ele.play();
     };
 
     // TODO: probably still needs to be added
@@ -427,7 +425,7 @@ if (localStorage.getItem("agreeToCC")) {
 
     if (dragging) {
       let bounds = canvas.getBoundingClientRect();
-      let mouse = { x: event.pageX - bounds.x, y: event.pageY - bounds.y };
+      let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
       sketchCtx.fillStyle = "white";
       sketchCtx.beginPath();
       sketchCtx.ellipse(
@@ -502,6 +500,8 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   initializeSketchCanvas();
+  
+  window
 
   document.addEventListener("mousedown", handleMouseDown, false);
   document.addEventListener("mousemove", handleMouseMove, false);
