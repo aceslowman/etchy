@@ -423,7 +423,7 @@ if (localStorage.getItem("agreeToCC")) {
     // this is for when there is no 'fade' effect
     // cameraCtx.globalCompositeOperation = "destination-in";
     cameraCtx.globalCompositeOperation = local_blend_mode;
-    if (v2) cameraCtx.drawImage(v2, 0, 0, canvas.width, canvas.height);
+    // if (v2) cameraCtx.drawImage(v2, 0, 0, canvas.width, canvas.height);
     cameraCtx.restore();
   };
 
