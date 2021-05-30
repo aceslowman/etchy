@@ -140,6 +140,7 @@ if (localStorage.getItem("agreeToCC")) {
       ele.id = "peerRemote";
       ele.autoplay = true;
       ele.controls = true; // TEMP
+      ele.playsinline = true;
 
       if (event.streams && event.streams[0]) {
         ele.srcObject = event.streams[0];
@@ -147,6 +148,8 @@ if (localStorage.getItem("agreeToCC")) {
         let inboundStream = new MediaStream(event.track);
         ele.srcObject = inboundStream;
       }
+      
+//       ele.play();
     };
 
     // TODO: probably still needs to be added
@@ -250,8 +253,6 @@ if (localStorage.getItem("agreeToCC")) {
 
     switch (data.type) {
       case "count":
-        // countElement.innerText = `currently online: ${data.count}`;
-
         // clear all buttons
         Array.from(peersElement.children).forEach(e => {
           e.removeEventListener("click", handlePeerClick);
