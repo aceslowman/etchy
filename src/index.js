@@ -104,6 +104,10 @@ if (localStorage.getItem("agreeToCC")) {
         });
       }
     };
+    
+    pc.onicecandidateerror = (err) => {
+      console.error(err)
+    };
 
     pc.oniceconnectionstatechange = async function() {
       console.log("ice connection state changed", pc.iceConnectionState);
@@ -168,6 +172,9 @@ if (localStorage.getItem("agreeToCC")) {
       .then(setAndSendLocalDescription)
       .then(() => {
         offer_sent = true;
+      })
+      .catch(err => {
+        console.error(err);
       });
   };
 
@@ -179,6 +186,9 @@ if (localStorage.getItem("agreeToCC")) {
       .then(setAndSendLocalDescription)
       .then(() => {
         answer_sent = true;
+      })
+      .catch(err => {
+        console.error(err);
       });
   };
 
@@ -190,14 +200,18 @@ if (localStorage.getItem("agreeToCC")) {
         type: sdp.type,
         sdp: sdp
       });
-    });
+    }).catch(err => {
+        console.error(err);
+      });
   };
 
   const handlePeerClick = e => {
     offer_sent = false;
     answer_sent = false;
     peer_id = e.target.innerHTML;
-    addCamera().then(sendOffer);
+    addCamera().then(sendOffer).catch(err => {
+        console.error(err);
+      });
     hideLobby();
     showLoading();
     // showControls();
@@ -441,8 +455,8 @@ if (localStorage.getItem("agreeToCC")) {
     }
   };
 
-  const handleMouseDown = e => dragging = true;
-  const handleMouseUp = e => dragging = false;
+  const handleMouseDown = e => (dragging = true);
+  const handleMouseUp = e => (dragging = false);
 
   const handleBrushRadiusChange = e => {
     document.querySelector("#brushRadiusValue").innerHTML = e.target.value;
@@ -500,10 +514,14 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   initializeSketchCanvas();
-  
-  window.addEventListener('resize', (e) =>{
-    // canvas.width = 
-  }, true)
+
+  window.addEventListener(
+    "resize",
+    e => {
+      // canvas.width =
+    },
+    true
+  );
 
   document.addEventListener("mousedown", handleMouseDown, false);
   document.addEventListener("mousemove", handleMouseMove, false);
