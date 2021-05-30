@@ -422,7 +422,6 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleMouseMove = e => {
-    // e.preventDefault();
     let event = e.touches ? e.touches[0] : e;
 
     if (dragging) {
@@ -443,14 +442,8 @@ if (localStorage.getItem("agreeToCC")) {
     }
   };
 
-  const handleMouseDown = e => {
-    // e.preventDefault();
-    dragging = true;
-  };
-  const handleMouseUp = e => {
-    // e.preventDefault();
-    dragging = false;
-  };
+  const handleMouseDown = e => dragging = true;
+  const handleMouseUp = e => dragging = false;
 
   const handleBrushRadiusChange = e => {
     document.querySelector("#brushRadiusValue").innerHTML = e.target.value;
@@ -469,11 +462,9 @@ if (localStorage.getItem("agreeToCC")) {
 
   const handleToggleFade = () => {
     fade = !fade;
-    if (fade) {
-      document.querySelector("#fadeToggle").innerHTML = "dont fade away";
-    } else {
-      document.querySelector("#fadeToggle").innerHTML = "fade away";
-    }
+    document.querySelector("#fadeToggle").innerHTML = fade
+      ? "dont fade away"
+      : "fade away";
   };
 
   const handleSnapButton = () => {
@@ -482,7 +473,6 @@ if (localStorage.getItem("agreeToCC")) {
     */
     console.log("saving snapshot");
     let uri = canvas.toDataURL("image/png");
-
     let link = document.createElement("a");
     link.download = `${user_id}`;
 
@@ -492,9 +482,7 @@ if (localStorage.getItem("agreeToCC")) {
     } else {
       // Firefox requires the link to be added to the DOM before it can be clicked.
       link.href = uri;
-      link.onclick = e => {
-        document.body.removeChild(e.target);
-      };
+      link.onclick = e => document.body.removeChild(e.target);
       link.style.display = "none";
       document.body.appendChild(link);
     }
