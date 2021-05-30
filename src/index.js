@@ -501,7 +501,9 @@ if (localStorage.getItem("agreeToCC")) {
 
   initializeSketchCanvas();
   
-  window
+  window.addEventListener('resize', (e) =>{
+    // canvas.width = 
+  }, true)
 
   document.addEventListener("mousedown", handleMouseDown, false);
   document.addEventListener("mousemove", handleMouseMove, false);

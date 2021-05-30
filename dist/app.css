@@ -18,9 +18,16 @@ body,
 
 #APP,
 .center,
-.loading,
-#canvasContainer {
+.loading {
   width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+#canvasContainer {
+    width: 100%;
   height: 100%;
   position: absolute;
   top: 0px;
@@ -79,8 +86,8 @@ body,
 #mainCanvas {
   border: 1px solid #333333;
   box-shadow: 3px 3px 3px #333;
-  max-width: 100%;
-  max-height: 100%;
+/*   max-width: 100%;
+  max-height: 100%; */
 }
 
 #sketchCanvas {
