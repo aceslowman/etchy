@@ -152,6 +152,8 @@ if (localStorage.getItem("agreeToCC")) {
         let inboundStream = new MediaStream(event.track);
         ele.srcObject = inboundStream;
       }
+      
+      console.log('on track', ele)
     };
 
     // TODO: probably still needs to be added
