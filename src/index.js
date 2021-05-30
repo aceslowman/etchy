@@ -206,7 +206,8 @@ if (localStorage.getItem("agreeToCC")) {
     return navigator.mediaDevices
       .getUserMedia({
         audio: false,
-        video: { width: 640, height: 480 }
+        video: true
+        // video: { width: 640, height: 480 }
       })
       .then(stream => {
         localStream = stream;
@@ -230,6 +231,9 @@ if (localStorage.getItem("agreeToCC")) {
         } else {
           main_update_loop = setInterval(updateMainCanvas, update_rate);
         }
+      })
+      .catch(err => {
+        console.error(err);
       });
   };
 

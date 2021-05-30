@@ -92,7 +92,10 @@ body,
 }
 
 #feeds {
-  display: none;
+/*   display: none; */
+  position:absolute;
+  overflow-x: scroll;
+  z-index:20;
 }
 
 #peerList {
