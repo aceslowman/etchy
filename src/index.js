@@ -156,19 +156,14 @@ if (localStorage.getItem("agreeToCC")) {
       ele.id = "peerRemote";
       
       ele.autoplay = true;
-      ele.controls = true; // TEMP
+      ele.controls = true;
       ele.playsInline = true;
       ele.muted = true;
-      // ele.setAttribute("muted", true);
-      
-      console.log('on track', ele)
       
       ele.play();
-    
-    // test
-      // document.getElementById("local-video").play();
-      //   document.getElementById("local-sketch").play();
-      //   document.getElementById("local-composite").play();
+      document.getElementById("local-video").play();
+      document.getElementById("local-sketch").play();
+      document.getElementById("local-composite").play();
     };
 
     // TODO: probably still needs to be added
@@ -243,8 +238,8 @@ if (localStorage.getItem("agreeToCC")) {
       })
       .then(stream => {
         localStream = stream;
-        cameraStream = cameraCanvas.captureStream(30);
-        sketchStream = sketchCanvas.captureStream(30);
+        cameraStream = cameraCanvas.captureStream();
+        sketchStream = sketchCanvas.captureStream();
 
         document.getElementById("local-video").srcObject = localStream;
         document.getElementById("local-sketch").srcObject = sketchStream;
