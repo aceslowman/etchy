@@ -144,9 +144,11 @@ if (localStorage.getItem("agreeToCC")) {
       }
 
       ele.id = "peerRemote";
+      ele.muted = true;
       ele.autoplay = true;
       ele.controls = true; // TEMP
-      ele.playsinline = true;
+      ele.playsInline = true;
+      // ele.setAttribute("playsinline", true);
 
       if (event.streams && event.streams[0]) {
         ele.srcObject = event.streams[0];
@@ -156,6 +158,8 @@ if (localStorage.getItem("agreeToCC")) {
       }
       
       console.log('on track', ele)
+      
+      ele.play();
     };
 
     // TODO: probably still needs to be added
@@ -236,6 +240,10 @@ if (localStorage.getItem("agreeToCC")) {
         document.getElementById("local-video").srcObject = localStream;
         document.getElementById("local-sketch").srcObject = sketchStream;
         document.getElementById("local-composite").srcObject = cameraStream;
+      
+        document.getElementById("local-video").play();
+        document.getElementById("local-sketch").play();
+        document.getElementById("local-composite").play();
 
         initializeSketchCanvas();
 
