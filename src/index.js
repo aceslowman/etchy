@@ -225,8 +225,8 @@ if (localStorage.getItem("agreeToCC")) {
     return navigator.mediaDevices
       .getUserMedia({
         audio: false,
-        video: true
-        // video: { width: 640, height: 480 }
+        // video: true
+        video: { width: 640, height: 480 }
       })
       .then(stream => {
         localStream = stream;
@@ -325,7 +325,7 @@ if (localStorage.getItem("agreeToCC")) {
           .catch(error => console.error(error));
         break;
       case "candidate":
-        if (!pc || !pc.remoteDescription.type) {
+        if (!pc || !pc.remoteDescription) {
           pc.addIceCandidate(data.candidate);
         }
         break;
@@ -442,6 +442,7 @@ if (localStorage.getItem("agreeToCC")) {
     let event = e.touches ? e.touches[0] : e;
 
     if (dragging) {
+      e.preventDefault();
       let bounds = canvas.getBoundingClientRect();
       let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
       sketchCtx.fillStyle = "white";
