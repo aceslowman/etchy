@@ -16,6 +16,8 @@
   
   fix on ios (works on everything but ios!)
     video elements all have to be muted, playinline, and autoplay
+    
+    works on safari (atm) but not on chrome ios
   
   multiple peers
   drawing customization
