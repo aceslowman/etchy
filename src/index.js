@@ -225,6 +225,7 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const addCamera = () => {
+    // if(localStream) return;
     return navigator.mediaDevices
       .getUserMedia({
         audio: false,
@@ -232,6 +233,7 @@ if (localStorage.getItem("agreeToCC")) {
         video: { width: 640, height: 480 }
       })
       .then(stream => {
+        console.log('adding camera')
         localStream = stream;
         compositeStream = cameraCanvas.captureStream();
         sketchStream = sketchCanvas.captureStream();
@@ -248,7 +250,7 @@ if (localStorage.getItem("agreeToCC")) {
         document.getElementById("local-video").play();
         document.getElementById("local-sketch").play();
         document.getElementById("local-composite").play();
-        document.getElementById("peerRemote").play();
+        // document.getElementById("peerRemote").play();
 
         // startup the main output loop
         if (main_update_loop) {
