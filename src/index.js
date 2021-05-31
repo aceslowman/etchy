@@ -14,6 +14,8 @@
   
   TODO:
   
+  fix on ios (works on everything but ios!)
+  
   multiple peers
   drawing customization
   add image!
