@@ -136,14 +136,7 @@ if (localStorage.getItem("agreeToCC")) {
     };
 
     pc.ontrack = event => {
-      let ele, sketch_ele;
-      if (document.querySelector("#peerRemote")) {
-        ele = document.querySelector("#peerRemote");
-      } else {
-        // ele = document.createElement("video");
-        // document.querySelector("#remoteStreams").appendChild(ele);
-      }
-
+      let ele = document.querySelector("#peerRemote");
 
       if (event.streams && event.streams[0]) {
         ele.srcObject = event.streams[0];
@@ -151,7 +144,6 @@ if (localStorage.getItem("agreeToCC")) {
         let inboundStream = new MediaStream(event.track);
         ele.srcObject = inboundStream;
       }
-      
       
       ele.id = "peerRemote";
       
@@ -161,6 +153,7 @@ if (localStorage.getItem("agreeToCC")) {
       ele.muted = true;
       
       ele.play();
+      
       document.getElementById("local-video").play();
       document.getElementById("local-sketch").play();
       document.getElementById("local-composite").play();
@@ -405,8 +398,7 @@ if (localStorage.getItem("agreeToCC")) {
 
     ctx.save();
     ctx.globalCompositeOperation = main_blend_mode;
-    ctx.setCompositeOperation(main_blend_mode)
-    // if (v1) ctx.drawImage(v1, 0, 0, canvas.width, canvas.height);
+    if (v1) ctx.drawImage(v1, 0, 0);
 
     ctx.restore();
   };
@@ -438,7 +430,7 @@ if (localStorage.getItem("agreeToCC")) {
     // this is for when there is no 'fade' effect
     // cameraCtx.globalCompositeOperation = "destination-in";
     cameraCtx.globalCompositeOperation = local_blend_mode;
-    // if (v2) cameraCtx.drawImage(v2, 0, 0, canvas.width, canvas.height);
+    if (v2) cameraCtx.drawImage(v2, 0, 0);
     cameraCtx.restore();
   };
 
