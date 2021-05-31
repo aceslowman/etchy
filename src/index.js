@@ -15,6 +15,7 @@
   TODO:
   
   fix on ios (works on everything but ios!)
+    video elements all have to be muted, playinline, and autoplay
   
   multiple peers
   drawing customization
@@ -139,16 +140,10 @@ if (localStorage.getItem("agreeToCC")) {
       if (document.querySelector("#peerRemote")) {
         ele = document.querySelector("#peerRemote");
       } else {
-        ele = document.createElement("video");
-        document.querySelector("#remoteStreams").appendChild(ele);
+        // ele = document.createElement("video");
+        // document.querySelector("#remoteStreams").appendChild(ele);
       }
 
-      ele.id = "peerRemote";
-      ele.muted = true;
-      ele.autoplay = true;
-      ele.controls = true; // TEMP
-      ele.playsInline = true;
-      // ele.setAttribute("playsinline", true);
 
       if (event.streams && event.streams[0]) {
         ele.srcObject = event.streams[0];
@@ -157,9 +152,23 @@ if (localStorage.getItem("agreeToCC")) {
         ele.srcObject = inboundStream;
       }
       
+      
+      ele.id = "peerRemote";
+      
+      ele.autoplay = true;
+      ele.controls = true; // TEMP
+      ele.playsInline = true;
+      ele.muted = true;
+      // ele.setAttribute("muted", true);
+      
       console.log('on track', ele)
       
       ele.play();
+    
+    // test
+      // document.getElementById("local-video").play();
+      //   document.getElementById("local-sketch").play();
+      //   document.getElementById("local-composite").play();
     };
 
     // TODO: probably still needs to be added
