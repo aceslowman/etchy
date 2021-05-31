@@ -236,8 +236,8 @@ if (localStorage.getItem("agreeToCC")) {
       })
       .then(stream => {
         localStream = stream;
-        cameraStream = cameraCanvas.captureStream(30);
-        sketchStream = sketchCanvas.captureStream(30);
+        cameraStream = cameraCanvas.captureStream();
+        sketchStream = sketchCanvas.captureStream();
 
         document.getElementById("local-video").srcObject = localStream;
         document.getElementById("local-sketch").srcObject = sketchStream;
@@ -309,9 +309,7 @@ if (localStorage.getItem("agreeToCC")) {
             .then(() => {
               hideLobby();
               showControls();
-              if (!offer_sent) {
-                sendOffer();
-              }
+              if (!offer_sent) sendOffer();
             })
             .catch(error => console.error(error));
         } else {
@@ -430,7 +428,6 @@ if (localStorage.getItem("agreeToCC")) {
     if (v1) cameraCtx.drawImage(v1, 0, 0);
 
     cameraCtx.save();
-    // this is for when there is no 'fade' effect
     cameraCtx.globalCompositeOperation = local_blend_mode;
     if (v2) cameraCtx.drawImage(v2, 0, 0);
     cameraCtx.restore();
