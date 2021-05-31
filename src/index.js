@@ -88,10 +88,10 @@ if (localStorage.getItem("agreeToCC")) {
 
   const createPeerConnection = (isOfferer = false) => {
     const pc = new RTCPeerConnection({
-      iceServers: [
-        { urls: "stun:stun.1.google.com:19302" },
-        { urls: "turn:quickturn.glitch.me", username: "n/a", credential: "n/a" }
-      ],
+      // iceServers: [
+      //   { urls: "stun:stun.1.google.com:19302" },
+      //   { urls: "turn:quickturn.glitch.me", username: "n/a", credential: "n/a" }
+      // ],
       offerToReceiveAudio: false,
       offerToReceiveVideo: true,
       voiceActivityDetection: false
@@ -152,11 +152,11 @@ if (localStorage.getItem("agreeToCC")) {
       ele.playsInline = true;
       ele.muted = true;
 
-      ele.play();
-
       document.getElementById("local-video").play();
       document.getElementById("local-sketch").play();
       document.getElementById("local-composite").play();
+
+      ele.play();
     };
 
     // TODO: probably still needs to be added
@@ -248,10 +248,11 @@ if (localStorage.getItem("agreeToCC")) {
         document.getElementById("local-composite").play();
 
         initializeSketchCanvas();
-
-        cameraStream
-          .getTracks()
-          .forEach(track => pc.addTrack(track, cameraStream));
+        console.log("cameraStream", cameraStream);
+        cameraStream.getTracks().forEach(track => {
+          console.log("track", track);
+          pc.addTrack(track, cameraStream);
+        });
 
         // startup the main output loop
         if (main_update_loop) {
@@ -401,7 +402,7 @@ if (localStorage.getItem("agreeToCC")) {
 
     ctx.save();
     ctx.globalCompositeOperation = main_blend_mode;
-    if (v1) ctx.drawImage(v1, 0, 0);
+    // if (v1) ctx.drawImage(v1, 0, 0);
     ctx.restore();
   };
 
