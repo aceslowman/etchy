@@ -50,7 +50,7 @@ if (localStorage.getItem("agreeToCC")) {
   let offer_sent = false;
   let answer_sent = false;
   let peer_id = undefined;
-  let localStream, sketchStream, cameraStream;
+  let localStream, sketchStream, compositeStream;
 
   let countElement = document.querySelector(".count");
   let peersElement = document.querySelector("#peers");
@@ -145,8 +145,6 @@ if (localStorage.getItem("agreeToCC")) {
         ele.srcObject = inboundStream;
       }
 
-      ele.id = "peerRemote";
-
       ele.autoplay = true;
       ele.controls = true;
       ele.playsInline = true;
@@ -155,8 +153,7 @@ if (localStorage.getItem("agreeToCC")) {
       document.getElementById("local-video").play();
       document.getElementById("local-sketch").play();
       document.getElementById("local-composite").play();
-
-      ele.play();
+      document.getElementById("peerRemote").play();
     };
 
     // TODO: probably still needs to be added
@@ -236,23 +233,22 @@ if (localStorage.getItem("agreeToCC")) {
       })
       .then(stream => {
         localStream = stream;
-        cameraStream = cameraCanvas.captureStream();
+        compositeStream = cameraCanvas.captureStream();
         sketchStream = sketchCanvas.captureStream();
+
+        initializeSketchCanvas();
+        compositeStream.getTracks().forEach(track => {
+          pc.addTrack(track, compositeStream);
+        });
 
         document.getElementById("local-video").srcObject = localStream;
         document.getElementById("local-sketch").srcObject = sketchStream;
-        document.getElementById("local-composite").srcObject = cameraStream;
+        document.getElementById("local-composite").srcObject = compositeStream;
 
         document.getElementById("local-video").play();
         document.getElementById("local-sketch").play();
         document.getElementById("local-composite").play();
-
-        initializeSketchCanvas();
-        console.log("cameraStream", cameraStream);
-        cameraStream.getTracks().forEach(track => {
-          console.log("track", track);
-          pc.addTrack(track, cameraStream);
-        });
+        document.getElementById("peerRemote").play();
 
         // startup the main output loop
         if (main_update_loop) {
@@ -402,7 +398,7 @@ if (localStorage.getItem("agreeToCC")) {
 
     ctx.save();
     ctx.globalCompositeOperation = main_blend_mode;
-    // if (v1) ctx.drawImage(v1, 0, 0);
+    if (v1) ctx.drawImage(v1, 0, 0);
     ctx.restore();
   };
 
