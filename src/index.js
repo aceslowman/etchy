@@ -107,9 +107,9 @@ if (localStorage.getItem("agreeToCC")) {
         });
       }
     };
-    
-    pc.onicecandidateerror = (err) => {
-      console.error(err)
+
+    pc.onicecandidateerror = err => {
+      console.error(err);
     };
 
     pc.oniceconnectionstatechange = async function() {
@@ -144,16 +144,16 @@ if (localStorage.getItem("agreeToCC")) {
         let inboundStream = new MediaStream(event.track);
         ele.srcObject = inboundStream;
       }
-      
+
       ele.id = "peerRemote";
-      
+
       ele.autoplay = true;
       ele.controls = true;
       ele.playsInline = true;
       ele.muted = true;
-      
+
       ele.play();
-      
+
       document.getElementById("local-video").play();
       document.getElementById("local-sketch").play();
       document.getElementById("local-composite").play();
@@ -198,14 +198,17 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const setAndSendLocalDescription = sdp => {
-    return pc.setLocalDescription(sdp).then(() => {
-      send({
-        from_id: user_id,
-        to_id: peer_id,
-        type: sdp.type,
-        sdp: sdp
-      });
-    }).catch(err => {
+    return pc
+      .setLocalDescription(sdp)
+      .then(() => {
+        send({
+          from_id: user_id,
+          to_id: peer_id,
+          type: sdp.type,
+          sdp: sdp
+        });
+      })
+      .catch(err => {
         console.error(err);
       });
   };
@@ -214,7 +217,9 @@ if (localStorage.getItem("agreeToCC")) {
     offer_sent = false;
     answer_sent = false;
     peer_id = e.target.innerHTML;
-    addCamera().then(sendOffer).catch(err => {
+    addCamera()
+      .then(sendOffer)
+      .catch(err => {
         console.error(err);
       });
     hideLobby();
@@ -231,13 +236,13 @@ if (localStorage.getItem("agreeToCC")) {
       })
       .then(stream => {
         localStream = stream;
-        cameraStream = cameraCanvas.captureStream();
-        sketchStream = sketchCanvas.captureStream();
+        cameraStream = cameraCanvas.captureStream(30);
+        sketchStream = sketchCanvas.captureStream(30);
 
         document.getElementById("local-video").srcObject = localStream;
         document.getElementById("local-sketch").srcObject = sketchStream;
         document.getElementById("local-composite").srcObject = cameraStream;
-      
+
         document.getElementById("local-video").play();
         document.getElementById("local-sketch").play();
         document.getElementById("local-composite").play();
@@ -394,12 +399,11 @@ if (localStorage.getItem("agreeToCC")) {
     let v1 = document.querySelector("#local-composite");
     let v2 = document.querySelector("#peerRemote");
 
-    if (v2) ctx.drawImage(v2, 0, 0, canvas.width, canvas.height);
+    if (v2) ctx.drawImage(v2, 0, 0);
 
     ctx.save();
     ctx.globalCompositeOperation = main_blend_mode;
     if (v1) ctx.drawImage(v1, 0, 0);
-
     ctx.restore();
   };
 
@@ -423,12 +427,10 @@ if (localStorage.getItem("agreeToCC")) {
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
 
-    if (v1)
-      cameraCtx.drawImage(v1, 0, 0, cameraCanvas.width, cameraCanvas.height);
+    if (v1) cameraCtx.drawImage(v1, 0, 0);
 
     cameraCtx.save();
     // this is for when there is no 'fade' effect
-    // cameraCtx.globalCompositeOperation = "destination-in";
     cameraCtx.globalCompositeOperation = local_blend_mode;
     if (v2) cameraCtx.drawImage(v2, 0, 0);
     cameraCtx.restore();
