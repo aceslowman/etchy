@@ -72,7 +72,8 @@ if (localStorage.getItem("agreeToCC")) {
   cameraCanvas.width = 640;
   cameraCanvas.height = 480;
 
-  let dragging = false;
+  let left_dragging = false;
+  let right_dragging = false;
 
   let main_update_loop, camera_update_loop;
 
@@ -80,6 +81,9 @@ if (localStorage.getItem("agreeToCC")) {
   let fadeAmount = 0.1;
   let update_rate = 100;
   let brush_radius = 20;
+
+  let message_index = 0;
+  let current_message = "a test message";
 
   let main_blend_mode = "screen";
   let local_blend_mode = "multiply";
@@ -90,12 +94,12 @@ if (localStorage.getItem("agreeToCC")) {
 
   const createPeerConnection = (isOfferer = false) => {
     const pc = new RTCPeerConnection({
-      // iceServers: [
-      //   { urls: "stun:stun.1.google.com:19302" },
-      //   { urls: "turn:quickturn.glitch.me", username: "n/a", credential: "n/a" }
-      // ],
-      offerToReceiveAudio: false,
-      offerToReceiveVideo: true,
+      iceServers: [
+        { urls: "stun:stun.1.google.com:19302" },
+        { urls: "turn:quickturn.glitch.me", username: "n/a", credential: "n/a" }
+      ],
+      // offerToReceiveAudio: false,
+      // offerToReceiveVideo: true,
       voiceActivityDetection: false
     });
 
@@ -235,7 +239,7 @@ if (localStorage.getItem("agreeToCC")) {
         video: { width: 640, height: 480 }
       })
       .then(stream => {
-        console.log('adding camera')
+        console.log("adding camera");
         localStream = stream;
         compositeStream = cameraCanvas.captureStream();
         sketchStream = sketchCanvas.captureStream();
@@ -446,7 +450,7 @@ if (localStorage.getItem("agreeToCC")) {
   const handleMouseMove = e => {
     let event = e.touches ? e.touches[0] : e;
 
-    if (dragging) {
+    if (left_dragging) {
       e.preventDefault();
       let bounds = canvas.getBoundingClientRect();
       let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
@@ -463,10 +467,45 @@ if (localStorage.getItem("agreeToCC")) {
       );
       sketchCtx.fill();
     }
+
+    if (right_dragging) {
+      e.preventDefault();
+      // draw message
+      sketchCtx.font = "30px Arial";
+      sketchCtx.fillText(current_message.split("")[message_index], 10, 5);
+    }
   };
 
-  const handleMouseDown = e => (dragging = true);
-  const handleMouseUp = e => (dragging = false);
+  const handleMouseDown = e => {
+    e.preventDefault();
+    
+    if (e.button === 0) {
+      // left
+      left_dragging = true;
+    } else if (e.button === 1) {
+      // middle
+    } else if (e.button === 2) {
+      // right
+      right_dragging = true;
+    }
+  };
+
+  const handleMouseUp = e => {
+    e.preventDefault();
+    
+    if (e.button === 0) {
+      // left
+      left_dragging = false;
+    } else if (e.button === 1) {
+      // middle
+    } else if (e.button === 2) {
+      // right
+      right_dragging = false;
+    }
+    
+    // left_dragging = false;
+    // right_dragging = false;
+  };
 
   const handleBrushRadiusChange = e => {
     document.querySelector("#brushRadiusValue").innerHTML = e.target.value;
@@ -522,6 +561,10 @@ if (localStorage.getItem("agreeToCC")) {
     console.log("handleGlobalBlendMode", e.target.value);
     main_blend_mode = e.target.value;
   };
+  
+  const handleContextMenu = e => {
+    e.preventsDefault();
+  }
 
   initializeSketchCanvas();
 
@@ -532,6 +575,8 @@ if (localStorage.getItem("agreeToCC")) {
     },
     true
   );
+  
+  canvas.addEventListener("contextmenu", handleContextMenu, false);
 
   document.addEventListener("mousedown", handleMouseDown, false);
   document.addEventListener("mousemove", handleMouseMove, false);
