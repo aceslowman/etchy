@@ -81,6 +81,7 @@ if (localStorage.getItem("agreeToCC")) {
   let fadeAmount = 0.1;
   let update_rate = 100;
   let brush_radius = 20;
+  let mouse = {};
 
   let message_index = 0;
   let current_message = "a test message";
@@ -408,6 +409,45 @@ if (localStorage.getItem("agreeToCC")) {
     ctx.globalCompositeOperation = main_blend_mode;
     if (v1) ctx.drawImage(v1, 0, 0);
     ctx.restore();
+    
+    
+    let event = e.touches ? e.touches[0] : e;
+
+    if (left_dragging) {
+      sketchCtx.fillStyle = "white";
+      sketchCtx.beginPath();
+      sketchCtx.ellipse(
+        mouse.x,
+        mouse.y,
+        brush_radius,
+        brush_radius,
+        Math.PI / 4,
+        0,
+        2 * Math.PI
+      );
+      sketchCtx.fill();
+
+      current_frame++;
+    }
+
+    if (right_dragging) {
+      let current_symbol = current_message.split("")[message_index];
+      // space out message
+      if (current_frame % 4 === 0 && current_symbol !== ' ') {
+        // draw message
+        sketchCtx.font = "50px Arial";
+        sketchCtx.fillStyle = "white";
+        sketchCtx.fillText(
+          current_message.split("")[message_index],
+          mouse.x,
+          mouse.y
+        );
+
+        message_index = (message_index + 1) % current_message.split("").length;
+      }
+
+      current_frame++;
+    }
   };
 
   // this fades away the sketch while drawing
@@ -452,45 +492,46 @@ if (localStorage.getItem("agreeToCC")) {
     let event = e.touches ? e.touches[0] : e;
 
     if (left_dragging) {
-      e.preventDefault();
+//       e.preventDefault();
       let bounds = canvas.getBoundingClientRect();
-      let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
-      sketchCtx.fillStyle = "white";
-      sketchCtx.beginPath();
-      sketchCtx.ellipse(
-        mouse.x,
-        mouse.y,
-        brush_radius,
-        brush_radius,
-        Math.PI / 4,
-        0,
-        2 * Math.PI
-      );
-      sketchCtx.fill();
+      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
+//       sketchCtx.fillStyle = "white";
+//       sketchCtx.beginPath();
+//       sketchCtx.ellipse(
+//         mouse.x,
+//         mouse.y,
+//         brush_radius,
+//         brush_radius,
+//         Math.PI / 4,
+//         0,
+//         2 * Math.PI
+//       );
+//       sketchCtx.fill();
 
-      current_frame++;
+//       current_frame++;
     }
 
     if (right_dragging) {
       e.preventDefault();
       let bounds = canvas.getBoundingClientRect();
-      let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
+      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
 
-      // space out message
-      if (current_frame % 4 === 0) {
-        // draw message
-        sketchCtx.font = "30px Arial";
-        sketchCtx.fillStyle = "white";
-        sketchCtx.fillText(
-          current_message.split("")[message_index],
-          mouse.x,
-          mouse.y
-        );
+//       let current_symbol = current_message.split("")[message_index];
+//       // space out message
+//       if (current_frame % 4 === 0 && current_symbol !== ' ') {
+//         // draw message
+//         sketchCtx.font = "50px Arial";
+//         sketchCtx.fillStyle = "white";
+//         sketchCtx.fillText(
+//           current_message.split("")[message_index],
+//           mouse.x,
+//           mouse.y
+//         );
 
-        message_index = (message_index + 1) % current_message.split("").length;
-      }
+//         message_index = (message_index + 1) % current_message.split("").length;
+//       }
 
-      current_frame++;
+//       current_frame++;
     }
   };
 
@@ -505,6 +546,7 @@ if (localStorage.getItem("agreeToCC")) {
     } else if (e.button === 2) {
       // right
       right_dragging = true;
+      // spell out from the beginning
       message_index = 0;
     }
   };
