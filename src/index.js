@@ -470,16 +470,20 @@ if (localStorage.getItem("agreeToCC")) {
 
     if (right_dragging) {
       e.preventDefault();
+      let bounds = canvas.getBoundingClientRect();
+      let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
       // draw message
       sketchCtx.font = "30px Arial";
-      sketchCtx.fillText(current_message.split("")[message_index], 10, 5);
+      sketchCtx.fillStyle = "white"
+      sketchCtx.fillText(current_message.split("")[message_index], mouse.x, mouse.y);
     }
   };
 
   const handleMouseDown = e => {
     e.preventDefault();
-    
+    console.log(e.button)
     if (e.button === 0) {
+      
       // left
       left_dragging = true;
     } else if (e.button === 1) {
@@ -492,8 +496,9 @@ if (localStorage.getItem("agreeToCC")) {
 
   const handleMouseUp = e => {
     e.preventDefault();
-    
+    console.log(e.button)
     if (e.button === 0) {
+      
       // left
       left_dragging = false;
     } else if (e.button === 1) {
