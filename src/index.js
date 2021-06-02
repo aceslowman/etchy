@@ -447,6 +447,7 @@ if (localStorage.getItem("agreeToCC")) {
     sketchCtx.restore();
   };
 
+  let current_frame = 0;
   const handleMouseMove = e => {
     let event = e.touches ? e.touches[0] : e;
 
@@ -466,24 +467,37 @@ if (localStorage.getItem("agreeToCC")) {
         2 * Math.PI
       );
       sketchCtx.fill();
+
+      current_frame++;
     }
 
     if (right_dragging) {
       e.preventDefault();
       let bounds = canvas.getBoundingClientRect();
       let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
-      // draw message
-      sketchCtx.font = "30px Arial";
-      sketchCtx.fillStyle = "white"
-      sketchCtx.fillText(current_message.split("")[message_index], mouse.x, mouse.y);
+
+      // space out message
+      if (current_frame % 4 === 0) {
+        // draw message
+        sketchCtx.font = "30px Arial";
+        sketchCtx.fillStyle = "white";
+        sketchCtx.fillText(
+          current_message.split("")[message_index],
+          mouse.x,
+          mouse.y
+        );
+
+        message_index = (message_index + 1) % current_message.split("").length;
+      }
+
+      current_frame++;
     }
   };
 
   const handleMouseDown = e => {
     e.preventDefault();
-    console.log(e.button)
+    console.log(e.button);
     if (e.button === 0) {
-      
       // left
       left_dragging = true;
     } else if (e.button === 1) {
@@ -491,14 +505,14 @@ if (localStorage.getItem("agreeToCC")) {
     } else if (e.button === 2) {
       // right
       right_dragging = true;
+      message_index = 0;
     }
   };
 
   const handleMouseUp = e => {
     e.preventDefault();
-    console.log(e.button)
+    console.log(e.button);
     if (e.button === 0) {
-      
       // left
       left_dragging = false;
     } else if (e.button === 1) {
@@ -507,7 +521,7 @@ if (localStorage.getItem("agreeToCC")) {
       // right
       right_dragging = false;
     }
-    
+
     // left_dragging = false;
     // right_dragging = false;
   };
@@ -566,10 +580,10 @@ if (localStorage.getItem("agreeToCC")) {
     console.log("handleGlobalBlendMode", e.target.value);
     main_blend_mode = e.target.value;
   };
-  
+
   const handleContextMenu = e => {
     e.preventDefault();
-  }
+  };
 
   initializeSketchCanvas();
 
@@ -580,7 +594,7 @@ if (localStorage.getItem("agreeToCC")) {
     },
     true
   );
-  
+
   document.addEventListener("contextmenu", handleContextMenu);
 
   document.addEventListener("mousedown", handleMouseDown, false);
