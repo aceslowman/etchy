@@ -480,7 +480,7 @@ if (localStorage.getItem("agreeToCC")) {
       // space out message
       if (current_frame % 4 === 0) {
         // draw message
-        sketchCtx.font = "50px Arial";
+        sketchCtx.font = "50px Georgia";
         sketchCtx.fillStyle = "white";
         sketchCtx.fillText(
           current_message.split("")[message_index],
@@ -488,7 +488,11 @@ if (localStorage.getItem("agreeToCC")) {
           mouse.y
         );
 
-        message_index = (message_index + 1) % current_message.split("").length;
+        // message_index = (message_index + 1) % current_message.split("").length;
+        message_index++;
+        if(message_index >= current_message.split("").length) {
+          right_dragging = false;
+        }
       }
 
       current_frame++;
