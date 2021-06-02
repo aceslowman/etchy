@@ -563,7 +563,7 @@ if (localStorage.getItem("agreeToCC")) {
   };
   
   const handleContextMenu = e => {
-    e.preventsDefault();
+    e.preventDefault();
   }
 
   initializeSketchCanvas();
@@ -576,7 +576,7 @@ if (localStorage.getItem("agreeToCC")) {
     true
   );
   
-  canvas.addEventListener("contextmenu", handleContextMenu, false);
+  document.addEventListener("contextmenu", handleContextMenu);
 
   document.addEventListener("mousedown", handleMouseDown, false);
   document.addEventListener("mousemove", handleMouseMove, false);
