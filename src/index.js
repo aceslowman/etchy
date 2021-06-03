@@ -82,6 +82,8 @@ if (localStorage.getItem("agreeToCC")) {
   let update_rate = 100;
   let brush_radius = 20;
 
+  let mouse;
+
   let message_index = 0;
   let current_message = "a test message";
 
@@ -423,6 +425,48 @@ if (localStorage.getItem("agreeToCC")) {
     sketchCtx.restore();
 
     sketchCtx.globalAlpha = 1.0;
+
+    // draw circle
+    if (left_dragging) {
+      sketchCtx.fillStyle = "white";
+      sketchCtx.beginPath();
+      sketchCtx.ellipse(
+        mouse.x,
+        mouse.y,
+        brush_radius,
+        brush_radius,
+        Math.PI / 4,
+        0,
+        2 * Math.PI
+      );
+      sketchCtx.fill();
+
+      // current_frame++;
+    }
+
+    // draw text
+    if (right_dragging) {
+      let current_symbol = current_message.split("")[message_index];
+      // space out message
+      // if (current_frame % 8 === 0) {
+      // draw message
+      sketchCtx.font = "50px Georgia";
+      sketchCtx.fillStyle = "white";
+      sketchCtx.fillText(
+        current_message.split("")[message_index],
+        mouse.x,
+        mouse.y
+      );
+
+      // message_index = (message_index + 1) % current_message.split("").length;
+      message_index++;
+      if (message_index >= current_message.split("").length) {
+        right_dragging = false;
+      }
+      // }
+
+      current_frame++;
+    }
   };
 
   // here I am masking out the video with the sketch (composite)
@@ -449,56 +493,13 @@ if (localStorage.getItem("agreeToCC")) {
 
   let current_frame = 0;
   const handleMouseMove = e => {
-    let event = e.touches ? e.touches[0] : e;
+    if (right_dragging || left_dragging) {
+      e.preventDefault();
 
-//     // draw circle
-//     if (left_dragging) {
-//       e.preventDefault();
-//       let bounds = canvas.getBoundingClientRect();
-//       let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
-//       sketchCtx.fillStyle = "white";
-//       sketchCtx.beginPath();
-//       sketchCtx.ellipse(
-//         mouse.x,
-//         mouse.y,
-//         brush_radius,
-//         brush_radius,
-//         Math.PI / 4,
-//         0,
-//         2 * Math.PI
-//       );
-//       sketchCtx.fill();
-
-//       // current_frame++;
-//     }
-
-//     // draw text
-//     if (right_dragging) {
-//       e.preventDefault();
-//       let bounds = canvas.getBoundingClientRect();
-//       let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
-
-//       let current_symbol = current_message.split("")[message_index];
-//       // space out message
-//       // if (current_frame % 8 === 0) {
-//         // draw message
-//         sketchCtx.font = "50px Georgia";
-//         sketchCtx.fillStyle = "white";
-//         sketchCtx.fillText(
-//           current_message.split("")[message_index],
-//           mouse.x,
-//           mouse.y
-//         );
-
-//         // message_index = (message_index + 1) % current_message.split("").length;
-//         message_index++;
-//         if (message_index >= current_message.split("").length) {
-//           right_dragging = false;
-//         }
-//       // }
-
-//       current_frame++;
-//     }
+      let event = e.touches ? e.touches[0] : e;
+      let bounds = canvas.getBoundingClientRect();
+      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
+    }
   };
 
   const handleMouseDown = e => {
@@ -506,6 +507,9 @@ if (localStorage.getItem("agreeToCC")) {
     if (e.button === 0) {
       // left
       left_dragging = true;
+      let event = e.touches ? e.touches[0] : e;
+      let bounds = canvas.getBoundingClientRect();
+      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
     } else if (e.button === 1) {
       // middle
     } else if (e.button === 2) {
@@ -513,6 +517,9 @@ if (localStorage.getItem("agreeToCC")) {
       right_dragging = true;
       // spell out from the beginning
       message_index = 0;
+      let event = e.touches ? e.touches[0] : e;
+      let bounds = canvas.getBoundingClientRect();
+      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
     }
   };
 
@@ -521,11 +528,19 @@ if (localStorage.getItem("agreeToCC")) {
     if (e.button === 0) {
       // left
       left_dragging = false;
+      
+      let event = e.touches ? e.touches[0] : e;
+      let bounds = canvas.getBoundingClientRect();
+      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
     } else if (e.button === 1) {
       // middle
     } else if (e.button === 2) {
       // right
       right_dragging = false;
+      
+      let event = e.touches ? e.touches[0] : e;
+      let bounds = canvas.getBoundingClientRect();
+      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
     }
   };
 
