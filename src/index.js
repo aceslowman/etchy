@@ -461,8 +461,8 @@ if (localStorage.getItem("agreeToCC")) {
         sketchCtx.fillStyle = "white";
         sketchCtx.fillText(
           current_message.split("")[message_index],
-          mouse.x + (brush_radius),
-          mouse.y + (brush_radius)
+          mouse.x + brush_radius,
+          mouse.y + brush_radius
         );
 
         // message_index = (message_index + 1) % current_message.split("").length;
@@ -617,14 +617,29 @@ if (localStorage.getItem("agreeToCC")) {
 
   initializeSketchCanvas();
 
+  const handleWheel = e => {
+    fadeAmount += e.deltaY / 1000;
+
+    if (fadeAmount > 1) fadeAmount = 1;
+    if (fadeAmount <= 0) fadeAmount = 0;
+    
+    console.log(e.deltaY)
+    
+    document.getElementById("fadeAmount").value = fadeAmount;
+    document.querySelector("#fadeAmountValue").innerHTML = fadeAmount.toFixed(2);
+  };
+
   window.addEventListener(
     "resize",
     e => {
-      if(window.innerWidth < 640 || window.innerHeight < 480) {     
-        let aspect = 480 / 640;
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight / aspect;
-      }
+      // if(window.innerWidth < 640 || window.innerHeight < 480) {
+      //   let aspect = 480 / 640;
+      //   canvas.width = window.innerWidth;
+      //   canvas.height = window.innerHeight * aspect;
+      // } else {
+      //   canvas.width = 640;
+      //   canvas.height = 480;
+      // }
     },
     true
   );
@@ -671,6 +686,8 @@ if (localStorage.getItem("agreeToCC")) {
   document
     .querySelector("#brushMessage")
     .addEventListener("input", handleMessageChange, false);
+
+  document.addEventListener("wheel", handleWheel, false);
 } else {
   // FOR CODE OF CONDUCT
 
