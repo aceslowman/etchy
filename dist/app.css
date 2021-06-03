@@ -99,9 +99,9 @@ body,
 }
 
 #feeds {
-/*   display: none; */
+  display: none;
   
-  display:flex;
+/*   display:flex; */
   flex-flow:column;
   width:25%;
   height:100%;
@@ -166,4 +166,22 @@ body,
 #info {
   font-style: italic;
   font-family: monospace;
+}
+
+#localBlendMode {
+  display: none;  
+}
+
+#globalBlendMode {
+  display: none;  
+}
+
+#brushMessage {
+  font-family: monospace;
+  color:white;
+  width:100%;
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px dotted white;
 }

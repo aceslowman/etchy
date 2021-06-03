@@ -79,7 +79,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   let fade = true;
   let fadeAmount = 0.1;
-  let update_rate = 200;
+  let update_rate = 100;
   let brush_radius = 20;
 
   let message_index = 0;
@@ -451,57 +451,58 @@ if (localStorage.getItem("agreeToCC")) {
   const handleMouseMove = e => {
     let event = e.touches ? e.touches[0] : e;
 
-    if (left_dragging) {
-      e.preventDefault();
-      let bounds = canvas.getBoundingClientRect();
-      let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
-      sketchCtx.fillStyle = "white";
-      sketchCtx.beginPath();
-      sketchCtx.ellipse(
-        mouse.x,
-        mouse.y,
-        brush_radius,
-        brush_radius,
-        Math.PI / 4,
-        0,
-        2 * Math.PI
-      );
-      sketchCtx.fill();
+//     // draw circle
+//     if (left_dragging) {
+//       e.preventDefault();
+//       let bounds = canvas.getBoundingClientRect();
+//       let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
+//       sketchCtx.fillStyle = "white";
+//       sketchCtx.beginPath();
+//       sketchCtx.ellipse(
+//         mouse.x,
+//         mouse.y,
+//         brush_radius,
+//         brush_radius,
+//         Math.PI / 4,
+//         0,
+//         2 * Math.PI
+//       );
+//       sketchCtx.fill();
 
-      current_frame++;
-    }
+//       // current_frame++;
+//     }
 
-    if (right_dragging) {
-      e.preventDefault();
-      let bounds = canvas.getBoundingClientRect();
-      let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
+//     // draw text
+//     if (right_dragging) {
+//       e.preventDefault();
+//       let bounds = canvas.getBoundingClientRect();
+//       let mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
 
-      let current_symbol = current_message.split("")[message_index];
-      // space out message
-      if (current_frame % 4 === 0) {
-        // draw message
-        sketchCtx.font = "50px Georgia";
-        sketchCtx.fillStyle = "white";
-        sketchCtx.fillText(
-          current_message.split("")[message_index],
-          mouse.x,
-          mouse.y
-        );
+//       let current_symbol = current_message.split("")[message_index];
+//       // space out message
+//       // if (current_frame % 8 === 0) {
+//         // draw message
+//         sketchCtx.font = "50px Georgia";
+//         sketchCtx.fillStyle = "white";
+//         sketchCtx.fillText(
+//           current_message.split("")[message_index],
+//           mouse.x,
+//           mouse.y
+//         );
 
-        // message_index = (message_index + 1) % current_message.split("").length;
-        message_index++;
-        if (message_index >= current_message.split("").length) {
-          right_dragging = false;
-        }
-      }
+//         // message_index = (message_index + 1) % current_message.split("").length;
+//         message_index++;
+//         if (message_index >= current_message.split("").length) {
+//           right_dragging = false;
+//         }
+//       // }
 
-      current_frame++;
-    }
+//       current_frame++;
+//     }
   };
 
   const handleMouseDown = e => {
     // e.preventDefault();
-    console.log(e.button);
     if (e.button === 0) {
       // left
       left_dragging = true;
@@ -517,7 +518,6 @@ if (localStorage.getItem("agreeToCC")) {
 
   const handleMouseUp = e => {
     // e.preventDefault();
-    console.log(e.button);
     if (e.button === 0) {
       // left
       left_dragging = false;
@@ -527,9 +527,6 @@ if (localStorage.getItem("agreeToCC")) {
       // right
       right_dragging = false;
     }
-
-    // left_dragging = false;
-    // right_dragging = false;
   };
 
   const handleBrushRadiusChange = e => {
