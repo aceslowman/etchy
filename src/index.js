@@ -455,7 +455,7 @@ if (localStorage.getItem("agreeToCC")) {
     if (right_dragging) {
       let current_symbol = current_message.split("")[message_index];
       // space out message
-      if (current_frame % 2 === 0) {
+      if (current_frame % 4 === 0) {
         // draw message
         sketchCtx.font = brush_radius * 4 + "px Times New Roman";
         sketchCtx.fillStyle = "white";
