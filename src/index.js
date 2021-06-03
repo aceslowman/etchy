@@ -85,7 +85,7 @@ if (localStorage.getItem("agreeToCC")) {
   let mouse;
 
   let message_index = 0;
-  let current_message = "a test message";
+  let current_message = "";
 
   let main_blend_mode = "screen";
   let local_blend_mode = "multiply";
@@ -117,11 +117,11 @@ if (localStorage.getItem("agreeToCC")) {
     };
 
     pc.onicecandidateerror = err => {
-      console.error(err);
+      // console.error(err);
     };
 
     pc.oniceconnectionstatechange = async function() {
-      console.log("ice connection state changed", pc.iceConnectionState);
+      // console.log("ice connection state changed", pc.iceConnectionState);
 
       switch (pc.iceConnectionState) {
         case "disconnected":
@@ -292,14 +292,22 @@ if (localStorage.getItem("agreeToCC")) {
           peersElement.removeChild(e);
         });
 
-        for (let i = 0; i < data.peers.length; i++) {
+        if(data.peers.length === 1) {
+          let ele = document.createElement("em");
+          
+          ele.innerText = "~ nobody is online! ~";
+          peersElement.appendChild(ele);
+        } else {
+          for (let i = 0; i < data.peers.length; i++) {
           if (data.peers[i].user_id !== user_id) {
             let btn = document.createElement("button");
             btn.innerHTML = data.peers[i].user_id;
             btn.addEventListener("click", handlePeerClick);
             peersElement.appendChild(btn);
           }
+        }  
         }
+        
 
         break;
       case "offer":
@@ -494,7 +502,7 @@ if (localStorage.getItem("agreeToCC")) {
   let current_frame = 0;
   const handleMouseMove = e => {
     if (right_dragging || left_dragging) {
-      e.preventDefault();
+      // e.preventDefault();
 
       let event = e.touches ? e.touches[0] : e;
       let bounds = canvas.getBoundingClientRect();

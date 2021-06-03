@@ -27,7 +27,7 @@ body,
 }
 
 #canvasContainer {
-    width: 100%;
+  width: 100%;
   height: 100%;
   position: absolute;
   top: 0px;
@@ -86,7 +86,7 @@ body,
 #mainCanvas {
   border: 1px solid #333333;
   box-shadow: 3px 3px 3px #333;
-/*   max-width: 100%;
+  /*   max-width: 100%;
   max-height: 100%; */
 }
 
@@ -100,14 +100,14 @@ body,
 
 #feeds {
   display: none;
-  
-/*   display:flex; */
-  flex-flow:column;
-  width:25%;
-  height:100%;
-  position:absolute;
+
+  /*   display:flex; */
+  flex-flow: column;
+  width: 25%;
+  height: 100%;
+  position: absolute;
   overflow-x: scroll;
-  z-index:20;
+  z-index: 20;
 }
 
 #peerList {
@@ -123,7 +123,7 @@ body,
 #controls {
   max-width: 640px;
   display: none;
-/*   display: flex; */
+  /*   display: flex; */
   z-index: 4;
   align-items: center;
   flex-flow: wrap;
@@ -169,19 +169,38 @@ body,
 }
 
 #localBlendMode {
-  display: none;  
+  display: none;
 }
 
 #globalBlendMode {
-  display: none;  
+  display: none;
 }
 
 #brushMessage {
   font-family: monospace;
-  color:white;
-  width:100%;
+  color: white;
+  width: 100%;
   text-align: center;
   background-color: transparent;
   border: none;
   border-bottom: 1px dotted white;
+}
+
+label {
+  font-family: monospace;
+}
+
+button {
+  font-family: monospace;
+  cursor: pointer;
+  background-color: white;
+  border: 1px solid black;
+}
+
+button:hover {
+  
+  color:white;
+  cursor: pointer;
+  background-color: gray;
+  border: 1px solid black;
 }
