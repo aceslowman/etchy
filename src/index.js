@@ -79,7 +79,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   let fade = true;
   let fadeAmount = 0.1;
-  let update_rate = 100;
+  let update_rate = 10;
   let brush_radius = 20;
 
   let mouse;
@@ -292,22 +292,21 @@ if (localStorage.getItem("agreeToCC")) {
           peersElement.removeChild(e);
         });
 
-        if(data.peers.length === 1) {
+        if (data.peers.length === 1) {
           let ele = document.createElement("em");
-          
+
           ele.innerText = "~ nobody is online! ~";
           peersElement.appendChild(ele);
         } else {
           for (let i = 0; i < data.peers.length; i++) {
-          if (data.peers[i].user_id !== user_id) {
-            let btn = document.createElement("button");
-            btn.innerHTML = data.peers[i].user_id;
-            btn.addEventListener("click", handlePeerClick);
-            peersElement.appendChild(btn);
+            if (data.peers[i].user_id !== user_id) {
+              let btn = document.createElement("button");
+              btn.innerHTML = data.peers[i].user_id;
+              btn.addEventListener("click", handlePeerClick);
+              peersElement.appendChild(btn);
+            }
           }
-        }  
         }
-        
 
         break;
       case "offer":
@@ -456,22 +455,22 @@ if (localStorage.getItem("agreeToCC")) {
     if (right_dragging) {
       let current_symbol = current_message.split("")[message_index];
       // space out message
-      // if (current_frame % 8 === 0) {
-      // draw message
-      sketchCtx.font = brush_radius*5+"px Georgia";
-      sketchCtx.fillStyle = "white";
-      sketchCtx.fillText(
-        current_message.split("")[message_index],
-        mouse.x,
-        mouse.y
-      );
+      if (current_frame % 2 === 0) {
+        // draw message
+        sketchCtx.font = brush_radius * 4 + "px Times New Roman";
+        sketchCtx.fillStyle = "white";
+        sketchCtx.fillText(
+          current_message.split("")[message_index],
+          mouse.x,
+          mouse.y
+        );
 
-      // message_index = (message_index + 1) % current_message.split("").length;
-      message_index++;
-      if (message_index >= current_message.split("").length) {
-        right_dragging = false;
+        // message_index = (message_index + 1) % current_message.split("").length;
+        message_index++;
+        if (message_index >= current_message.split("").length) {
+          right_dragging = false;
+        }
       }
-      // }
 
       current_frame++;
     }
@@ -536,7 +535,7 @@ if (localStorage.getItem("agreeToCC")) {
     if (e.button === 0) {
       // left
       left_dragging = false;
-      
+
       let event = e.touches ? e.touches[0] : e;
       let bounds = canvas.getBoundingClientRect();
       mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
@@ -545,7 +544,7 @@ if (localStorage.getItem("agreeToCC")) {
     } else if (e.button === 2) {
       // right
       right_dragging = false;
-      
+
       let event = e.touches ? e.touches[0] : e;
       let bounds = canvas.getBoundingClientRect();
       mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
