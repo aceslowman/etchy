@@ -461,7 +461,7 @@ if (localStorage.getItem("agreeToCC")) {
         sketchCtx.fillStyle = "white";
         sketchCtx.fillText(
           current_message.split("")[message_index],
-          mouse.x - (brush_radius),
+          mouse.x + (brush_radius),
           mouse.y + (brush_radius)
         );
 
@@ -620,7 +620,11 @@ if (localStorage.getItem("agreeToCC")) {
   window.addEventListener(
     "resize",
     e => {
-      // canvas.width =
+      if(window.innerWidth < 640 || window.innerHeight < 480) {     
+        let aspect = 480 / 640;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight / aspect;
+      }
     },
     true
   );
