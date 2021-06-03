@@ -450,7 +450,7 @@ if (localStorage.getItem("agreeToCC")) {
       // space out message
       // if (current_frame % 8 === 0) {
       // draw message
-      sketchCtx.font = "50px Georgia";
+      sketchCtx.font = brush_radius*5+"px Georgia";
       sketchCtx.fillStyle = "white";
       sketchCtx.fillText(
         current_message.split("")[message_index],

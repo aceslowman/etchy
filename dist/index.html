@@ -64,6 +64,37 @@
             <span class="peerId"></span>
           </p>
         </div>
+        <div class="center">
+        <h1>
+          <em>etchy</em>
+        </h1>
+        <p class="centerText">
+          select someone to share your camera with. <br />click and drag to
+          draw.
+        </p>
+        <p class="centerText">
+          <small>
+            <em
+              ><strong
+                >if your friend disappears, they might come back after a second.
+                if they don't refresh and try again</strong
+              ></em
+            >
+          </small>
+        </p>
+        <div id="peerList">
+          <p>
+            connect with:
+          </p>
+          <div id="peers"></div>
+        </div>
+        <p>
+          <small class="credit">
+            <em>austin slominski 2021</em>
+          </small>
+        </p>
+      </div>
+
         <canvas id="sketchCanvas"></canvas>
         <canvas id="cameraCanvas"></canvas>
         <canvas id="mainCanvas"></canvas>
@@ -113,7 +144,7 @@
               snap
             </button>
           </div>
-          <div>
+          <div style="display:none;">
             <p style="padding-right:5px;">
               local
             </p>
@@ -145,7 +176,7 @@
               <option value="luminosity">luminosity</option>
             </select>
           </div>
-          <div>
+          <div style="display:none;">
             <p style="padding-right:5px;">
               global
             </p>
@@ -182,37 +213,7 @@
 
       <div class="loading">connecting......</div>
 
-      <div class="center">
-        <h1>
-          <em>etchy</em>
-        </h1>
-        <p class="centerText">
-          select someone to share your camera with. <br />click and drag to
-          draw.
-        </p>
-        <p class="centerText">
-          <small>
-            <em
-              ><strong
-                >if your friend disappears, they might come back after a second.
-                if they don't refresh and try again</strong
-              ></em
-            >
-          </small>
-        </p>
-        <div id="peerList">
-          <p>
-            connect with:
-          </p>
-          <div id="peers"></div>
-        </div>
-        <p>
-          <small class="credit">
-            <em>austin slominski 2021</em>
-          </small>
-        </p>
-      </div>
-
+      
       <div id="feeds">
         local-video <video id="local-video" controls autoplay playsinline muted></video>
         local-sketch <video id="local-sketch" controls autoplay playsinline muted></video>
