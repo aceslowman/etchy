@@ -79,7 +79,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   let fade = true;
   let fadeAmount = 0.1;
-  let update_rate = 10;
+  let update_rate = 50;
   let brush_radius = 20;
 
   let mouse;
@@ -461,8 +461,8 @@ if (localStorage.getItem("agreeToCC")) {
         sketchCtx.fillStyle = "white";
         sketchCtx.fillText(
           current_message.split("")[message_index],
-          mouse.x,
-          mouse.y
+          mouse.x - (brush_radius),
+          mouse.y + (brush_radius)
         );
 
         // message_index = (message_index + 1) % current_message.split("").length;
