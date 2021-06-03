@@ -79,7 +79,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   let fade = true;
   let fadeAmount = 0.1;
-  let update_rate = 100;
+  let update_rate = 200;
   let brush_radius = 20;
 
   let message_index = 0;
@@ -490,7 +490,7 @@ if (localStorage.getItem("agreeToCC")) {
 
         // message_index = (message_index + 1) % current_message.split("").length;
         message_index++;
-        if(message_index >= current_message.split("").length) {
+        if (message_index >= current_message.split("").length) {
           right_dragging = false;
         }
       }
@@ -500,7 +500,7 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleMouseDown = e => {
-    e.preventDefault();
+    // e.preventDefault();
     console.log(e.button);
     if (e.button === 0) {
       // left
@@ -516,7 +516,7 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleMouseUp = e => {
-    e.preventDefault();
+    // e.preventDefault();
     console.log(e.button);
     if (e.button === 0) {
       // left
@@ -591,6 +591,11 @@ if (localStorage.getItem("agreeToCC")) {
     e.preventDefault();
   };
 
+  const handleMessageChange = e => {
+    console.log(e.target.value);
+    current_message = e.target.value;
+  };
+
   initializeSketchCanvas();
 
   window.addEventListener(
@@ -601,7 +606,7 @@ if (localStorage.getItem("agreeToCC")) {
     true
   );
 
-  document.addEventListener("contextmenu", handleContextMenu);
+  document.addEventListener("contextmenu", handleContextMenu, false);
 
   document.addEventListener("mousedown", handleMouseDown, false);
   document.addEventListener("mousemove", handleMouseMove, false);
@@ -639,6 +644,10 @@ if (localStorage.getItem("agreeToCC")) {
   document
     .querySelector("#globalBlendMode")
     .addEventListener("change", handleGlobalBlendMode, false);
+
+  document
+    .querySelector("#brushMessage")
+    .addEventListener("input", handleMessageChange, false);
 } else {
   // FOR CODE OF CONDUCT
 

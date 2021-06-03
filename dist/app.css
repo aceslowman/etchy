@@ -122,7 +122,8 @@ body,
 
 #controls {
   max-width: 640px;
-  display: none;
+/*   display: none; */
+  display: flex;
   z-index: 4;
   align-items: center;
   flex-flow: wrap;
