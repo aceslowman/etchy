@@ -98,7 +98,7 @@ if (localStorage.getItem("agreeToCC")) {
   const createPeerConnection = (isOfferer = false) => {
     const pc = new RTCPeerConnection({
       iceServers: [
-        { urls: "stun:stun.1.google.com:19302" },
+        // { urls: "stun:stun.1.google.com:19302" },
         { urls: "turn:quickturn.glitch.me", username: "n/a", credential: "n/a" }
       ],
       // offerToReceiveAudio: false,
@@ -668,9 +668,9 @@ if (localStorage.getItem("agreeToCC")) {
   document.addEventListener("mousemove", handleMouseMove, false);
   document.addEventListener("mouseup", handleMouseUp, false);
 
-  document.addEventListener("touchstart", handleMouseDown, false);
-  document.addEventListener("touchmove", handleMouseMove, false);
-  document.addEventListener("touchend", handleMouseUp, false);
+  document.addEventListener("touchstart", (e) => {e.preventDefault(); handleMouseDown(e)}, false);
+  document.addEventListener("touchmove", (e) => {e.preventDefault(); handleMouseMove(e)}, false);
+  document.addEventListener("touchend", (e) => {e.preventDefault(); handleMouseUp(e)}, false);
 
   document.querySelector("#brushRadiusValue").innerHTML = brush_radius;
   document.querySelector("#brushRadiusValue").value = brush_radius;
