@@ -668,9 +668,9 @@ if (localStorage.getItem("agreeToCC")) {
   document.addEventListener("mousemove", handleMouseMove, false);
   document.addEventListener("mouseup", handleMouseUp, false);
 
-  document.addEventListener("touchstart", (e) => {e.preventDefault(); handleMouseDown(e)}, false);
-  document.addEventListener("touchmove", (e) => {e.preventDefault(); handleMouseMove(e)}, false);
-  document.addEventListener("touchend", (e) => {e.preventDefault(); handleMouseUp(e)}, false);
+  canvas.addEventListener("touchstart", (e) => {e.preventDefault(); handleMouseDown(e)}, false);
+  canvas.addEventListener("touchmove", (e) => {e.preventDefault(); handleMouseMove(e)}, false);
+  canvas.addEventListener("touchend", (e) => {e.preventDefault(); handleMouseUp(e)}, false);
 
   document.querySelector("#brushRadiusValue").innerHTML = brush_radius;
   document.querySelector("#brushRadiusValue").value = brush_radius;
