@@ -74,6 +74,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   let left_dragging = false;
   let right_dragging = false;
+  let middle_dragging = false;
 
   let main_update_loop, camera_update_loop;
 
@@ -447,8 +448,27 @@ if (localStorage.getItem("agreeToCC")) {
         2 * Math.PI
       );
       sketchCtx.fill();
+      sketchCtx.closePath();
 
       // current_frame++;
+    }
+    
+    // erase    
+    if (middle_dragging) {
+      console.log('dragging')
+      sketchCtx.fillStyle = "black";
+      sketchCtx.beginPath();
+      sketchCtx.ellipse(
+        mouse.x,
+        mouse.y,
+        brush_radius,
+        brush_radius,
+        Math.PI / 4,
+        0,
+        2 * Math.PI
+      );
+      sketchCtx.fill();
+      sketchCtx.closePath();
     }
 
     // draw text
@@ -500,7 +520,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   let current_frame = 0;
   const handleMouseMove = e => {
-    if (right_dragging || left_dragging) {
+    if (right_dragging || left_dragging || middle_dragging) {
       // e.preventDefault();
 
       let event = e.touches ? e.touches[0] : e;
@@ -514,20 +534,19 @@ if (localStorage.getItem("agreeToCC")) {
     if (e.button === 0) {
       // left
       left_dragging = true;
-      let event = e.touches ? e.touches[0] : e;
-      let bounds = canvas.getBoundingClientRect();
-      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
     } else if (e.button === 1) {
       // middle
+      middle_dragging = true;
     } else if (e.button === 2) {
       // right
       right_dragging = true;
       // spell out from the beginning
       message_index = 0;
-      let event = e.touches ? e.touches[0] : e;
-      let bounds = canvas.getBoundingClientRect();
-      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
     }
+
+    let event = e.touches ? e.touches[0] : e;
+    let bounds = canvas.getBoundingClientRect();
+    mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
   };
 
   const handleMouseUp = e => {
@@ -535,20 +554,17 @@ if (localStorage.getItem("agreeToCC")) {
     if (e.button === 0) {
       // left
       left_dragging = false;
-
-      let event = e.touches ? e.touches[0] : e;
-      let bounds = canvas.getBoundingClientRect();
-      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
     } else if (e.button === 1) {
       // middle
+      middle_dragging = false;
     } else if (e.button === 2) {
       // right
       right_dragging = false;
-
-      let event = e.touches ? e.touches[0] : e;
-      let bounds = canvas.getBoundingClientRect();
-      mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
     }
+
+    let event = e.touches ? e.touches[0] : e;
+    let bounds = canvas.getBoundingClientRect();
+    mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
   };
 
   const handleBrushRadiusChange = e => {
@@ -618,15 +634,17 @@ if (localStorage.getItem("agreeToCC")) {
   initializeSketchCanvas();
 
   const handleWheel = e => {
-    fadeAmount += e.deltaY / 1000;
+    fadeAmount += (e.deltaY * -1) / 1000;
 
     if (fadeAmount > 1) fadeAmount = 1;
     if (fadeAmount <= 0) fadeAmount = 0;
-    
-    console.log(e.deltaY)
-    
+
+    console.log(e.deltaY);
+
     document.getElementById("fadeAmount").value = fadeAmount;
-    document.querySelector("#fadeAmountValue").innerHTML = fadeAmount.toFixed(2);
+    document.querySelector("#fadeAmountValue").innerHTML = fadeAmount.toFixed(
+      2
+    );
   };
 
   window.addEventListener(
