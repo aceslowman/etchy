@@ -75,13 +75,15 @@ console.log('v1',v1)
   // https://www.w3.org/TR/compositing-1/#blendingscreen
   function screen(cA, cB) {
     // console.log([cA,cB])
-    let cA_data = cA.getContext('2d').getImageData(0, 0, cA.width, cA.height).data;
-    let cB_data = cB.getContext('2d').getImageData(0, 0, cB.width, cB.height).data;
+    let a = cA.getContext('2d').getImageData(0, 0, cA.width, cA.height);
+    let cA_data = a.data;
+    let b = cB.getContext('2d').getImageData(0, 0, cB.width, cB.height);
+    let cB_data = b.data;
 
     for (var i = 0; i < cB_data.length; i += 4) {
-      cB_data[i] = 1 - (1 - (cB_data[i] / 255) ) * (1 - (cA_data[i] / 255));
-      cB_data[i + 1] = 1 - (1 - (cB_data[i+1] / 255) ) * (1 - (cA_data[i+1] / 255));
-      cB_data[i + 2] = 1 - (1 - (cB_data[i+2] / 255) ) * (1 - (cA_data[i+2] / 255));
+      cB_data[i] = 1 - ((1 - cB_data[i] ) * (1 - cA_data[i]));
+      cB_data[i + 1] = 1 - ((1 - cB_data[i+1] ) * (1 - cA_data[i+1]));
+      cB_data[i + 2] = 1 - ((1 - cB_data[i+2] ) * (1 - cA_data[i+2]));
     }
 
     cA.getContext('2d').drawImage(cB, 0, 0);
