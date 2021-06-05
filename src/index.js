@@ -477,16 +477,10 @@ console.log('v1',v1)
     let v1 = document.querySelector("#local-composite");
     let v2 = document.querySelector("#peerRemote");
 
-        ctx.globalCompositeOperation = "source-over";
-
-    if (v2) ctx.drawImage(v2, 0, 0);
-
-    // ctx.save();
-    ctx.globalCompositeOperation = main_blend_mode;
+    ctx.globalCompositeOperation = "source-over";
     if (v1) ctx.drawImage(v1, 0, 0);
-    // if (v1) v1.blendOnto(v2,'screen');
-    // if (v1) screen(canvas);
-    // ctx.restore();
+    ctx.globalCompositeOperation = main_blend_mode;
+    if (v2) ctx.drawImage(v2, 0, 0);
   };
 
   // this fades away the sketch while drawing
@@ -568,16 +562,10 @@ console.log('v1',v1)
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
 
-    cameraCtx.globalCompositeOperation = "source_over";
+    cameraCtx.globalCompositeOperation = "source-over";
     if (v1) cameraCtx.drawImage(v1, 0, 0);
-
-    cameraCtx.save();
-
     cameraCtx.globalCompositeOperation = local_blend_mode;
     if (v2) cameraCtx.drawImage(v2, 0, 0);
-    // if (v2) multiply(v1, v2, cameraCanvas);
-    // if (v2) v2.blendOnto(v1,'multiply');
-    cameraCtx.restore();
   };
 
   // draw sketch that can be later be used as a mask

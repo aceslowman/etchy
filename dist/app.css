@@ -98,9 +98,9 @@ body,
 }
 
 #feeds {
-    display: none;
+  /*   display: none; */
   
-/*   display: flex; */
+  display: flex;
   height: 100px;  
   flex-flow: column;
   width: 25%;
@@ -169,13 +169,13 @@ body,
 }
 
 #localBlendMode {
-  display: none;
-/*   display: block; */
+/*   display: none; */
+  display: block;
 }
 
 #globalBlendMode {
-  display: none;
-/*   display: block; */
+/*   display: none; */
+  display: block;
 }
 
 #brushMessage {
