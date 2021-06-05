@@ -49,12 +49,13 @@ if (localStorage.getItem("agreeToCC")) {
   // https://stackoverflow.com/questions/25158696/blend-modemultiply-in-internet-explorer
   // this helps make 'multiply' more browser compatible!
   function multiply(v1, v2, c, R=1, G=1, B=1) {
-    let _ctx = c.getContext("2d");
-    var imgData = _ctx.getImageData(0, 0, c.width, c.height);
-    var data = imgData.data;
+console.log('v1',v1)
+    var a = v1.getImageData(0, 0, c.width, c.height).data;    
+    var b = v2.getImageData(0, 0, c.width, c.height).data;
     
-    let a = v1.data;
-    let b = v2.data;
+    
+    
+    
 
     // for (var i = 0; i < a.length; i += 4) {
     //   data[i] = (R * data[i]) / 255;
@@ -68,7 +69,7 @@ if (localStorage.getItem("agreeToCC")) {
       b[i + 2] = (B * a[i + 2]) / 255;
     }
 
-    _ctx.putImageData(b, 0, 0);
+    c.putImageData(b, 0, 0);
   }
   
   // https://www.w3.org/TR/compositing-1/#blendingscreen
