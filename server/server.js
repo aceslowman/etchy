@@ -54,7 +54,7 @@ wss.on("connection", ws => {
 
         // gets a username, password, and array of iceServers
         client.tokens.create().then(token => {
-          // first, set up connection          
+          // first, set up connection
           id = message.user_id;
           connections.set(id, {
             user_id: id,
@@ -63,10 +63,14 @@ wss.on("connection", ws => {
             paired: false
           });
           updateCount();
-          
+
           // now inform user of their creds
-          let {username, pw, iceServers} = token;          
-          connections.get(id).socket.send(JSON.stringify({username, pw, iceServers}));
+          let { username, pw, iceServers } = token;
+          connections
+            .get(id)
+            .socket.send(
+              JSON.stringify({ type: "authenticate", username, pw, iceServers })
+            );
 
           console.log(token);
         });

@@ -417,6 +417,12 @@ console.log('v1',v1)
           pc.addIceCandidate(data.candidate);
         }
         break;
+      case "authenticate":
+        // if (!pc || !pc.remoteDescription) {
+        //   pc.addIceCandidate(data.candidate);
+        // }
+        console.log('authenticate',data)
+        break;
       case "rejectOffer":
         alert(
           "the other user declined (or just closed their tab, something like that)"
