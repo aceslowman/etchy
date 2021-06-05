@@ -73,9 +73,10 @@ console.log('v1',v1)
   }
   
   // https://www.w3.org/TR/compositing-1/#blendingscreen
-  function screen(c) {
-    let _ctx = c.getContext("2d");
-    var imgData = _ctx.getImageData(0, 0, c.width, c.height);
+  function screen(cA, cB) {
+    // let _ctx = c.getContext("2d");
+    let cA_data = cA.getImageData(0, 0, cA.width, cA.height).data;
+    let cB_data = cB.getImageData(0, 0, cB.width, cB.height).data;
     var data = imgData.data;
 
     for (var i = 0; i < data.length; i += 4) {
@@ -465,20 +466,6 @@ console.log('v1',v1)
     document.querySelector("#controls").style.display = "none";
   };
 
-  // composite final output
-  const updateMainCanvas = () => {
-    if (fade) updateSketchCanvas();
-    updateCameraCanvas();
-
-    let v1 = document.querySelector("#local-composite");
-    let v2 = document.querySelector("#peerRemote");
-
-    ctx.globalCompositeOperation = "source-over";
-    ctx.drawImage(v1, 0, 0);
-    ctx.globalCompositeOperation = main_blend_mode;
-    ctx.drawImage(v2, 0, 0);
-  };
-
   // this fades away the sketch while drawing
   const updateSketchCanvas = () => {
     sketchCtx.save();
@@ -552,15 +539,45 @@ console.log('v1',v1)
     }
   };
 
+  // composite final output
+  const updateMainCanvas = () => {
+    if (fade) updateSketchCanvas();
+    updateCameraCanvas();
+
+    let v1 = document.querySelector("#local-composite");
+    let v2 = document.querySelector("#peerRemote");
+
+    ctx.globalCompositeOperation = "source-over";
+    ctx.drawImage(v1, 0, 0);
+    ctx.globalCompositeOperation = main_blend_mode;
+    ctx.drawImage(v2, 0, 0);
+  };
+  
   // here I am masking out the video with the sketch (composite)
   const updateCameraCanvas = () => {
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
+    
+    let ex = document.querySelector("#extraCanvas");
+    
+    let extraCtx = ex.getContext('2d');
+    
+    extraCtx.drawImage(v2, 0, 0);
+    
+    
+    // i have the videos, but on iOS they don't want to
+    // work with globalCompositeOperation.
+    // console.log(Object.keys(v1))
+    // console.log(v1.readyState)
 
-    cameraCtx.globalCompositeOperation = "source-over";
+    // cameraCtx.globalCompositeOperation = "source-over";
+    // draw first video
     cameraCtx.drawImage(v1, 0, 0);
-    cameraCtx.globalCompositeOperation = local_blend_mode;
-    cameraCtx.drawImage(v2, 0, 0);
+    
+    // screen blend extraCtx (v2)
+    screen(cameraCtx,extraCtx);
+    // cameraCtx.globalCompositeOperation = local_blend_mode;
+    cameraCtx.drawImage(ex, 0, 0);
   };
 
   // draw sketch that can be later be used as a mask

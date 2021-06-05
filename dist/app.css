@@ -89,11 +89,7 @@ body,
   max-height: 100%; */
 }
 
-#sketchCanvas {
-  display: none;
-}
-
-#cameraCanvas {
+#sketchCanvas, #cameraCanvas, #extraCanvas {
   display: none;
 }
 
