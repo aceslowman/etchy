@@ -46,30 +46,24 @@ import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 if (localStorage.getItem("agreeToCC")) {
   document.getElementById("CODEOFCONDUCT").style.display = "none";
 
-  // https://stackoverflow.com/questions/25158696/blend-modemultiply-in-internet-explorer
+  // adapted from: https://stackoverflow.com/questions/25158696/blend-modemultiply-in-internet-explorer
   // this helps make 'multiply' more browser compatible!
-  function multiply(v1, v2, c, R=1, G=1, B=1) {
-console.log('v1',v1)
-    var a = v1.getImageData(0, 0, c.width, c.height).data;    
-    var b = v2.getImageData(0, 0, c.width, c.height).data;
-    
-    
-    
-    
+  // iOS doesn't play along with globalCompositeOperation = 'multiply'
+  function multiply(cA, cB) {
+    // console.log([cA,cB])
+    let a = cA.getContext('2d').getImageData(0, 0, cA.width, cA.height);
+    let cA_data = a.data;
+    let b = cB.getContext('2d').getImageData(0, 0, cB.width, cB.height);
+    let cB_data = b.data;
 
-    // for (var i = 0; i < a.length; i += 4) {
-    //   data[i] = (R * data[i]) / 255;
-    //   data[i + 1] = (G * data[i + 1]) / 255;
-    //   data[i + 2] = (B * data[i + 2]) / 255;
-    // }
-    
-    for (var i = 0; i < b.length; i += 4) {
-      b[i] = (R * a[i]) / 255;
-      b[i + 1] = (G * a[i + 1]) / 255;
-      b[i + 2] = (B * a[i + 2]) / 255;
+    for (var i = 0; i < cB_data.length; i += 4) {
+      cB_data[i] *= cA_data[i] / 255; 
+      cB_data[i + 1] *= cA_data[i + 1] / 255; 
+      cB_data[i + 2] *= cA_data[i + 2] / 255; 
     }
 
-    c.putImageData(b, 0, 0);
+    // cA.getContext('2d').drawImage(cB, 0, 0);
+    cA.getContext('2d').putImageData(b, 0, 0);
   }
   
   // https://www.w3.org/TR/compositing-1/#blendingscreen
@@ -536,6 +530,10 @@ console.log('v1',v1)
 
     let v1 = document.querySelector("#local-composite");
     let v2 = document.querySelector("#peerRemote");
+    
+//     extraCtx.drawImage(v2, 0, 0);    
+//     ctx.drawImage(v1, 0, 0);
+//     screen(canvas,extraCanvas);
 
     ctx.globalCompositeOperation = "source-over";
     ctx.drawImage(v1, 0, 0);
@@ -565,7 +563,7 @@ console.log('v1',v1)
     cameraCtx.drawImage(v1, 0, 0);
     
     // screen blend extraCtx (v2)
-    screen(cameraCanvas,extraCanvas);
+    multiply(cameraCanvas,extraCanvas);
     // cameraCtx.globalCompositeOperation = local_blend_mode;
     // cameraCtx.drawImage(ex, 0, 0);
   };

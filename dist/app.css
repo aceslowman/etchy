@@ -94,7 +94,7 @@ body,
 }
 
 #feeds {
-  display: none;
+  display: flex;
   height: 100px;  
   flex-flow: column;
   width: 25%;
