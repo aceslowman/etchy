@@ -75,12 +75,13 @@ if (localStorage.getItem("agreeToCC")) {
     let cB_data = b.data;
 
     for (var i = 0; i < cB_data.length; i += 4) {
-      cB_data[i] = 1 - ((1 - cB_data[i] ) * (1 - cA_data[i]));
-      cB_data[i + 1] = 1 - ((1 - cB_data[i+1] ) * (1 - cA_data[i+1]));
-      cB_data[i + 2] = 1 - ((1 - cB_data[i+2] ) * (1 - cA_data[i+2]));
+      cB_data[i] = 255 - ((255 - (cB_data[i] )) * (255 - (cA_data[i])));
+      cB_data[i + 1] = 1 - ((1 - (cB_data[i+1] / 255) ) * (25 - (cA_data[i+1] / 255)));
+      cB_data[i + 2] = 1 - ((1 - (cB_data[i+2] / 255) ) * (25 - (cA_data[i+2] / 255)));
     }
 
-    cA.getContext('2d').drawImage(cB, 0, 0);
+    // cA.getContext('2d').drawImage(cB, 0, 0);
+    cA.getContext('2d').putImageData(b, 0, 0);
   }
   
   // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
@@ -531,14 +532,14 @@ if (localStorage.getItem("agreeToCC")) {
     let v1 = document.querySelector("#local-composite");
     let v2 = document.querySelector("#peerRemote");
     
-//     extraCtx.drawImage(v2, 0, 0);    
-//     ctx.drawImage(v1, 0, 0);
-//     screen(canvas,extraCanvas);
-
-    ctx.globalCompositeOperation = "source-over";
+    extraCtx.drawImage(v2, 0, 0);    
     ctx.drawImage(v1, 0, 0);
-    ctx.globalCompositeOperation = main_blend_mode;
-    ctx.drawImage(v2, 0, 0);
+    screen(canvas,extraCanvas);
+
+//     ctx.globalCompositeOperation = "source-over";
+//     ctx.drawImage(v1, 0, 0);
+//     ctx.globalCompositeOperation = main_blend_mode;
+//     ctx.drawImage(v2, 0, 0);
   };
   
   // here I am masking out the video with the sketch (composite)
@@ -546,26 +547,14 @@ if (localStorage.getItem("agreeToCC")) {
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
     
-    // let ex = document.querySelector("#extraCanvas");
-    
-    // let extraCtx = ex.getContext('2d');
-    
     extraCtx.drawImage(v2, 0, 0);
-    
-    
-    // i have the videos, but on iOS they don't want to
-    // work with globalCompositeOperation.
-    // console.log(Object.keys(v1))
-    // console.log(v1.readyState)
-
-    // cameraCtx.globalCompositeOperation = "source-over";
-    // draw first video
     cameraCtx.drawImage(v1, 0, 0);
-    
-    // screen blend extraCtx (v2)
     multiply(cameraCanvas,extraCanvas);
+    
+    // cameraCtx.globalCompositeOperation = "source-over";
+    // cameraCtx.drawImage(v1, 0, 0);
     // cameraCtx.globalCompositeOperation = local_blend_mode;
-    // cameraCtx.drawImage(ex, 0, 0);
+    // cameraCtx.drawImage(v2, 0, 0);
   };
 
   // draw sketch that can be later be used as a mask
