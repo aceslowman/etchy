@@ -169,11 +169,13 @@ body,
 }
 
 #localBlendMode {
-  display: none;
+/*   display: none; */
+  display: block;
 }
 
 #globalBlendMode {
-  display: none;
+/*   display: none; */
+  display: block;
 }
 
 #brushMessage {

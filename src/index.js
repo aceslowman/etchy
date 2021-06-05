@@ -416,7 +416,7 @@ if (localStorage.getItem("agreeToCC")) {
 
     ctx.save();
     ctx.globalCompositeOperation = main_blend_mode;
-    if (v1) ctx.drawImage(v1, 0, 0);
+    // if (v1) ctx.drawImage(v1, 0, 0);
     ctx.restore();
   };
 
@@ -519,8 +519,6 @@ if (localStorage.getItem("agreeToCC")) {
   let current_frame = 0;
   const handleMouseMove = e => {
     if (right_dragging || left_dragging || middle_dragging) {
-      // e.preventDefault();
-
       let event = e.touches ? e.touches[0] : e;
       let bounds = canvas.getBoundingClientRect();
       mouse = { x: event.clientX - bounds.x, y: event.clientY - bounds.y };
