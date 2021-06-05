@@ -39,7 +39,7 @@
 */
 
 import FriendlyWebSocket from "./FriendlyWebSocket";
-import ContextBlender from "./ContextBlender";
+// import ContextBlender from "./ContextBlender";
 import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 
 // if the code of conduct has been agreed to
@@ -48,10 +48,10 @@ if (localStorage.getItem("agreeToCC")) {
 
   // https://stackoverflow.com/questions/25158696/blend-modemultiply-in-internet-explorer
   // this helps make 'multiply' more browser compatible!
-  function multiply(c0, c1, R, G, B) {
-    let _ctx = c0.getContext('2d');
-    var imgData0 = _ctx0.getImageData(0, 0, c0.width, c0.height);
-    var data0 = imgData0.data;
+  function multiply(c, R, G, B) {
+    let _ctx = c.getContext("2d");
+    var imgData = _ctx.getImageData(0, 0, c.width, c.height);
+    var data = imgData.data;
 
     for (var i = 0; i < data.length; i += 4) {
       data[i] = (R * data[i]) / 255;
@@ -62,23 +62,36 @@ if (localStorage.getItem("agreeToCC")) {
     ctx.putImageData(imgData, 0, 0);
   }
   
-  // https://www.w3.org/TR/compositing-1/#blendingscreen  
-  function screen(c0,c1) {
-    let _ctx0 = c0.getContext('2d');
-    let _ctx1 = c1.getContext('2d');
-    var imgData0 = _ctx0.getImageData(0, 0, c0.width, c0.height);
-    var data0 = imgData0.data;
-    var imgData1 = _ctx1.getImageData(0, 0, c1.width, c1.height);
-    var data1 = imgData1.data;
+  // https://www.w3.org/TR/compositing-1/#blendingscreen
+  function screen(c) {
+    let _ctx = c.getContext("2d");
+    var imgData = _ctx.getImageData(0, 0, c.width, c.height);
+    var data = imgData.data;
 
-    for (var i = 0; i < data0.length; i += 4) {
-      data1[i] = 1 - ((1 - (data0[i]/255)) * (1 - (data1[i]/255)));
-      // data1[i + 1] = (data[i + 1]) / 255;
-      // data1[i + 2] = (data[i + 2]) / 255;
+    for (var i = 0; i < data.length; i += 4) {
+      data[i] = (data[i]) / 255;
+      data[i + 1] = (data[i + 1]) / 255;
+      data[i + 2] = (data[i + 2]) / 255;
     }
 
-    _ctx1.putImageData(imgData1, 0, 0);
+    ctx.putImageData(imgData, 0, 0);
   }
+//   function screen(c0, c1) {
+//     let _ctx0 = c0.getContext("2d");
+//     let _ctx1 = c1.getContext("2d");
+//     var imgData0 = _ctx0.getImageData(0, 0, c0.width, c0.height);
+//     var data0 = imgData0.data;
+//     var imgData1 = _ctx1.getImageData(0, 0, c1.width, c1.height);
+//     var data1 = imgData1.data;
+
+//     for (var i = 0; i < data0.length; i += 4) {
+//       data1[i] = 1 - (1 - data0[i] / 255) * (1 - data1[i] / 255);
+//       data1[i + 1] = 1 - (1 - data0[i + 1] / 255) * (1 - data1[i + 1] / 255);
+//       data1[i + 2] = 1 - (1 - data0[i + 2] / 255) * (1 - data1[i + 2] / 255);
+//     }
+
+//     _ctx1.putImageData(imgData1, 0, 0);
+//   }
 
   // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
   function guidGenerator() {
@@ -546,10 +559,10 @@ if (localStorage.getItem("agreeToCC")) {
     if (v1) cameraCtx.drawImage(v1, 0, 0);
 
     cameraCtx.save();
-    
+
     // cameraCtx.globalCompositeOperation = local_blend_mode;
     // if (v2) cameraCtx.drawImage(v2, 0, 0);
-    if (v2) multiply(cameraCanvas, 1,1,1);
+    if (v2) multiply(cameraCanvas, 1, 1, 1);
     // if (v2) v2.blendOnto(v1,'multiply');
     cameraCtx.restore();
   };
