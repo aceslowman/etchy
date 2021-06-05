@@ -429,7 +429,8 @@ if (localStorage.getItem("agreeToCC")) {
     // leaves the background with artifacts
     sketchCtx.globalAlpha = fadeAmount;
     sketchCtx.fillStyle = "black";
-    sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+    sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);    
+    sketchCtx.fillStyle = "white";
     sketchCtx.restore();
 
     sketchCtx.globalAlpha = 1.0;
@@ -449,13 +450,10 @@ if (localStorage.getItem("agreeToCC")) {
       );
       sketchCtx.fill();
       sketchCtx.closePath();
-
-      // current_frame++;
     }
     
     // erase    
     if (middle_dragging) {
-      console.log('dragging')
       sketchCtx.fillStyle = "black";
       sketchCtx.beginPath();
       sketchCtx.ellipse(
@@ -530,17 +528,13 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleMouseDown = e => {
-    // e.preventDefault();
-    if (e.button === 0) {
-      // left
+    if (e.button === 0 || e.touches.length === 1) {
       left_dragging = true;
-    } else if (e.button === 1) {
-      // middle
+    } else if (e.button === 1 || e.touches.length === 3) {
       middle_dragging = true;
-    } else if (e.button === 2) {
-      // right
+    } else if (e.button === 2 || e.touches.length === 2) {
       right_dragging = true;
-      // spell out from the beginning
+      // spell it out from the beginning
       message_index = 0;
     }
 
@@ -550,15 +544,20 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleMouseUp = e => {
-    // e.preventDefault();
+    
     if (e.button === 0) {
-      // left
       left_dragging = false;
     } else if (e.button === 1) {
-      // middle
       middle_dragging = false;
     } else if (e.button === 2) {
-      // right
+      right_dragging = false;
+    }
+    
+    if (e.touches && e.touches.length === 1) {
+      left_dragging = false;
+    } else if (e.touches && e.touches.length === 3) {
+      middle_dragging = false;
+    } else if (e.touches && e.touches.length === 2) {
       right_dragging = false;
     }
 
@@ -670,7 +669,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   canvas.addEventListener("touchstart", (e) => {e.preventDefault(); handleMouseDown(e)}, false);
   canvas.addEventListener("touchmove", (e) => { handleMouseMove(e)}, false);
-  canvas.addEventListener("touchend", (e) => {e.preventDefault(); handleMouseUp(e)}, false);
+  canvas.addEventListener("touchend", (e) => {handleMouseUp(e)}, false);
 
   document.querySelector("#brushRadiusValue").innerHTML = brush_radius;
   document.querySelector("#brushRadiusValue").value = brush_radius;
