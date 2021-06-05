@@ -39,6 +39,7 @@
 */
 
 import FriendlyWebSocket from "./FriendlyWebSocket";
+import { screenVert, screenFrag, multiplyVert, multiplyFrag } from "./shaders";
 // import ContextBlender from "./ContextBlender";
 import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 
@@ -46,50 +47,65 @@ import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 if (localStorage.getItem("agreeToCC")) {
   document.getElementById("CODEOFCONDUCT").style.display = "none";
 
+  // IN PROGRESS use shaders instead of cpu blend modes
+  function createShader(gl, sourceCode, type) {
+    // Compiles either a shader of type gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
+    var shader = gl.createShader(type);
+    gl.shaderSource(shader, sourceCode);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      var info = gl.getShaderInfoLog(shader);
+      throw "Could not compile WebGL program. \n\n" + info;
+    }
+    return shader;
+  }
+  
+  
+  // let multiplyShader = createShader()
+  
+  const setupShaders = () => {
+    
+  }
+
   // adapted from: https://stackoverflow.com/questions/25158696/blend-modemultiply-in-internet-explorer
   // this helps make 'multiply' more browser compatible!
   // iOS doesn't play along with globalCompositeOperation = 'multiply'
   function multiply(cA, cB) {
     // console.log([cA,cB])
-    let a = cA.getContext('2d').getImageData(0, 0, cA.width, cA.height);
+    let a = cA.getContext("2d").getImageData(0, 0, cA.width, cA.height);
     let cA_data = a.data;
-    let b = cB.getContext('2d').getImageData(0, 0, cB.width, cB.height);
+    let b = cB.getContext("2d").getImageData(0, 0, cB.width, cB.height);
     let cB_data = b.data;
 
     for (var i = 0; i < cB_data.length; i += 4) {
-      cB_data[i] *= cA_data[i] / 255; 
-      cB_data[i + 1] *= cA_data[i + 1] / 255; 
-      cB_data[i + 2] *= cA_data[i + 2] / 255; 
+      cB_data[i] *= cA_data[i] / 255;
+      cB_data[i + 1] *= cA_data[i + 1] / 255;
+      cB_data[i + 2] *= cA_data[i + 2] / 255;
     }
 
-    cA.getContext('2d').drawImage(cB, 0, 0);
+    cA.getContext("2d").drawImage(cB, 0, 0);
     // cA.getContext('2d').putImageData(b, 0, 0);
   }
-  
+
   // https://www.w3.org/TR/compositing-1/#blendingscreen
-  function screen(cA, cB) {
+  function lighter(cA, cB) {
     // console.log([cA,cB])
-    let a = cA.getContext('2d').getImageData(0, 0, cA.width, cA.height);
+    let a = cA.getContext("2d").getImageData(0, 0, cA.width, cA.height);
     let cA_data = a.data;
-    let b = cB.getContext('2d').getImageData(0, 0, cB.width, cB.height);
+    let b = cB.getContext("2d").getImageData(0, 0, cB.width, cB.height);
     let cB_data = b.data;
 
-    // for (var i = 0; i < cB_data.length; i += 4) {
-    //   cB_data[i] = 1 - ((1 - (cB_data[i] / 255)) * (1 - (cA_data[i] / 255)));
-    //   cB_data[i + 1] = 1 - ((1 - (cB_data[i+1] / 255) ) * (1 - (cA_data[i+1] / 255)));
-    //   cB_data[i + 2] = 1 - ((1 - (cB_data[i+2] / 255) ) * (1 - (cA_data[i+2] / 255)));
-    // }
-    
     for (var i = 0; i < cB_data.length; i += 4) {
       cB_data[i] = Math.max(cB_data[i], cA_data[i]);
-      cB_data[i + 1] = Math.max(cB_data[i+1], cA_data[i+1]);
-      cB_data[i + 2] = Math.max(cB_data[i+2], cA_data[i+2]);
+      cB_data[i + 1] = Math.max(cB_data[i + 1], cA_data[i + 1]);
+      cB_data[i + 2] = Math.max(cB_data[i + 2], cA_data[i + 2]);
     }
 
-    cA.getContext('2d').drawImage(cB, 0, 0);
+    cA.getContext("2d").drawImage(cB, 0, 0);
     // cA.getContext('2d').putImageData(b, 0, 0);
   }
-  
+
   // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
   function guidGenerator() {
     var S4 = function() {
@@ -123,7 +139,7 @@ if (localStorage.getItem("agreeToCC")) {
   let cameraCtx = cameraCanvas.getContext("2d");
   cameraCanvas.width = 640;
   cameraCanvas.height = 480;
-  
+
   let extraCanvas = document.getElementById("extraCanvas");
   let extraCtx = extraCanvas.getContext("2d");
   extraCanvas.width = 640;
@@ -152,7 +168,7 @@ if (localStorage.getItem("agreeToCC")) {
   // setting up websocket signaling server
   const websocket = new FriendlyWebSocket({ path: "/" });
 
-  const createPeerConnection = (iceServers) => {
+  const createPeerConnection = iceServers => {
     // console.log('ice', iceServers)
     const pc = new RTCPeerConnection({
       iceServers,
@@ -537,26 +553,26 @@ if (localStorage.getItem("agreeToCC")) {
 
     let v1 = document.querySelector("#local-composite");
     let v2 = document.querySelector("#peerRemote");
-    
-    extraCtx.drawImage(v2, 0, 0);    
-    ctx.drawImage(v1, 0, 0);
-    screen(canvas,extraCanvas);
 
-//     ctx.globalCompositeOperation = "source-over";
-//     ctx.drawImage(v1, 0, 0);
-//     ctx.globalCompositeOperation = main_blend_mode;
-//     ctx.drawImage(v2, 0, 0);
+    extraCtx.drawImage(v2, 0, 0);
+    ctx.drawImage(v1, 0, 0);
+    lighter(canvas, extraCanvas);
+
+    //     ctx.globalCompositeOperation = "source-over";
+    //     ctx.drawImage(v1, 0, 0);
+    //     ctx.globalCompositeOperation = main_blend_mode;
+    //     ctx.drawImage(v2, 0, 0);
   };
-  
+
   // here I am masking out the video with the sketch (composite)
   const updateCameraCanvas = () => {
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
-    
+
     extraCtx.drawImage(v2, 0, 0);
     cameraCtx.drawImage(v1, 0, 0);
-    multiply(cameraCanvas,extraCanvas);
-    
+    multiply(cameraCanvas, extraCanvas);
+
     // cameraCtx.globalCompositeOperation = "source-over";
     // cameraCtx.drawImage(v1, 0, 0);
     // cameraCtx.globalCompositeOperation = local_blend_mode;
@@ -708,11 +724,7 @@ if (localStorage.getItem("agreeToCC")) {
     );
   };
 
-  window.addEventListener(
-    "resize",
-    e => {},
-    true
-  );
+  window.addEventListener("resize", e => {}, true);
 
   document.addEventListener("contextmenu", handleContextMenu, false);
   document.addEventListener("mousedown", handleMouseDown, false);
