@@ -669,7 +669,7 @@ if (localStorage.getItem("agreeToCC")) {
   document.addEventListener("mouseup", handleMouseUp, false);
 
   canvas.addEventListener("touchstart", (e) => {e.preventDefault(); handleMouseDown(e)}, false);
-  canvas.addEventListener("touchmove", (e) => {e.preventDefault(); handleMouseMove(e)}, false);
+  canvas.addEventListener("touchmove", (e) => { handleMouseMove(e)}, false);
   canvas.addEventListener("touchend", (e) => {e.preventDefault(); handleMouseUp(e)}, false);
 
   document.querySelector("#brushRadiusValue").innerHTML = brush_radius;
