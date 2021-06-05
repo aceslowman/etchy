@@ -12,9 +12,9 @@ var defaultOffsets = {
 };
 
 if (typeof require==='function' && typeof module==='object'){
-	var canvas = require('canvas');
-	addBlendMethod(canvas.Context2d.prototype);
-	module.exports = canvas;
+	// var canvas = require('canvas');
+	// addBlendMethod(canvas.Context2d.prototype);
+	// module.exports = canvas;
 } else addBlendMethod(this.CanvasRenderingContext2D && this.CanvasRenderingContext2D.prototype);
 
 function addBlendMethod(object){

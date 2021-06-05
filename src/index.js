@@ -34,10 +34,12 @@
   
   this project makes use of context-blender
                 https://github.com/Phrogz/context-blender
-  the mdn describes 
+  the 'multiply' and 'screen' blend modes in particular don't seem to have good browser
+  compatibility, particularly on mobile.
 */
 
 import FriendlyWebSocket from "./FriendlyWebSocket";
+import ContextBlender from "./ContextBlender";
 import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 
 // if the code of conduct has been agreed to
@@ -454,7 +456,8 @@ if (localStorage.getItem("agreeToCC")) {
     ctx.save();
     // ctx.globalCompositeOperation = main_blend_mode;
     // if (v1) ctx.drawImage(v1, 0, 0);
-    if (v1) screen(canvas);
+    if (v1) v1.blendOnto(v2,'screen');
+    // if (v1) screen(canvas);
     ctx.restore();
   };
 
@@ -543,7 +546,8 @@ if (localStorage.getItem("agreeToCC")) {
     
     // cameraCtx.globalCompositeOperation = local_blend_mode;
     // if (v2) cameraCtx.drawImage(v2, 0, 0);
-    if (v2) multiply(cameraCanvas, 1,1,1);
+    // if (v2) multiply(cameraCanvas, 1,1,1);
+    if (v2) v2.blendOnto(v1,'multiply');
     cameraCtx.restore();
   };
 
