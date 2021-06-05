@@ -98,9 +98,7 @@ body,
 }
 
 #feeds {
-  /*   display: none; */
-  
-  display: flex;
+  display: none;
   height: 100px;  
   flex-flow: column;
   width: 25%;
@@ -123,7 +121,6 @@ body,
 #controls {
   max-width: 640px;
   display: none;
-  /*   display: flex; */
   z-index: 4;
   align-items: center;
   flex-flow: wrap;

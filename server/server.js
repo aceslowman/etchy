@@ -53,7 +53,8 @@ wss.on("connection", ws => {
         console.log("registering user", message.user_id);
 
         // gets a username, password, and array of iceServers
-        client.tokens.create().then(token => {
+        // expires after half hour (ttl: 1800), might need to change
+        client.tokens.create({ ttl: 1800 }).then(token => {
           // first, set up connection
           id = message.user_id;
           connections.set(id, {
@@ -71,8 +72,6 @@ wss.on("connection", ws => {
             .socket.send(
               JSON.stringify({ type: "authenticate", username, pw, iceServers })
             );
-
-          console.log(token);
         });
 
         break;

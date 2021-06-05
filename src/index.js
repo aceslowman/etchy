@@ -160,12 +160,14 @@ console.log('v1',v1)
   // setting up websocket signaling server
   const websocket = new FriendlyWebSocket({ path: "/" });
 
-  const createPeerConnection = (isOfferer = false) => {
+  const createPeerConnection = (iceServers) => {
+    console.log('ice', iceServers)
     const pc = new RTCPeerConnection({
-      iceServers: [
-        // { urls: "stun:stun.1.google.com:19302" },
-        { urls: "turn:quickturn.glitch.me", username: "n/a", credential: "n/a" }
-      ],
+      iceServers,
+      // iceServers: [
+      //   // { urls: "stun:stun.1.google.com:19302" },
+      //   { urls: "turn:quickturn.glitch.me", username: "n/a", credential: "n/a" }
+      // ],
       // offerToReceiveAudio: false,
       // offerToReceiveVideo: true,
       voiceActivityDetection: false
@@ -183,7 +185,7 @@ console.log('v1',v1)
     };
 
     pc.onicecandidateerror = err => {
-      // console.error(err);
+      console.error(err);
     };
 
     pc.oniceconnectionstatechange = async function() {
@@ -343,7 +345,7 @@ console.log('v1',v1)
   websocket.on("open", data => {
     document.querySelector(".yourId").innerText = `(you) ${user_id}`;
     send({ type: "register", user_id: user_id });
-    pc = createPeerConnection();
+    // pc = createPeerConnection();
   });
 
   // when signaling server sends a message
@@ -422,6 +424,7 @@ console.log('v1',v1)
         //   pc.addIceCandidate(data.candidate);
         // }
         console.log('authenticate',data)
+        pc = createPeerConnection(data.iceServers);
         break;
       case "rejectOffer":
         alert(
