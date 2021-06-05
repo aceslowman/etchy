@@ -62,8 +62,8 @@ if (localStorage.getItem("agreeToCC")) {
       cB_data[i + 2] *= cA_data[i + 2] / 255; 
     }
 
-    // cA.getContext('2d').drawImage(cB, 0, 0);
-    cA.getContext('2d').putImageData(b, 0, 0);
+    cA.getContext('2d').drawImage(cB, 0, 0);
+    // cA.getContext('2d').putImageData(b, 0, 0);
   }
   
   // https://www.w3.org/TR/compositing-1/#blendingscreen
@@ -74,14 +74,20 @@ if (localStorage.getItem("agreeToCC")) {
     let b = cB.getContext('2d').getImageData(0, 0, cB.width, cB.height);
     let cB_data = b.data;
 
+    // for (var i = 0; i < cB_data.length; i += 4) {
+    //   cB_data[i] = 1 - ((1 - (cB_data[i] / 255)) * (1 - (cA_data[i] / 255)));
+    //   cB_data[i + 1] = 1 - ((1 - (cB_data[i+1] / 255) ) * (1 - (cA_data[i+1] / 255)));
+    //   cB_data[i + 2] = 1 - ((1 - (cB_data[i+2] / 255) ) * (1 - (cA_data[i+2] / 255)));
+    // }
+    
     for (var i = 0; i < cB_data.length; i += 4) {
-      cB_data[i] = 255 - ((255 - (cB_data[i] )) * (255 - (cA_data[i])));
-      cB_data[i + 1] = 1 - ((1 - (cB_data[i+1] / 255) ) * (25 - (cA_data[i+1] / 255)));
-      cB_data[i + 2] = 1 - ((1 - (cB_data[i+2] / 255) ) * (25 - (cA_data[i+2] / 255)));
+      cB_data[i] = Math.max(cB_data[i], cA_data[i]);
+      cB_data[i + 1] = Math.max(cB_data[i+1], cA_data[i+1]);
+      cB_data[i + 2] = Math.max(cB_data[i+2], cA_data[i+2]);
     }
 
-    // cA.getContext('2d').drawImage(cB, 0, 0);
-    cA.getContext('2d').putImageData(b, 0, 0);
+    cA.getContext('2d').drawImage(cB, 0, 0);
+    // cA.getContext('2d').putImageData(b, 0, 0);
   }
   
   // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
