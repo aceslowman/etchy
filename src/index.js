@@ -74,36 +74,19 @@ console.log('v1',v1)
   
   // https://www.w3.org/TR/compositing-1/#blendingscreen
   function screen(cA, cB) {
-    // let _ctx = c.getContext("2d");
-    let cA_data = cA.getImageData(0, 0, cA.width, cA.height).data;
-    let cB_data = cB.getImageData(0, 0, cB.width, cB.height).data;
-    var data = imgData.data;
+    // console.log([cA,cB])
+    let cA_data = cA.getContext('2d').getImageData(0, 0, cA.width, cA.height).data;
+    let cB_data = cB.getContext('2d').getImageData(0, 0, cB.width, cB.height).data;
 
-    for (var i = 0; i < data.length; i += 4) {
-      data[i] = (data[i]) / 255;
-      data[i + 1] = (data[i + 1]) / 255;
-      data[i + 2] = (data[i + 2]) / 255;
+    for (var i = 0; i < cB_data.length; i += 4) {
+      cB_data[i] = 1 - (1 - (cB_data[i] / 255) ) * (1 - (cA_data[i] / 255));
+      cB_data[i + 1] = 1 - (1 - (cB_data[i+1] / 255) ) * (1 - (cA_data[i+1] / 255));
+      cB_data[i + 2] = 1 - (1 - (cB_data[i+2] / 255) ) * (1 - (cA_data[i+2] / 255));
     }
 
-    ctx.putImageData(imgData, 0, 0);
+    cA.getContext('2d').drawImage(cB, 0, 0);
   }
-//   function screen(c0, c1) {
-//     let _ctx0 = c0.getContext("2d");
-//     let _ctx1 = c1.getContext("2d");
-//     var imgData0 = _ctx0.getImageData(0, 0, c0.width, c0.height);
-//     var data0 = imgData0.data;
-//     var imgData1 = _ctx1.getImageData(0, 0, c1.width, c1.height);
-//     var data1 = imgData1.data;
-
-//     for (var i = 0; i < data0.length; i += 4) {
-//       data1[i] = 1 - (1 - data0[i] / 255) * (1 - data1[i] / 255);
-//       data1[i + 1] = 1 - (1 - data0[i + 1] / 255) * (1 - data1[i + 1] / 255);
-//       data1[i + 2] = 1 - (1 - data0[i + 2] / 255) * (1 - data1[i + 2] / 255);
-//     }
-
-//     _ctx1.putImageData(imgData1, 0, 0);
-//   }
-
+  
   // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
   function guidGenerator() {
     var S4 = function() {
@@ -137,6 +120,11 @@ console.log('v1',v1)
   let cameraCtx = cameraCanvas.getContext("2d");
   cameraCanvas.width = 640;
   cameraCanvas.height = 480;
+  
+  let extraCanvas = document.getElementById("extraCanvas");
+  let extraCtx = extraCanvas.getContext("2d");
+  extraCanvas.width = 640;
+  extraCanvas.height = 480;
 
   let left_dragging = false;
   let right_dragging = false;
@@ -558,9 +546,9 @@ console.log('v1',v1)
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
     
-    let ex = document.querySelector("#extraCanvas");
+    // let ex = document.querySelector("#extraCanvas");
     
-    let extraCtx = ex.getContext('2d');
+    // let extraCtx = ex.getContext('2d');
     
     extraCtx.drawImage(v2, 0, 0);
     
@@ -575,9 +563,9 @@ console.log('v1',v1)
     cameraCtx.drawImage(v1, 0, 0);
     
     // screen blend extraCtx (v2)
-    screen(cameraCtx,extraCtx);
+    screen(cameraCanvas,extraCanvas);
     // cameraCtx.globalCompositeOperation = local_blend_mode;
-    cameraCtx.drawImage(ex, 0, 0);
+    // cameraCtx.drawImage(ex, 0, 0);
   };
 
   // draw sketch that can be later be used as a mask
