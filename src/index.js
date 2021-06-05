@@ -161,15 +161,9 @@ console.log('v1',v1)
   const websocket = new FriendlyWebSocket({ path: "/" });
 
   const createPeerConnection = (iceServers) => {
-    console.log('ice', iceServers)
+    // console.log('ice', iceServers)
     const pc = new RTCPeerConnection({
       iceServers,
-      // iceServers: [
-      //   // { urls: "stun:stun.1.google.com:19302" },
-      //   { urls: "turn:quickturn.glitch.me", username: "n/a", credential: "n/a" }
-      // ],
-      // offerToReceiveAudio: false,
-      // offerToReceiveVideo: true,
       voiceActivityDetection: false
     });
 
@@ -297,15 +291,12 @@ console.log('v1',v1)
       });
     hideLobby();
     showLoading();
-    // showControls();
   };
 
   const addCamera = () => {
-    // if(localStream) return;
     return navigator.mediaDevices
       .getUserMedia({
         audio: false,
-        // video: true
         video: { width: 640, height: 480 }
       })
       .then(stream => {
@@ -326,7 +317,7 @@ console.log('v1',v1)
         document.getElementById("local-video").play();
         document.getElementById("local-sketch").play();
         document.getElementById("local-composite").play();
-        // document.getElementById("peerRemote").play();
+        document.getElementById("peerRemote").play();
 
         // startup the main output loop
         if (main_update_loop) {
@@ -345,7 +336,6 @@ console.log('v1',v1)
   websocket.on("open", data => {
     document.querySelector(".yourId").innerText = `(you) ${user_id}`;
     send({ type: "register", user_id: user_id });
-    // pc = createPeerConnection();
   });
 
   // when signaling server sends a message
@@ -420,10 +410,7 @@ console.log('v1',v1)
         }
         break;
       case "authenticate":
-        // if (!pc || !pc.remoteDescription) {
-        //   pc.addIceCandidate(data.candidate);
-        // }
-        console.log('authenticate',data)
+        // now that we can connect to iceServers, make connection
         pc = createPeerConnection(data.iceServers);
         break;
       case "rejectOffer":
@@ -555,7 +542,6 @@ console.log('v1',v1)
           mouse.y + brush_radius
         );
 
-        // message_index = (message_index + 1) % current_message.split("").length;
         message_index++;
         if (message_index >= current_message.split("").length) {
           right_dragging = false;
@@ -658,7 +644,6 @@ console.log('v1',v1)
 
   const handleClearButton = () => {
     initializeSketchCanvas();
-    // sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
   };
 
   const handleToggleFade = () => {
@@ -717,8 +702,6 @@ console.log('v1',v1)
     if (fadeAmount > 1) fadeAmount = 1;
     if (fadeAmount <= 0) fadeAmount = 0;
 
-    console.log(e.deltaY);
-
     document.getElementById("fadeAmount").value = fadeAmount;
     document.querySelector("#fadeAmountValue").innerHTML = fadeAmount.toFixed(
       2
@@ -727,21 +710,11 @@ console.log('v1',v1)
 
   window.addEventListener(
     "resize",
-    e => {
-      // if(window.innerWidth < 640 || window.innerHeight < 480) {
-      //   let aspect = 480 / 640;
-      //   canvas.width = window.innerWidth;
-      //   canvas.height = window.innerHeight * aspect;
-      // } else {
-      //   canvas.width = 640;
-      //   canvas.height = 480;
-      // }
-    },
+    e => {},
     true
   );
 
   document.addEventListener("contextmenu", handleContextMenu, false);
-
   document.addEventListener("mousedown", handleMouseDown, false);
   document.addEventListener("mousemove", handleMouseMove, false);
   document.addEventListener("mouseup", handleMouseUp, false);
