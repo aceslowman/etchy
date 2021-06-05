@@ -47,27 +47,6 @@ import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 if (localStorage.getItem("agreeToCC")) {
   document.getElementById("CODEOFCONDUCT").style.display = "none";
 
-  // IN PROGRESS use shaders instead of cpu blend modes
-  function createShader(gl, sourceCode, type) {
-    // Compiles either a shader of type gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
-    var shader = gl.createShader(type);
-    gl.shaderSource(shader, sourceCode);
-    gl.compileShader(shader);
-
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      var info = gl.getShaderInfoLog(shader);
-      throw "Could not compile WebGL program. \n\n" + info;
-    }
-    return shader;
-  }
-  
-  
-  // let multiplyShader = createShader()
-  
-  const setupShaders = () => {
-    
-  }
-
   // adapted from: https://stackoverflow.com/questions/25158696/blend-modemultiply-in-internet-explorer
   // this helps make 'multiply' more browser compatible!
   // iOS doesn't play along with globalCompositeOperation = 'multiply'
@@ -131,17 +110,20 @@ if (localStorage.getItem("agreeToCC")) {
   canvas.height = 480;
 
   let sketchCanvas = document.getElementById("sketchCanvas");
-  let sketchCtx = sketchCanvas.getContext("2d");
+  // let sketchCtx = sketchCanvas.getContext("2d");
+  let sketchCtx = sketchCanvas.getContext("webgl");
   sketchCanvas.width = 640;
   sketchCanvas.height = 480;
 
   let cameraCanvas = document.getElementById("cameraCanvas");
-  let cameraCtx = cameraCanvas.getContext("2d");
+  // let cameraCtx = cameraCanvas.getContext("2d");
+  let cameraCtx = cameraCanvas.getContext("webgl");
   cameraCanvas.width = 640;
   cameraCanvas.height = 480;
 
   let extraCanvas = document.getElementById("extraCanvas");
-  let extraCtx = extraCanvas.getContext("2d");
+  // let extraCtx = extraCanvas.getContext("2d");
+  let extraCtx = extraCanvas.getContext("webgl");
   extraCanvas.width = 640;
   extraCanvas.height = 480;
 
@@ -163,6 +145,17 @@ if (localStorage.getItem("agreeToCC")) {
 
   let main_blend_mode = "screen";
   let local_blend_mode = "multiply";
+  
+  // SHADERS ----------------------------------------------------
+  
+  const setupShaders = () => {
+    // let shaderProgram = buildShaderProgram()
+    
+    let compositeProgram = cameraCtx.createProgram();
+    
+    cameraCtx.attachShader(compositeProgram, compositeVertShader);
+    cameraCtx.attachShader(compositeProgram, compositeFragShader);
+  }
 
   // ------------------------------------------------------------
   // setting up websocket signaling server
