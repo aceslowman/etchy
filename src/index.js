@@ -478,9 +478,9 @@ console.log('v1',v1)
     let v2 = document.querySelector("#peerRemote");
 
     ctx.globalCompositeOperation = "source-over";
-    if (v1) ctx.drawImage(v1, 0, 0);
+    ctx.drawImage(v1, 0, 0);
     ctx.globalCompositeOperation = main_blend_mode;
-    if (v2) ctx.drawImage(v2, 0, 0);
+    ctx.drawImage(v2, 0, 0);
   };
 
   // this fades away the sketch while drawing
@@ -563,9 +563,9 @@ console.log('v1',v1)
     let v2 = document.querySelector("#local-sketch");
 
     cameraCtx.globalCompositeOperation = "source-over";
-    if (v1) cameraCtx.drawImage(v1, 0, 0);
+    cameraCtx.drawImage(v1, 0, 0);
     cameraCtx.globalCompositeOperation = local_blend_mode;
-    if (v2) cameraCtx.drawImage(v2, 0, 0);
+    cameraCtx.drawImage(v2, 0, 0);
   };
 
   // draw sketch that can be later be used as a mask
