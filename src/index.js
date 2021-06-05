@@ -38,6 +38,21 @@ import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 if (localStorage.getItem("agreeToCC")) {
   document.getElementById("CODEOFCONDUCT").style.display = "none";
 
+  // https://stackoverflow.com/questions/25158696/blend-modemultiply-in-internet-explorer
+  // this helps make 'multiply' more browser compatible!
+  function multiply(canvas, R, G, B) {
+    var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    var data = imgData.data;
+
+    for (var i = 0; i < data.length; i += 4) {
+      data[i] = (R * data[i]) / 255;
+      data[i + 1] = (G * data[i + 1]) / 255;
+      data[i + 2] = (B * data[i + 2]) / 255;
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+  }
+
   // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
   function guidGenerator() {
     var S4 = function() {
@@ -416,7 +431,7 @@ if (localStorage.getItem("agreeToCC")) {
 
     ctx.save();
     ctx.globalCompositeOperation = main_blend_mode;
-    // if (v1) ctx.drawImage(v1, 0, 0);
+    if (v1) ctx.drawImage(v1, 0, 0);
     ctx.restore();
   };
 
@@ -535,7 +550,7 @@ if (localStorage.getItem("agreeToCC")) {
       // spell it out from the beginning
       message_index = 0;
     }
-    
+
     if (e.touches) {
       if (e.touches.length === 1) {
         left_dragging = true;
@@ -543,7 +558,7 @@ if (localStorage.getItem("agreeToCC")) {
         middle_dragging = true;
       } else if (e.touches.length === 2) {
         right_dragging = true;
-         message_index = 0;
+        message_index = 0;
       }
     }
 
