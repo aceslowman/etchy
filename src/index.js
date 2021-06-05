@@ -48,18 +48,27 @@ if (localStorage.getItem("agreeToCC")) {
 
   // https://stackoverflow.com/questions/25158696/blend-modemultiply-in-internet-explorer
   // this helps make 'multiply' more browser compatible!
-  function multiply(c, R, G, B) {
+  function multiply(v1, v2, c, R=1, G=1, B=1) {
     let _ctx = c.getContext("2d");
     var imgData = _ctx.getImageData(0, 0, c.width, c.height);
     var data = imgData.data;
+    
+    let a = v1.data;
+    let b = v2.data;
 
-    for (var i = 0; i < data.length; i += 4) {
-      data[i] = (R * data[i]) / 255;
-      data[i + 1] = (G * data[i + 1]) / 255;
-      data[i + 2] = (B * data[i + 2]) / 255;
+    // for (var i = 0; i < a.length; i += 4) {
+    //   data[i] = (R * data[i]) / 255;
+    //   data[i + 1] = (G * data[i + 1]) / 255;
+    //   data[i + 2] = (B * data[i + 2]) / 255;
+    // }
+    
+    for (var i = 0; i < b.length; i += 4) {
+      b[i] = (R * a[i]) / 255;
+      b[i + 1] = (G * a[i + 1]) / 255;
+      b[i + 2] = (B * a[i + 2]) / 255;
     }
 
-    ctx.putImageData(imgData, 0, 0);
+    _ctx.putImageData(b, 0, 0);
   }
   
   // https://www.w3.org/TR/compositing-1/#blendingscreen
@@ -470,10 +479,10 @@ if (localStorage.getItem("agreeToCC")) {
     if (v2) ctx.drawImage(v2, 0, 0);
 
     ctx.save();
-    // ctx.globalCompositeOperation = main_blend_mode;
-    // if (v1) ctx.drawImage(v1, 0, 0);
+    ctx.globalCompositeOperation = main_blend_mode;
+    if (v1) ctx.drawImage(v1, 0, 0);
     // if (v1) v1.blendOnto(v2,'screen');
-    if (v1) screen(canvas);
+    // if (v1) screen(canvas);
     ctx.restore();
   };
 
@@ -562,7 +571,7 @@ if (localStorage.getItem("agreeToCC")) {
 
     // cameraCtx.globalCompositeOperation = local_blend_mode;
     // if (v2) cameraCtx.drawImage(v2, 0, 0);
-    if (v2) multiply(cameraCanvas, 1, 1, 1);
+    if (v2) multiply(v1, v2, cameraCanvas);
     // if (v2) v2.blendOnto(v1,'multiply');
     cameraCtx.restore();
   };
