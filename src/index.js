@@ -29,6 +29,12 @@
   HELPFUL LINKS:
   recognizing temporary or full disconnects
   https://stackoverflow.com/questions/63582725/webrtc-differentiate-between-temporary-disconnect-or-failure-and-permanant
+  
+  NOTE: 
+  
+  this project makes use of context-blender
+                https://github.com/Phrogz/context-blender
+  the mdn describes 
 */
 
 import FriendlyWebSocket from "./FriendlyWebSocket";
@@ -40,14 +46,30 @@ if (localStorage.getItem("agreeToCC")) {
 
   // https://stackoverflow.com/questions/25158696/blend-modemultiply-in-internet-explorer
   // this helps make 'multiply' more browser compatible!
-  function multiply(canvas, R, G, B) {
-    var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  function multiply(c, R, G, B) {
+    let _ctx = c.getContext('2d');
+    var imgData = _ctx.getImageData(0, 0, c.width, c.height);
     var data = imgData.data;
 
     for (var i = 0; i < data.length; i += 4) {
       data[i] = (R * data[i]) / 255;
       data[i + 1] = (G * data[i + 1]) / 255;
       data[i + 2] = (B * data[i + 2]) / 255;
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+  }
+  
+  // https://www.w3.org/TR/compositing-1/#blendingscreen  
+  function screen(c) {
+    let _ctx = c.getContext('2d');
+    var imgData = _ctx.getImageData(0, 0, c.width, c.height);
+    var data = imgData.data;
+
+    for (var i = 0; i < data.length; i += 4) {
+      data[i] = (data[i]) / 255;
+      data[i + 1] = (data[i + 1]) / 255;
+      data[i + 2] = (data[i + 2]) / 255;
     }
 
     ctx.putImageData(imgData, 0, 0);
@@ -430,8 +452,9 @@ if (localStorage.getItem("agreeToCC")) {
     if (v2) ctx.drawImage(v2, 0, 0);
 
     ctx.save();
-    ctx.globalCompositeOperation = main_blend_mode;
-    if (v1) ctx.drawImage(v1, 0, 0);
+    // ctx.globalCompositeOperation = main_blend_mode;
+    // if (v1) ctx.drawImage(v1, 0, 0);
+    if (v1) screen(canvas);
     ctx.restore();
   };
 
@@ -517,8 +540,10 @@ if (localStorage.getItem("agreeToCC")) {
     if (v1) cameraCtx.drawImage(v1, 0, 0);
 
     cameraCtx.save();
-    cameraCtx.globalCompositeOperation = local_blend_mode;
-    if (v2) cameraCtx.drawImage(v2, 0, 0);
+    
+    // cameraCtx.globalCompositeOperation = local_blend_mode;
+    // if (v2) cameraCtx.drawImage(v2, 0, 0);
+    if (v2) multiply(cameraCanvas, 1,1,1);
     cameraCtx.restore();
   };
 
