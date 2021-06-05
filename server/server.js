@@ -33,10 +33,7 @@ const ws = require("ws");
 // and set the environment variables. See http://twil.io/secure
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = require('twilio')(accountSid, authToken);
-
-client.tokens.create().then(token => console.log(token.username));
-
+const client = require("twilio")(accountSid, authToken);
 
 const app = express();
 
@@ -54,15 +51,28 @@ wss.on("connection", ws => {
     switch (message.type) {
       case "register":
         console.log("registering user", message.user_id);
-        id = message.user_id;
-        connections.set(id, {
-          user_id: id,
-          peer_id: null,
-          socket: ws,
-          paired: false
+
+        // gets a username, password, and array of iceServers
+        client.tokens.create().then(token => {
+          // first, set up connection          
+          id = message.user_id;
+          connections.set(id, {
+            user_id: id,
+            peer_id: null,
+            socket: ws,
+            paired: false
+          });
+          updateCount();
+          
+          // now inform user of their creds
+          let {username, pw, iceServers} = token;          
+          connections.get(id).socket.send(JSON.stringify({username, pw, iceServers}));
+
+          console.log(token);
         });
-        updateCount();
+
         break;
+
       case "offer":
         console.log("OFFER", [message.from_id, message.to_id]);
         if (connections.get(message.to_id)) {
@@ -75,7 +85,7 @@ wss.on("connection", ws => {
         console.log("ANSWER", [message.from_id, message.to_id]);
         if (connections.get(message.to_id)) {
           connections.get(message.to_id).peer_id = message.from_id;
-          connections.get(message.to_id).paired = true;          
+          connections.get(message.to_id).paired = true;
           connections.get(message.to_id).socket.send(JSON.stringify(message));
         }
 
@@ -91,7 +101,7 @@ wss.on("connection", ws => {
         console.log("REJECTOFFER", [message.from_id, message.to_id]);
         if (connections.get(message.to_id)) {
           connections.get(message.to_id).peer_id = undefined;
-          connections.get(message.to_id).paired = false;  
+          connections.get(message.to_id).paired = false;
           connections.get(message.to_id).socket.send(JSON.stringify(message));
         }
 
@@ -117,10 +127,12 @@ function updateCount() {
       JSON.stringify({
         type: "count",
         count: connections.size,
-        peers: Array.from(connections.values()).filter(a => !a.paired).map(e => ({
-          user_id: e.user_id,
-          peer_id: e.peer_id
-        }))
+        peers: Array.from(connections.values())
+          .filter(a => !a.paired)
+          .map(e => ({
+            user_id: e.user_id,
+            peer_id: e.peer_id
+          }))
       })
     );
   });
