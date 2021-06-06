@@ -858,7 +858,7 @@ if (localStorage.getItem("agreeToCC")) {
     if (fadeAmount <= 0) fadeAmount = 0;
 
     document.getElementById("fadeAmount").value = fadeAmount;
-    document.querySelector("#fadeAmountValue").innerHTML = fadeAmount.toFixed ? fadeAmount.toFixed(
+    document.querySelector("#fadeAmountValue").innerText = fadeAmount.toFixed ? fadeAmount.toFixed(
       2
     ) : fadeAmount;
   };
