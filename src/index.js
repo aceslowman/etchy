@@ -125,8 +125,8 @@ if (localStorage.getItem("agreeToCC")) {
     compositeInfo = {
       program: compositeProgram,
       attribLocations: {
-        vertexPosition: mainGl.getAttribLocation(mainProgram, 'aVertexPosition'),
-        textureCoord: mainGl.getAttribLocation(mainProgram, 'aTextureCoord'),
+        vertexPosition: compositeGl.getAttribLocation(compositeProgram, 'aVertexPosition'),
+        textureCoord: compositeGl.getAttribLocation(compositeProgram, 'aTextureCoord'),
       },
       uniformLocations: {
         projectionMatrix: compositeGl.getUniformLocation(
@@ -309,14 +309,14 @@ if (localStorage.getItem("agreeToCC")) {
     mainInfo = {
       ...mainInfo,
       uniformLocations: {
-        tex0: v1,
-        tex1: v2,
-        projectionMatrix: compositeGl.getUniformLocation(
-          compositeProgram,
+        tex0: compositeGl.getUniformLocation(compositeProgram, 'tex0'),
+        tex1: compositeGl.getUniformLocation(compositeProgram, 'tex1'),        
+        projectionMatrix: mainGl.getUniformLocation(
+          mainProgram,
           "uProjectionMatrix"
         ),
-        modelViewMatrix: compositeGl.getUniformLocation(
-          compositeProgram,
+        modelViewMatrix: mainGl.getUniformLocation(
+          mainProgram,
           "uModelViewMatrix"
         )
       }
@@ -335,8 +335,8 @@ if (localStorage.getItem("agreeToCC")) {
     compositeInfo = {
       ...compositeInfo,
       uniformLocations: {
-        tex0: v1,
-        tex1: v2,
+        tex0: compositeGl.getUniformLocation(compositeProgram, 'tex0'),
+        tex1: compositeGl.getUniformLocation(compositeProgram, 'tex1'),        
         projectionMatrix: compositeGl.getUniformLocation(
           compositeProgram,
           "uProjectionMatrix"
@@ -829,7 +829,7 @@ if (localStorage.getItem("agreeToCC")) {
     current_message = e.target.value;
   };
 
-  initializeSketchCanvas();
+  // initializeSketchCanvas();
 
   const handleWheel = e => {
     fadeAmount += (e.deltaY * -1) / 1000;
