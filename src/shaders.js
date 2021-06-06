@@ -5,7 +5,7 @@ const screenVert = `
 
   varying highp vec2 vTextureCoord;
 
-  void main(void) {
+  void main() {
     gl_Position = aVertexPosition;
     vTextureCoord = aTextureCoord;
   }
@@ -19,10 +19,11 @@ const screenFrag = `
   varying highp vec2 vTextureCoord;
   
   void main() {
-    vec4 v0 = texture2D(tex0, vTextureCoord);
-    vec4 v1 = texture2D(tex1, vTextureCoord);
-    // gl_FragColor = v0;
-    gl_FragColor = vec4(0.0,1.0,0.0,1.0);
+    vec4 v0 = texture2D(tex0, gl_FragCoord.xy);
+    vec4 v1 = texture2D(tex1, gl_FragCoord.xy);
+    //gl_FragColor = vec4(fract(gl_FragCoord.xy / vec2(16., 32.)),0,1);
+    gl_FragColor = v0;
+    //gl_FragColor = vec4(0.0,1.0,0.0,1.0);
   }
 `;
 
@@ -33,7 +34,7 @@ const multiplyVert = `
   
   varying highp vec2 vTextureCoord;
 
-  void main(void) {
+  void main() {
     gl_Position = aVertexPosition;
     vTextureCoord = aTextureCoord;
   }
@@ -49,8 +50,8 @@ const multiplyFrag = `
   void main() {
     vec4 v0 = texture2D(tex0, vTextureCoord);
     vec4 v1 = texture2D(tex1, vTextureCoord);
-    // gl_FragColor = v0;
-    gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+    gl_FragColor = v0;
+    // gl_FragColor = vec4(1.0,0.0,0.0,1.0);
   }
 `;
 

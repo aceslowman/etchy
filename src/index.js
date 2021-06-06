@@ -69,26 +69,26 @@ if (localStorage.getItem("agreeToCC")) {
   let canvas = document.getElementById("mainCanvas");
   let mainGl = canvas.getContext("webgl");
   let ctx = canvas.getContext("2d");
-  canvas.width = 640;
-  canvas.height = 480;
+  // canvas.width = 640;
+  // canvas.height = 480;
 
   let sketchCanvas = document.getElementById("sketchCanvas");
   // let sketchGl = sketchCanvas.getContext("webgl");
   let sketchCtx = sketchCanvas.getContext("2d");
-  sketchCanvas.width = 640;
-  sketchCanvas.height = 480;
+  // sketchCanvas.width = 640;
+  // sketchCanvas.height = 480;
 
   let cameraCanvas = document.getElementById("cameraCanvas");
   let compositeGl = cameraCanvas.getContext("webgl");
   // let cameraCtx = cameraCanvas.getContext("2d");
-  cameraCanvas.width = 640;
-  cameraCanvas.height = 480;
+  // cameraCanvas.width = 640;
+  // cameraCanvas.height = 480;
 
   let extraCanvas = document.getElementById("extraCanvas");
   let extraGl = extraCanvas.getContext("webgl");
   // let extraCtx = extraCanvas.getContext("2d");
-  extraCanvas.width = 640;
-  extraCanvas.height = 480;
+  // extraCanvas.width = 640;
+  // extraCanvas.height = 480;
 
   let left_dragging = false;
   let right_dragging = false;
@@ -235,36 +235,9 @@ if (localStorage.getItem("agreeToCC")) {
       gl.STATIC_DRAW
     );
 
-    // Build the element array buffer; this specifies the indices
-    // into the vertex arrays for each face's vertices.
-
-    // const indexBuffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-
-    // This array defines each face as two triangles, using the
-    // indices into the vertex array to specify each triangle's
-    // position.
-    // const indices = [
-    //   0,
-    //   1,
-    //   2,
-    //   0,
-    //   2,
-    //   3 // front
-    // ];
-
-    // Now send the element array to GL
-
-    // gl.bufferData(
-    //   gl.ELEMENT_ARRAY_BUFFER,
-    //   new Uint16Array(indices),
-    //   gl.STATIC_DRAW
-    // );
-
     return {
       position: positionBuffer,
-      textureCoord: textureCoordBuffer,
-      // indices: indexBuffer
+      textureCoord: textureCoordBuffer
     };
   }
 
@@ -322,15 +295,6 @@ if (localStorage.getItem("agreeToCC")) {
   }
 
   function drawScene(gl, programInfo, buffers, texture0, texture1) {
-//     gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
-//     gl.clearDepth(1.0); // Clear everything
-//     gl.enable(gl.DEPTH_TEST); // Enable depth testing
-//     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
-
-//     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    // Tell WebGL how to pull out the positions from the position
-    // buffer into the vertexPosition attribute.
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
     gl.vertexAttribPointer(
       programInfo.attribLocations.vertexPosition,
@@ -342,7 +306,6 @@ if (localStorage.getItem("agreeToCC")) {
     );
     gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
 
-    // tell webgl how to pull out the texture coordinates from buffer    
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
     gl.vertexAttribPointer(
       programInfo.attribLocations.textureCoord,
@@ -353,9 +316,6 @@ if (localStorage.getItem("agreeToCC")) {
       0
     );
     gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
-
-    // Tell WebGL which indices to use to index the vertices
-    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
 
     // Tell WebGL to use our program when drawing
     gl.useProgram(programInfo.program);
