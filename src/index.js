@@ -41,7 +41,7 @@
 import FriendlyWebSocket from "./FriendlyWebSocket";
 import { screenVert, screenFrag, multiplyVert, multiplyFrag } from "./shaders";
 import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
-import { mat4 } from './glMatrix.js';
+import { mat4 } from "./glMatrix.js";
 
 // if the code of conduct has been agreed to
 if (localStorage.getItem("agreeToCC")) {
@@ -79,7 +79,7 @@ if (localStorage.getItem("agreeToCC")) {
   sketchCanvas.height = 480;
 
   let cameraCanvas = document.getElementById("cameraCanvas");
-  let cameraGl = cameraCanvas.getContext("webgl");
+  let compositeGl = cameraCanvas.getContext("webgl");
   // let cameraCtx = cameraCanvas.getContext("2d");
   cameraCanvas.width = 640;
   cameraCanvas.height = 480;
@@ -110,13 +110,60 @@ if (localStorage.getItem("agreeToCC")) {
   let local_blend_mode = "multiply";
 
   // SHADERS ----------------------------------------------------
+  let compositeInfo, compositeProgram, compositeBuffers;
+  let mainInfo, mainProgram, mainBuffers;
 
   const setupShaders = () => {
-    let compositeProgram = initShaderProgram(
-      cameraGl,
+    compositeInfo = {
+      program: compositeProgram,
+      attribLocations: {
+        vertexPosition: gl.getAttribLocation(
+          compositeProgram,
+          "aVertexPosition"
+        )
+      },
+      uniformLocations: {
+        projectionMatrix: gl.getUniformLocation(
+          compositeProgram,
+          "uProjectionMatrix"
+        ),
+        modelViewMatrix: gl.getUniformLocation(
+          compositeProgram,
+          "uModelViewMatrix"
+        )
+      }
+    };
+    
+    compositeProgram = initShaderProgram(
+      compositeGl,
       multiplyVert,
       multiplyFrag
     );
+    
+    compositeBuffers = initBuffers(compositeGl);
+    
+    mainInfo = {
+      program: mainProgram,
+      attribLocations: {
+        vertexPosition: gl.getAttribLocation(
+          mainProgram,
+          "aVertexPosition"
+        )
+      },
+      uniformLocations: {
+        projectionMatrix: gl.getUniformLocation(
+          mainProgram,
+          "uProjectionMatrix"
+        ),
+        modelViewMatrix: gl.getUniformLocation(
+          mainProgram,
+          "uModelViewMatrix"
+        )
+      }
+    };
+
+    mainProgram = initShaderProgram(gl, screenVert, screenFrag);
+    mainBuffers = initBuffers(gl);
   };
 
   function initShaderProgram(gl, vsSource, fsSource) {
@@ -267,11 +314,20 @@ if (localStorage.getItem("agreeToCC")) {
     }
   }
 
-  const drawComposite = () => {};
+  const drawComposite = () => {
+    drawScene(compositeGl, compositeInfo, compositeBuffers);
+  };
 
-  const drawSketch = () => {};
+  const drawSketch = () => {
+    // drawScene(cameraGl)
+  };
 
-  const drawMain = () => {};
+  const drawMain = () => {
+    drawSketch();
+    drawComposite();
+    
+    drawScene(gl, mainInfo, mainBuffers);
+  };
 
   // ------------------------------------------------------------
   // setting up websocket signaling server
@@ -439,13 +495,15 @@ if (localStorage.getItem("agreeToCC")) {
         // startup the main output loop
         if (main_update_loop) {
           clearInterval(main_update_loop);
-          main_update_loop = setInterval(updateMainCanvas, update_rate);
+          // main_update_loop = setInterval(updateMainCanvas, update_rate);
+          main_update_loop = setInterval(drawMain, update_rate);
         } else {
-          main_update_loop = setInterval(updateMainCanvas, update_rate);
+          // main_update_loop = setInterval(updateMainCanvas, update_rate);
+          main_update_loop = setInterval(drawMain, update_rate);
         }
-      
+
         // setup gl
-      
+
         setupShaders();
       })
       .catch(err => {
@@ -564,117 +622,105 @@ if (localStorage.getItem("agreeToCC")) {
 
   // this fades away the sketch while drawing
   const updateSketchCanvas = () => {
-//     sketchCtx.save();
-
-//     // I can't decide what value this should be at
-//     // a longer tail on the fade looks better but
-//     // leaves the background with artifacts
-//     sketchCtx.globalAlpha = fadeAmount;
-//     sketchCtx.fillStyle = "black";
-//     sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-//     sketchCtx.fillStyle = "white";
-//     sketchCtx.restore();
-
-//     sketchCtx.globalAlpha = 1.0;
-
-//     // draw circle
-//     if (left_dragging) {
-//       sketchCtx.fillStyle = "white";
-//       sketchCtx.beginPath();
-//       sketchCtx.ellipse(
-//         mouse.x,
-//         mouse.y,
-//         brush_radius,
-//         brush_radius,
-//         Math.PI / 4,
-//         0,
-//         2 * Math.PI
-//       );
-//       sketchCtx.fill();
-//       sketchCtx.closePath();
-//     }
-
-//     // erase
-//     if (middle_dragging) {
-//       sketchCtx.fillStyle = "black";
-//       sketchCtx.beginPath();
-//       sketchCtx.ellipse(
-//         mouse.x,
-//         mouse.y,
-//         brush_radius,
-//         brush_radius,
-//         Math.PI / 4,
-//         0,
-//         2 * Math.PI
-//       );
-//       sketchCtx.fill();
-//       sketchCtx.closePath();
-//     }
-
-//     // draw text
-//     if (right_dragging) {
-//       let current_symbol = current_message.split("")[message_index];
-//       // space out message
-//       if (current_frame % 4 === 0) {
-//         // draw message
-//         sketchCtx.font = brush_radius * 4 + "px Times New Roman";
-//         sketchCtx.fillStyle = "white";
-//         sketchCtx.fillText(
-//           current_message.split("")[message_index],
-//           mouse.x + brush_radius,
-//           mouse.y + brush_radius
-//         );
-
-//         message_index++;
-//         if (message_index >= current_message.split("").length) {
-//           right_dragging = false;
-//         }
-//       }
-
-//       current_frame++;
-//     }
+    //     sketchCtx.save();
+    //     // I can't decide what value this should be at
+    //     // a longer tail on the fade looks better but
+    //     // leaves the background with artifacts
+    //     sketchCtx.globalAlpha = fadeAmount;
+    //     sketchCtx.fillStyle = "black";
+    //     sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+    //     sketchCtx.fillStyle = "white";
+    //     sketchCtx.restore();
+    //     sketchCtx.globalAlpha = 1.0;
+    //     // draw circle
+    //     if (left_dragging) {
+    //       sketchCtx.fillStyle = "white";
+    //       sketchCtx.beginPath();
+    //       sketchCtx.ellipse(
+    //         mouse.x,
+    //         mouse.y,
+    //         brush_radius,
+    //         brush_radius,
+    //         Math.PI / 4,
+    //         0,
+    //         2 * Math.PI
+    //       );
+    //       sketchCtx.fill();
+    //       sketchCtx.closePath();
+    //     }
+    //     // erase
+    //     if (middle_dragging) {
+    //       sketchCtx.fillStyle = "black";
+    //       sketchCtx.beginPath();
+    //       sketchCtx.ellipse(
+    //         mouse.x,
+    //         mouse.y,
+    //         brush_radius,
+    //         brush_radius,
+    //         Math.PI / 4,
+    //         0,
+    //         2 * Math.PI
+    //       );
+    //       sketchCtx.fill();
+    //       sketchCtx.closePath();
+    //     }
+    //     // draw text
+    //     if (right_dragging) {
+    //       let current_symbol = current_message.split("")[message_index];
+    //       // space out message
+    //       if (current_frame % 4 === 0) {
+    //         // draw message
+    //         sketchCtx.font = brush_radius * 4 + "px Times New Roman";
+    //         sketchCtx.fillStyle = "white";
+    //         sketchCtx.fillText(
+    //           current_message.split("")[message_index],
+    //           mouse.x + brush_radius,
+    //           mouse.y + brush_radius
+    //         );
+    //         message_index++;
+    //         if (message_index >= current_message.split("").length) {
+    //           right_dragging = false;
+    //         }
+    //       }
+    //       current_frame++;
+    //     }
   };
 
   // composite final output
   const updateMainCanvas = () => {
-//     if (fade) updateSketchCanvas();
-//     updateCameraCanvas();
-
-//     let v1 = document.querySelector("#local-composite");
-//     let v2 = document.querySelector("#peerRemote");
-
-//     extraCtx.drawImage(v2, 0, 0);
-//     ctx.drawImage(v1, 0, 0);
-//     // lighter(canvas, extraCanvas);
-
-//         ctx.globalCompositeOperation = "source-over";
-//         ctx.drawImage(v1, 0, 0);
-//         ctx.globalCompositeOperation = main_blend_mode;
-//         ctx.drawImage(v2, 0, 0);
+    //     if (fade) updateSketchCanvas();
+    //     updateCameraCanvas();
+    //     let v1 = document.querySelector("#local-composite");
+    //     let v2 = document.querySelector("#peerRemote");
+    //     extraCtx.drawImage(v2, 0, 0);
+    //     ctx.drawImage(v1, 0, 0);
+    //     // lighter(canvas, extraCanvas);
+    //         ctx.globalCompositeOperation = "source-over";
+    //         ctx.drawImage(v1, 0, 0);
+    //         ctx.globalCompositeOperation = main_blend_mode;
+    //         ctx.drawImage(v2, 0, 0);
   };
 
   // here I am masking out the video with the sketch (composite)
   const updateCameraCanvas = () => {
-//     let v1 = document.querySelector("#local-video");
-//     let v2 = document.querySelector("#local-sketch");
-
-//     extraCtx.drawImage(v2, 0, 0);
-//     cameraCtx.drawImage(v1, 0, 0);
-//     // multiply(cameraCanvas, extraCanvas);
-
-//     cameraCtx.globalCompositeOperation = "source-over";
-//     cameraCtx.drawImage(v1, 0, 0);
-//     cameraCtx.globalCompositeOperation = local_blend_mode;
-//     cameraCtx.drawImage(v2, 0, 0);
+    //     let v1 = document.querySelector("#local-video");
+    //     let v2 = document.querySelector("#local-sketch");
+    //     extraCtx.drawImage(v2, 0, 0);
+    //     cameraCtx.drawImage(v1, 0, 0);
+    //     // multiply(cameraCanvas, extraCanvas);
+    //     cameraCtx.globalCompositeOperation = "source-over";
+    //     cameraCtx.drawImage(v1, 0, 0);
+    //     cameraCtx.globalCompositeOperation = local_blend_mode;
+    //     cameraCtx.drawImage(v2, 0, 0);
   };
 
   // draw sketch that can be later be used as a mask
   const initializeSketchCanvas = () => {
-  //   sketchCtx.save();
-  //   sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-  //   sketchCtx.fillStyle = "black";
-  //   sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-  //   sketchCtx.restore();
+    //   sketchCtx.save();
+    //   sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+    //   sketchCtx.fillStyle = "black";
+    //   sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+    //   sketchCtx.restore();
   };
 
   let current_frame = 0;
@@ -812,7 +858,7 @@ if (localStorage.getItem("agreeToCC")) {
       2
     );
   };
-    
+
   const showLobby = () => {
     document.querySelector(".center").style.display = "flex";
   };
