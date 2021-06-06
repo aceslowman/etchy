@@ -37,19 +37,19 @@ const screenFrag = `
   void main() {
     vec2 uv0 = vTextureCoord;
     vec2 uv1 = vTextureCoord;
-    
-    if(texdim0.x > texdim0.y) { // if wide
-      // uv0.x *= texdim0.x / texdim0.y;
-    } else {
-      uv0.y *= texdim0.y / texdim0.x;
+   
+    if(texdim0.x < texdim0.y) {
+      float windowAspect = resolution.x / resolution.y;
+      float aspect = resolution.x / resolution.y;
+      uv0.y /= ;
     }
     
-    if(texdim1.x > texdim1.y) { // if wide
-      // uv1.x *= texdim1.x / texdim1.y;
-    } else {
-      uv1.y *= texdim1.y / texdim1.x;
+    if(texdim1.x < texdim1.y) {
+      float windowAspect = resolution.x / resolution.y;
+      float aspect = resolution.x / resolution.y;
+      uv1.y /= ;
     }
- 
+    
     vec3 v0 = texture2D(tex0, uv0).rgb;
     vec3 v1 = texture2D(tex1, uv1).rgb;
     
@@ -85,16 +85,12 @@ const multiplyFrag = `
     vec2 uv0 = vTextureCoord;
     vec2 uv1 = vTextureCoord;
    
-    if(texdim0.x > texdim0.y) { // if wide
-      // uv0.x *= texdim0.x / texdim0.y;
-    } else {
-      uv0.y *= texdim0.y / texdim0.x;
+    if(texdim0.x < texdim0.y) {
+      uv0.y /= texdim0.y / texdim0.x;
     }
     
-    if(texdim1.x > texdim1.y) { // if wide
-      // uv1.x *= texdim1.x / texdim1.y;
-    } else {
-      uv1.y *= texdim1.y / texdim1.x;
+    if(texdim1.x < texdim1.y) {
+      uv1.y /= texdim1.y / texdim1.x;
     }
  
     vec3 v0 = texture2D(tex0, uv0).rgb;
