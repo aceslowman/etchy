@@ -430,14 +430,14 @@ if (localStorage.getItem("agreeToCC")) {
       if (current_frame % 4 === 0) {
         // console.log('sym', current_symbol)
         // console.log(mouse)
-        console.log(brush_radius * 4 + "px Times New Roman")
+        // console.log(brush_radius * 4 + "px Times New Roman")
         // draw message
-        sketchCtx.font = brush_radius * 4 + "80px Times New Roman";
+        sketchCtx.font = brush_radius * 4 + "px Times New Roman";
         sketchCtx.fillStyle = "white";
         sketchCtx.fillText(
           current_symbol,
-          mouse.x + brush_radius,
-          mouse.y + brush_radius
+          mouse.x,
+          mouse.y
         );
                 
         message_index++;
@@ -494,8 +494,8 @@ if (localStorage.getItem("agreeToCC")) {
       );
 
       if (isDisconnectPermanent) {
-        // alert("the person you were connected to has disappeared");
-        // reset();
+        alert("the person you were connected to has disappeared");
+        reset();
       }
     };
 
