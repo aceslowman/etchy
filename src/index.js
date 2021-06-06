@@ -248,8 +248,8 @@ if (localStorage.getItem("agreeToCC")) {
       gl.TEXTURE_2D,
       0,
       gl.RGBA,
-      1,
-      1,
+      1, // just to init
+      1, // just to init
       0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
@@ -266,17 +266,13 @@ if (localStorage.getItem("agreeToCC")) {
   }
 
   function updateTexture(gl, texture, video) {
-    const level = 0;
-    const internalFormat = gl.RGBA;
-    const srcFormat = gl.RGBA;
-    const srcType = gl.UNSIGNED_BYTE;
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(
       gl.TEXTURE_2D,
-      level,
-      internalFormat,
-      srcFormat,
-      srcType,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
       video
     );
   }
@@ -319,6 +315,7 @@ if (localStorage.getItem("agreeToCC")) {
  
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
+  
   // Draw the scene repeatedly
   let then = 0;
   const drawMain = now => {
