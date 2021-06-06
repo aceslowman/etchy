@@ -144,14 +144,6 @@ if (localStorage.getItem("agreeToCC")) {
         )
       },
       uniformLocations: {
-        projectionMatrix: compositeGl.getUniformLocation(
-          compositeProgram,
-          "uProjectionMatrix"
-        ),
-        modelViewMatrix: compositeGl.getUniformLocation(
-          compositeProgram,
-          "uModelViewMatrix"
-        )
       }
     };
 
@@ -169,14 +161,7 @@ if (localStorage.getItem("agreeToCC")) {
         textureCoord: mainGl.getAttribLocation(mainProgram, "aTextureCoord")
       },
       uniformLocations: {
-        projectionMatrix: mainGl.getUniformLocation(
-          mainProgram,
-          "uProjectionMatrix"
-        ),
-        modelViewMatrix: mainGl.getUniformLocation(
-          mainProgram,
-          "uModelViewMatrix"
-        )
+
       }
     };
   };
@@ -349,7 +334,7 @@ if (localStorage.getItem("agreeToCC")) {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
     gl.vertexAttribPointer(
       programInfo.attribLocations.vertexPosition,
-      2,
+      3,
       gl.FLOAT,
       false,
       0,
@@ -370,7 +355,7 @@ if (localStorage.getItem("agreeToCC")) {
     gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
 
     // Tell WebGL which indices to use to index the vertices
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
 
     // Tell WebGL to use our program when drawing
     gl.useProgram(programInfo.program);
