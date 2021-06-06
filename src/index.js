@@ -228,19 +228,10 @@ if (localStorage.getItem("agreeToCC")) {
     // Now create an array of positions for the cube.
 
     const positions = [
-      // Front face
-      -1.0,
-      -1.0,
-      1.0,
-      1.0,
-      -1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      -1.0,
-      1.0,
-      1.0
+      -1.0,  1.0,
+       1.0,  1.0,
+      -1.0, -1.0,
+       1.0, -1.0,
     ];
 
     // Now pass the list of positions into WebGL to build the
@@ -255,15 +246,10 @@ if (localStorage.getItem("agreeToCC")) {
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
 
     const textureCoordinates = [
-      // Front
-      0.0,
-      0.0,
-      1.0,
-      0.0,
-      1.0,
-      1.0,
-      0.0,
-      1.0
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
     ];
 
     gl.bufferData(
