@@ -74,19 +74,19 @@ if (localStorage.getItem("agreeToCC")) {
 
   let sketchCanvas = document.getElementById("sketchCanvas");
   let sketchGl = sketchCanvas.getContext("webgl");
-  let sketchCtx = sketchCanvas.getContext("2d");
+  // let sketchCtx = sketchCanvas.getContext("2d");
   sketchCanvas.width = 640;
   sketchCanvas.height = 480;
 
   let cameraCanvas = document.getElementById("cameraCanvas");
   let cameraGl = cameraCanvas.getContext("webgl");
-  let cameraCtx = cameraCanvas.getContext("2d");
+  // let cameraCtx = cameraCanvas.getContext("2d");
   cameraCanvas.width = 640;
   cameraCanvas.height = 480;
 
   let extraCanvas = document.getElementById("extraCanvas");
   let extraGl = extraCanvas.getContext("webgl");
-  let extraCtx = extraCanvas.getContext("2d");
+  // let extraCtx = extraCanvas.getContext("2d");
   extraCanvas.width = 640;
   extraCanvas.height = 480;
 
@@ -337,10 +337,10 @@ if (localStorage.getItem("agreeToCC")) {
       ele.playsInline = true;
       ele.muted = true;
 
-      document.getElementById("local-video").play();
-      document.getElementById("local-sketch").play();
-      document.getElementById("local-composite").play();
-      document.getElementById("peerRemote").play();
+      // document.getElementById("local-video").play();
+      // document.getElementById("local-sketch").play();
+      // document.getElementById("local-composite").play();
+      // document.getElementById("peerRemote").play();
     };
 
     // TODO: probably still needs to be added
@@ -431,10 +431,10 @@ if (localStorage.getItem("agreeToCC")) {
         document.getElementById("local-sketch").srcObject = sketchStream;
         document.getElementById("local-composite").srcObject = compositeStream;
 
-        document.getElementById("local-video").play();
-        document.getElementById("local-sketch").play();
-        document.getElementById("local-composite").play();
-        document.getElementById("peerRemote").play();
+        // document.getElementById("local-video").play();
+        // document.getElementById("local-sketch").play();
+        // document.getElementById("local-composite").play();
+        // document.getElementById("peerRemote").play();
 
         // startup the main output loop
         if (main_update_loop) {
@@ -443,6 +443,10 @@ if (localStorage.getItem("agreeToCC")) {
         } else {
           main_update_loop = setInterval(updateMainCanvas, update_rate);
         }
+      
+        // setup gl
+      
+        setupShaders();
       })
       .catch(err => {
         console.error(err);
@@ -560,117 +564,117 @@ if (localStorage.getItem("agreeToCC")) {
 
   // this fades away the sketch while drawing
   const updateSketchCanvas = () => {
-    sketchCtx.save();
+//     sketchCtx.save();
 
-    // I can't decide what value this should be at
-    // a longer tail on the fade looks better but
-    // leaves the background with artifacts
-    sketchCtx.globalAlpha = fadeAmount;
-    sketchCtx.fillStyle = "black";
-    sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-    sketchCtx.fillStyle = "white";
-    sketchCtx.restore();
+//     // I can't decide what value this should be at
+//     // a longer tail on the fade looks better but
+//     // leaves the background with artifacts
+//     sketchCtx.globalAlpha = fadeAmount;
+//     sketchCtx.fillStyle = "black";
+//     sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+//     sketchCtx.fillStyle = "white";
+//     sketchCtx.restore();
 
-    sketchCtx.globalAlpha = 1.0;
+//     sketchCtx.globalAlpha = 1.0;
 
-    // draw circle
-    if (left_dragging) {
-      sketchCtx.fillStyle = "white";
-      sketchCtx.beginPath();
-      sketchCtx.ellipse(
-        mouse.x,
-        mouse.y,
-        brush_radius,
-        brush_radius,
-        Math.PI / 4,
-        0,
-        2 * Math.PI
-      );
-      sketchCtx.fill();
-      sketchCtx.closePath();
-    }
+//     // draw circle
+//     if (left_dragging) {
+//       sketchCtx.fillStyle = "white";
+//       sketchCtx.beginPath();
+//       sketchCtx.ellipse(
+//         mouse.x,
+//         mouse.y,
+//         brush_radius,
+//         brush_radius,
+//         Math.PI / 4,
+//         0,
+//         2 * Math.PI
+//       );
+//       sketchCtx.fill();
+//       sketchCtx.closePath();
+//     }
 
-    // erase
-    if (middle_dragging) {
-      sketchCtx.fillStyle = "black";
-      sketchCtx.beginPath();
-      sketchCtx.ellipse(
-        mouse.x,
-        mouse.y,
-        brush_radius,
-        brush_radius,
-        Math.PI / 4,
-        0,
-        2 * Math.PI
-      );
-      sketchCtx.fill();
-      sketchCtx.closePath();
-    }
+//     // erase
+//     if (middle_dragging) {
+//       sketchCtx.fillStyle = "black";
+//       sketchCtx.beginPath();
+//       sketchCtx.ellipse(
+//         mouse.x,
+//         mouse.y,
+//         brush_radius,
+//         brush_radius,
+//         Math.PI / 4,
+//         0,
+//         2 * Math.PI
+//       );
+//       sketchCtx.fill();
+//       sketchCtx.closePath();
+//     }
 
-    // draw text
-    if (right_dragging) {
-      let current_symbol = current_message.split("")[message_index];
-      // space out message
-      if (current_frame % 4 === 0) {
-        // draw message
-        sketchCtx.font = brush_radius * 4 + "px Times New Roman";
-        sketchCtx.fillStyle = "white";
-        sketchCtx.fillText(
-          current_message.split("")[message_index],
-          mouse.x + brush_radius,
-          mouse.y + brush_radius
-        );
+//     // draw text
+//     if (right_dragging) {
+//       let current_symbol = current_message.split("")[message_index];
+//       // space out message
+//       if (current_frame % 4 === 0) {
+//         // draw message
+//         sketchCtx.font = brush_radius * 4 + "px Times New Roman";
+//         sketchCtx.fillStyle = "white";
+//         sketchCtx.fillText(
+//           current_message.split("")[message_index],
+//           mouse.x + brush_radius,
+//           mouse.y + brush_radius
+//         );
 
-        message_index++;
-        if (message_index >= current_message.split("").length) {
-          right_dragging = false;
-        }
-      }
+//         message_index++;
+//         if (message_index >= current_message.split("").length) {
+//           right_dragging = false;
+//         }
+//       }
 
-      current_frame++;
-    }
+//       current_frame++;
+//     }
   };
 
   // composite final output
   const updateMainCanvas = () => {
-    if (fade) updateSketchCanvas();
-    updateCameraCanvas();
+//     if (fade) updateSketchCanvas();
+//     updateCameraCanvas();
 
-    let v1 = document.querySelector("#local-composite");
-    let v2 = document.querySelector("#peerRemote");
+//     let v1 = document.querySelector("#local-composite");
+//     let v2 = document.querySelector("#peerRemote");
 
-    extraCtx.drawImage(v2, 0, 0);
-    ctx.drawImage(v1, 0, 0);
-    // lighter(canvas, extraCanvas);
+//     extraCtx.drawImage(v2, 0, 0);
+//     ctx.drawImage(v1, 0, 0);
+//     // lighter(canvas, extraCanvas);
 
-        ctx.globalCompositeOperation = "source-over";
-        ctx.drawImage(v1, 0, 0);
-        ctx.globalCompositeOperation = main_blend_mode;
-        ctx.drawImage(v2, 0, 0);
+//         ctx.globalCompositeOperation = "source-over";
+//         ctx.drawImage(v1, 0, 0);
+//         ctx.globalCompositeOperation = main_blend_mode;
+//         ctx.drawImage(v2, 0, 0);
   };
 
   // here I am masking out the video with the sketch (composite)
   const updateCameraCanvas = () => {
-    let v1 = document.querySelector("#local-video");
-    let v2 = document.querySelector("#local-sketch");
+//     let v1 = document.querySelector("#local-video");
+//     let v2 = document.querySelector("#local-sketch");
 
-    extraCtx.drawImage(v2, 0, 0);
-    cameraCtx.drawImage(v1, 0, 0);
-    // multiply(cameraCanvas, extraCanvas);
+//     extraCtx.drawImage(v2, 0, 0);
+//     cameraCtx.drawImage(v1, 0, 0);
+//     // multiply(cameraCanvas, extraCanvas);
 
-    cameraCtx.globalCompositeOperation = "source-over";
-    cameraCtx.drawImage(v1, 0, 0);
-    cameraCtx.globalCompositeOperation = local_blend_mode;
-    cameraCtx.drawImage(v2, 0, 0);
+//     cameraCtx.globalCompositeOperation = "source-over";
+//     cameraCtx.drawImage(v1, 0, 0);
+//     cameraCtx.globalCompositeOperation = local_blend_mode;
+//     cameraCtx.drawImage(v2, 0, 0);
   };
 
   // draw sketch that can be later be used as a mask
   const initializeSketchCanvas = () => {
-    sketchCtx.save();
-    sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-    sketchCtx.fillStyle = "black";
-    sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-    sketchCtx.restore();
+  //   sketchCtx.save();
+  //   sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+  //   sketchCtx.fillStyle = "black";
+  //   sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+  //   sketchCtx.restore();
   };
 
   let current_frame = 0;
@@ -808,8 +812,7 @@ if (localStorage.getItem("agreeToCC")) {
       2
     );
   };
-  
-  
+    
   const showLobby = () => {
     document.querySelector(".center").style.display = "flex";
   };

@@ -24,7 +24,7 @@ const multiplyFrag = `
   }
 `;
 
-module.export = {
+module.exports = {
   screenVert,
   screenFrag,
   multiplyVert,
