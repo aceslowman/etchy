@@ -10,9 +10,9 @@ async function checkStatePermanent(_con, iceState) {
 
   let firstFlag = await isPermanentDisconnect();
 
-  await customdelay(2000);
+  await customdelay(4000);
 
-  let secondFlag = await isPermanentDisconnect(); //Call this func again after 2 seconds to check whether data is still coming in.
+  let secondFlag = await isPermanentDisconnect(); //Call this func again after 4 seconds to check whether data is still coming in.
 
   if (secondFlag) {
     //If permanent disconnect then we hangup i.e no audio/video is fllowing

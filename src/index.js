@@ -89,7 +89,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   let fade = true;
   let fadeAmount = 0.1;
-  let update_rate = 500;
+  let update_rate = 50;
   let brush_radius = 20;
 
   let mouse;
@@ -330,7 +330,7 @@ if (localStorage.getItem("agreeToCC")) {
       updateTexture(mainGl, main_texture1, v2);
     }
 
-    drawSketch();
+    // drawSketch();
     drawComposite();
 
     drawScene(mainGl, mainInfo, mainBuffers, main_texture0, main_texture1);
@@ -591,10 +591,10 @@ if (localStorage.getItem("agreeToCC")) {
         // startup the main output loop
         if (main_update_loop) {
           clearInterval(main_update_loop);
-          main_update_loop = setInterval(updateMainCanvas, update_rate);
+          main_update_loop = setInterval(drawSketch, update_rate);
           // main_update_loop = setInterval(drawMain, update_rate);
         } else {
-          main_update_loop = setInterval(updateMainCanvas, update_rate);
+          main_update_loop = setInterval(drawSketch, update_rate);
         //   main_update_loop = setInterval(drawMain, update_rate);
         }
 
