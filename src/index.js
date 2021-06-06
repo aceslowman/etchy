@@ -40,50 +40,11 @@
 
 import FriendlyWebSocket from "./FriendlyWebSocket";
 import { screenVert, screenFrag, multiplyVert, multiplyFrag } from "./shaders";
-// import ContextBlender from "./ContextBlender";
 import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
 
 // if the code of conduct has been agreed to
 if (localStorage.getItem("agreeToCC")) {
   document.getElementById("CODEOFCONDUCT").style.display = "none";
-
-  // adapted from: https://stackoverflow.com/questions/25158696/blend-modemultiply-in-internet-explorer
-  // this helps make 'multiply' more browser compatible!
-  // iOS doesn't play along with globalCompositeOperation = 'multiply'
-  function multiply(cA, cB) {
-    // console.log([cA,cB])
-    let a = cA.getContext("2d").getImageData(0, 0, cA.width, cA.height);
-    let cA_data = a.data;
-    let b = cB.getContext("2d").getImageData(0, 0, cB.width, cB.height);
-    let cB_data = b.data;
-
-    for (var i = 0; i < cB_data.length; i += 4) {
-      cB_data[i] *= cA_data[i] / 255;
-      cB_data[i + 1] *= cA_data[i + 1] / 255;
-      cB_data[i + 2] *= cA_data[i + 2] / 255;
-    }
-
-    cA.getContext("2d").drawImage(cB, 0, 0);
-    // cA.getContext('2d').putImageData(b, 0, 0);
-  }
-
-  // https://www.w3.org/TR/compositing-1/#blendingscreen
-  function lighter(cA, cB) {
-    // console.log([cA,cB])
-    let a = cA.getContext("2d").getImageData(0, 0, cA.width, cA.height);
-    let cA_data = a.data;
-    let b = cB.getContext("2d").getImageData(0, 0, cB.width, cB.height);
-    let cB_data = b.data;
-
-    for (var i = 0; i < cB_data.length; i += 4) {
-      cB_data[i] = Math.max(cB_data[i], cA_data[i]);
-      cB_data[i + 1] = Math.max(cB_data[i + 1], cA_data[i + 1]);
-      cB_data[i + 2] = Math.max(cB_data[i + 2], cA_data[i + 2]);
-    }
-
-    cA.getContext("2d").drawImage(cB, 0, 0);
-    // cA.getContext('2d').putImageData(b, 0, 0);
-  }
 
   // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
   function guidGenerator() {
@@ -105,25 +66,22 @@ if (localStorage.getItem("agreeToCC")) {
   let peersElement = document.querySelector("#peers");
 
   let canvas = document.getElementById("mainCanvas");
-  let ctx = canvas.getContext("2d");
+  let gl = canvas.getContext("2d");
   canvas.width = 640;
   canvas.height = 480;
 
   let sketchCanvas = document.getElementById("sketchCanvas");
-  // let sketchCtx = sketchCanvas.getContext("2d");
-  let sketchCtx = sketchCanvas.getContext("webgl");
+  let sketchGl = sketchCanvas.getContext("webgl");
   sketchCanvas.width = 640;
   sketchCanvas.height = 480;
 
   let cameraCanvas = document.getElementById("cameraCanvas");
-  // let cameraCtx = cameraCanvas.getContext("2d");
-  let cameraCtx = cameraCanvas.getContext("webgl");
+  let cameraGl = cameraCanvas.getContext("webgl");
   cameraCanvas.width = 640;
   cameraCanvas.height = 480;
 
   let extraCanvas = document.getElementById("extraCanvas");
-  // let extraCtx = extraCanvas.getContext("2d");
-  let extraCtx = extraCanvas.getContext("webgl");
+  let extraGl = extraCanvas.getContext("webgl");
   extraCanvas.width = 640;
   extraCanvas.height = 480;
 
@@ -145,18 +103,86 @@ if (localStorage.getItem("agreeToCC")) {
 
   let main_blend_mode = "screen";
   let local_blend_mode = "multiply";
-  
+
   // SHADERS ----------------------------------------------------
-  
+
   const setupShaders = () => {
-    // let shaderProgram = buildShaderProgram()
+    // import { screenVert, screenFrag, multiplyVert, multiplyFrag } from "./shaders";
+    let compositeProgram = cameraGl.createProgram();
+
+    let compositeVertShader = createShader(
+      cameraGl,
+      multiplyVert,
+      cameraGl.VERTEX_SHADER
+    );
+    let compositeFragShader = createShader(
+      cameraGl,
+      multiplyFrag,
+      cameraGl.FRAGMENT_SHADER
+    );
+
+    cameraGl.attachShader(compositeProgram, compositeVertShader);
+    cameraGl.attachShader(compositeProgram, compositeFragShader);
+
+    cameraGl.linkProgram(compositeProgram);
+
+    if (
+      !cameraGl.getProgramParameter(compositeProgram, cameraGl.LINK_STATUS)
+    ) {
+      var info = cameraGl.getProgramInfoLog(compositeProgram);
+      throw "Could not compile WebGL program. \n\n" + info;
+    }
+  };
+
+  function createShader(gl, sourceCode, type) {
+    // Compiles either a shader of type gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
+    var shader = gl.createShader(type);
+    gl.shaderSource(shader, sourceCode);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      var info = gl.getShaderInfoLog(shader);
+      throw "Could not compile WebGL program. \n\n" + info;
+    }
+
+    return shader;
+  }
+
+  function initBuffers(gl) {
+    // Create a buffer for the square's positions.
+
+    const positionBuffer = gl.createBuffer();
+
+    // Select the positionBuffer as the one to apply buffer
+    // operations to from here out.
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+    // Now create an array of positions for the square.
+
+    const positions = [-1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0];
+
+    // Now pass the list of positions into WebGL to build the
+    // shape. We do this by creating a Float32Array from the
+    // JavaScript array, then use it to fill the current buffer.
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+    return {
+      position: positionBuffer
+    };
+  }
+  
+  const drawComposite = () => {
     
-    let compositeProgram = cameraCtx.createProgram();
+  }
+  
+  const drawSketch = () => {
     
-    cameraCtx.attachShader(compositeProgram, compositeVertShader);
-    cameraCtx.attachShader(compositeProgram, compositeFragShader);
+  }
+  
+  const drawMain = () => {
     
-    cameraCtx.linkProgram(compositeProgram);
   }
 
   // ------------------------------------------------------------
