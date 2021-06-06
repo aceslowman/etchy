@@ -15,8 +15,9 @@ const screenFrag = `
   precision highp float;
   uniform sampler2D tex0;
   uniform sampler2D tex1;
-  uniform vec2 resolution0;
-  uniform vec2 resolution1;
+  uniform vec2 resolution;
+  uniform vec2 texdim0;
+  uniform vec2 texdim1;
   
   varying highp vec2 vTextureCoord;
   
@@ -34,8 +35,37 @@ const screenFrag = `
   }
   
   void main() {
-    vec3 v0 = texture2D(tex0, vTextureCoord).rgb;
-    vec3 v1 = texture2D(tex1, vTextureCoord).rgb;
+    vec2 uv0 = vTextureCoord;
+    vec2 uv1 = vTextureCoord;
+    
+    if(resolution.x > resolution.y) { // fit vertical
+      float canvasAspect = resolution.x / resolution.y;
+      float aspect0 = texdim0.x / texdim0.y;
+      float aspect1 = texdim1.x / texdim1.y;
+      
+      uv0.x *= resolution * aspect0;
+      uv0.x -= (resolution * aspect0) / 2.0;
+      uv0.x += 0.5;
+      
+      uv1.x *= resolution * aspect1;
+      uv1.x -= (resolution * aspect1) / 2.0;
+      uv1.x += 0.5;
+    } else {                            // fit horizontal
+      float canvasAspect = resolution.y / resolution.x;
+      float aspect0 = texdim0.y / texdim0.x;
+      float aspect1 = texdim1.y / texdim1.x;
+      
+      uv0.y *= resolution * aspect0;
+      uv0.y -= (resolution * aspect0) / 2.0;
+      uv0.y += 0.5;
+      
+      uv1.y *= resolution * aspect1;
+      uv1.y -= (resolution * aspect1) / 2.0;
+      uv1.y += 0.5;
+    }
+  
+    vec3 v0 = texture2D(tex0, uv0).rgb;
+    vec3 v1 = texture2D(tex1, uv1).rgb;
     
     gl_FragColor = vec4(blendScreen(v0,v1,1.0),1.0);
   }
@@ -58,8 +88,10 @@ const multiplyFrag = `
   precision highp float;
   uniform sampler2D tex0;
   uniform sampler2D tex1;
-  uniform vec2 resolution0;
-  uniform vec2 resolution1;
+  
+  uniform vec2 resolution;
+  uniform vec2 texdim0;
+  uniform vec2 texdim1;
   
   varying highp vec2 vTextureCoord;
   
@@ -67,14 +99,34 @@ const multiplyFrag = `
     vec2 uv0 = vTextureCoord;
     vec2 uv1 = vTextureCoord;
     
-    vec2 
-    
-    if(resolution0.u > resolution0.y) {
+    if(resolution.x > resolution.y) { // fit vertical
+      float canvasAspect = resolution.x / resolution.y;
+      float aspect0 = texdim0.x / texdim0.y;
+      float aspect1 = texdim1.x / texdim1.y;
       
+      uv0.x *= resolution.x * aspect0.x;
+      uv0.x -= (resolution.x * aspect0.x) / 2.0;
+      uv0.x += 0.5;
+      
+      uv1.x *= resolution.x * aspect1.x;
+      uv1.x -= (resolution.x * aspect1.x) / 2.0;
+      uv1.x += 0.5;
+    } else {                            // fit horizontal
+      float canvasAspect = resolution.y / resolution.x;
+      float aspect0 = texdim0.y / texdim0.x;
+      float aspect1 = texdim1.y / texdim1.x;
+      
+      uv0.y *= resolution * aspect0;
+      uv0.y -= (resolution * aspect0) / 2.0;
+      uv0.y += 0.5;
+      
+      uv1.y *= resolution * aspect1;
+      uv1.y -= (resolution * aspect1) / 2.0;
+      uv1.y += 0.5;
     }
   
-    vec3 v0 = texture2D(tex0, vTextureCoord).rgb;
-    vec3 v1 = texture2D(tex1, vTextureCoord).rgb;
+    vec3 v0 = texture2D(tex0, uv0).rgb;
+    vec3 v1 = texture2D(tex1, uv1).rgb;
     
     gl_FragColor = vec4(v0 * v1,1.0);
   }
