@@ -341,7 +341,7 @@ if (localStorage.getItem("agreeToCC")) {
 
     const fieldOfView = (45 * Math.PI) / 180; // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-    const zNear = 0.1;
+    const zNear = 0.0;
     const zFar = 100.0;
     const projectionMatrix = mat4.create();
 
@@ -356,7 +356,7 @@ if (localStorage.getItem("agreeToCC")) {
     mat4.translate(
       modelViewMatrix, // destination matrix
       modelViewMatrix, // matrix to translate
-      [-0.0, 0.0, -6.0]
+      [0.5, 0.5, -0.0]
     ); // amount to translate
 
     // Tell WebGL how to pull out the positions from the position
@@ -432,7 +432,7 @@ if (localStorage.getItem("agreeToCC")) {
     gl.uniform1i(programInfo.uniformLocations.tex1, 1);
 
     {
-      const vertexCount = 4;
+      const vertexCount = 6;
       const type = gl.UNSIGNED_SHORT;
       const offset = 0;
       gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
@@ -456,16 +456,10 @@ if (localStorage.getItem("agreeToCC")) {
     drawSketch();
     drawComposite();
 
-    drawScene(
-      mainGl, 
-      mainInfo, 
-      mainBuffers, 
-      main_texture0, 
-      main_texture1
-    );
+    drawScene(mainGl, mainInfo, mainBuffers, main_texture0, main_texture1);
 
     requestAnimationFrame(drawMain);
-  };  
+  };
 
   const drawComposite = () => {
     let v1 = document.querySelector("#local-video");
@@ -725,7 +719,7 @@ if (localStorage.getItem("agreeToCC")) {
         //   // main_update_loop = setInterval(updateMainCanvas, update_rate);
         //   main_update_loop = setInterval(drawMain, update_rate);
         // }
-      
+
         requestAnimationFrame(drawMain);
       })
       .catch(err => {
