@@ -41,6 +41,7 @@
 import FriendlyWebSocket from "./FriendlyWebSocket";
 import { screenVert, screenFrag, multiplyVert, multiplyFrag } from "./shaders";
 import { isPermanentDisconnect, checkStatePermanent } from "./webrtc_utils";
+import { mat4 } from './glMatrix.js';
 
 // if the code of conduct has been agreed to
 if (localStorage.getItem("agreeToCC")) {
@@ -66,22 +67,26 @@ if (localStorage.getItem("agreeToCC")) {
   let peersElement = document.querySelector("#peers");
 
   let canvas = document.getElementById("mainCanvas");
-  let gl = canvas.getContext("2d");
+  let gl = canvas.getContext("webgl");
+  let ctx = canvas.getContext("2d");
   canvas.width = 640;
   canvas.height = 480;
 
   let sketchCanvas = document.getElementById("sketchCanvas");
   let sketchGl = sketchCanvas.getContext("webgl");
+  let sketchCtx = sketchCanvas.getContext("2d");
   sketchCanvas.width = 640;
   sketchCanvas.height = 480;
 
   let cameraCanvas = document.getElementById("cameraCanvas");
   let cameraGl = cameraCanvas.getContext("webgl");
+  let cameraCtx = cameraCanvas.getContext("2d");
   cameraCanvas.width = 640;
   cameraCanvas.height = 480;
 
   let extraCanvas = document.getElementById("extraCanvas");
   let extraGl = extraCanvas.getContext("webgl");
+  let extraCtx = extraCanvas.getContext("2d");
   extraCanvas.width = 640;
   extraCanvas.height = 480;
 
@@ -107,32 +112,36 @@ if (localStorage.getItem("agreeToCC")) {
   // SHADERS ----------------------------------------------------
 
   const setupShaders = () => {
-    // import { screenVert, screenFrag, multiplyVert, multiplyFrag } from "./shaders";
-    let compositeProgram = cameraGl.createProgram();
-
-    let compositeVertShader = createShader(
+    let compositeProgram = initShaderProgram(
       cameraGl,
       multiplyVert,
-      cameraGl.VERTEX_SHADER
+      multiplyFrag
     );
-    let compositeFragShader = createShader(
-      cameraGl,
-      multiplyFrag,
-      cameraGl.FRAGMENT_SHADER
-    );
-
-    cameraGl.attachShader(compositeProgram, compositeVertShader);
-    cameraGl.attachShader(compositeProgram, compositeFragShader);
-
-    cameraGl.linkProgram(compositeProgram);
-
-    if (
-      !cameraGl.getProgramParameter(compositeProgram, cameraGl.LINK_STATUS)
-    ) {
-      var info = cameraGl.getProgramInfoLog(compositeProgram);
-      throw "Could not compile WebGL program. \n\n" + info;
-    }
   };
+
+  function initShaderProgram(gl, vsSource, fsSource) {
+    const vertexShader = createShader(gl, vsSource, gl.VERTEX_SHADER);
+    const fragmentShader = createShader(gl, fsSource, gl.FRAGMENT_SHADER);
+
+    // Create the shader program
+
+    const shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    // If creating the shader program failed, alert
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      alert(
+        "Unable to initialize the shader program: " +
+          gl.getProgramInfoLog(shaderProgram)
+      );
+      return null;
+    }
+
+    return shaderProgram;
+  }
 
   function createShader(gl, sourceCode, type) {
     // Compiles either a shader of type gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
@@ -172,18 +181,97 @@ if (localStorage.getItem("agreeToCC")) {
       position: positionBuffer
     };
   }
-  
-  const drawComposite = () => {
-    
+
+  function drawScene(gl, programInfo, buffers) {
+    gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
+    gl.clearDepth(1.0); // Clear everything
+    gl.enable(gl.DEPTH_TEST); // Enable depth testing
+    gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+
+    // Clear the canvas before we start drawing on it.
+
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    // Create a perspective matrix, a special matrix that is
+    // used to simulate the distortion of perspective in a camera.
+    // Our field of view is 45 degrees, with a width/height
+    // ratio that matches the display size of the canvas
+    // and we only want to see objects between 0.1 units
+    // and 100 units away from the camera.
+
+    const fieldOfView = (45 * Math.PI) / 180; // in radians
+    const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    const zNear = 0.1;
+    const zFar = 100.0;
+    const projectionMatrix = mat4.create();
+
+    // note: glmatrix.js always has the first argument
+    // as the destination to receive the result.
+    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+
+    // Set the drawing position to the "identity" point, which is
+    // the center of the scene.
+    const modelViewMatrix = mat4.create();
+
+    // Now move the drawing position a bit to where we want to
+    // start drawing the square.
+
+    mat4.translate(
+      modelViewMatrix, // destination matrix
+      modelViewMatrix, // matrix to translate
+      [-0.0, 0.0, -6.0]
+    ); // amount to translate
+
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute.
+    {
+      const numComponents = 2; // pull out 2 values per iteration
+      const type = gl.FLOAT; // the data in the buffer is 32bit floats
+      const normalize = false; // don't normalize
+      const stride = 0; // how many bytes to get from one set of values to the next
+      // 0 = use type and numComponents above
+      const offset = 0; // how many bytes inside the buffer to start from
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+      gl.vertexAttribPointer(
+        programInfo.attribLocations.vertexPosition,
+        numComponents,
+        type,
+        normalize,
+        stride,
+        offset
+      );
+      gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+    }
+
+    // Tell WebGL to use our program when drawing
+
+    gl.useProgram(programInfo.program);
+
+    // Set the shader uniforms
+
+    gl.uniformMatrix4fv(
+      programInfo.uniformLocations.projectionMatrix,
+      false,
+      projectionMatrix
+    );
+    gl.uniformMatrix4fv(
+      programInfo.uniformLocations.modelViewMatrix,
+      false,
+      modelViewMatrix
+    );
+
+    {
+      const offset = 0;
+      const vertexCount = 4;
+      gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+    }
   }
-  
-  const drawSketch = () => {
-    
-  }
-  
-  const drawMain = () => {
-    
-  }
+
+  const drawComposite = () => {};
+
+  const drawSketch = () => {};
+
+  const drawMain = () => {};
 
   // ------------------------------------------------------------
   // setting up websocket signaling server
@@ -577,12 +665,12 @@ if (localStorage.getItem("agreeToCC")) {
 
     extraCtx.drawImage(v2, 0, 0);
     ctx.drawImage(v1, 0, 0);
-    lighter(canvas, extraCanvas);
+    // lighter(canvas, extraCanvas);
 
-    //     ctx.globalCompositeOperation = "source-over";
-    //     ctx.drawImage(v1, 0, 0);
-    //     ctx.globalCompositeOperation = main_blend_mode;
-    //     ctx.drawImage(v2, 0, 0);
+        ctx.globalCompositeOperation = "source-over";
+        ctx.drawImage(v1, 0, 0);
+        ctx.globalCompositeOperation = main_blend_mode;
+        ctx.drawImage(v2, 0, 0);
   };
 
   // here I am masking out the video with the sketch (composite)
@@ -592,12 +680,12 @@ if (localStorage.getItem("agreeToCC")) {
 
     extraCtx.drawImage(v2, 0, 0);
     cameraCtx.drawImage(v1, 0, 0);
-    multiply(cameraCanvas, extraCanvas);
+    // multiply(cameraCanvas, extraCanvas);
 
-    // cameraCtx.globalCompositeOperation = "source-over";
-    // cameraCtx.drawImage(v1, 0, 0);
-    // cameraCtx.globalCompositeOperation = local_blend_mode;
-    // cameraCtx.drawImage(v2, 0, 0);
+    cameraCtx.globalCompositeOperation = "source-over";
+    cameraCtx.drawImage(v1, 0, 0);
+    cameraCtx.globalCompositeOperation = local_blend_mode;
+    cameraCtx.drawImage(v2, 0, 0);
   };
 
   // draw sketch that can be later be used as a mask
