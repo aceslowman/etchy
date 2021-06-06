@@ -1,5 +1,3 @@
-// global p5
-
 /*
   ETCHY
   
@@ -111,18 +109,350 @@ if (localStorage.getItem("agreeToCC")) {
   let main_blend_mode = "screen";
   let local_blend_mode = "multiply";
 
+  // SHADERS ----------------------------------------------------
+  let compositeInfo, compositeProgram, compositeBuffers;
+  let mainInfo, mainProgram, mainBuffers;
+  let composite_texture0, composite_texture1, main_texture0, main_texture1;
+
+  let videos_loaded = false;
+
+  const setupShaders = () => {
+    // set up textures
+    composite_texture0 = initTexture(compositeGl);
+    composite_texture1 = initTexture(compositeGl);
+    main_texture0 = initTexture(mainGl);
+    main_texture1 = initTexture(mainGl);
+
+    // set up composite    --------------------------------------
+    compositeProgram = initShaderProgram(
+      compositeGl,
+      multiplyVert,
+      multiplyFrag
+    );
+    compositeBuffers = initBuffers(compositeGl);
+
+    compositeInfo = {
+      program: compositeProgram,
+      attribLocations: {
+        vertexPosition: compositeGl.getAttribLocation(
+          compositeProgram,
+          "aVertexPosition"
+        ),
+        textureCoord: compositeGl.getAttribLocation(
+          compositeProgram,
+          "aTextureCoord"
+        )
+      },
+      uniformLocations: {
+        projectionMatrix: compositeGl.getUniformLocation(
+          compositeProgram,
+          "uProjectionMatrix"
+        ),
+        modelViewMatrix: compositeGl.getUniformLocation(
+          compositeProgram,
+          "uModelViewMatrix"
+        )
+      }
+    };
+
+    // set up main---------------------------------------------
+    mainProgram = initShaderProgram(mainGl, screenVert, screenFrag);
+    mainBuffers = initBuffers(mainGl);
+
+    mainInfo = {
+      program: mainProgram,
+      attribLocations: {
+        vertexPosition: mainGl.getAttribLocation(
+          mainProgram,
+          "aVertexPosition"
+        ),
+        textureCoord: mainGl.getAttribLocation(mainProgram, "aTextureCoord")
+      },
+      uniformLocations: {
+        projectionMatrix: mainGl.getUniformLocation(
+          mainProgram,
+          "uProjectionMatrix"
+        ),
+        modelViewMatrix: mainGl.getUniformLocation(
+          mainProgram,
+          "uModelViewMatrix"
+        )
+      }
+    };
+  };
+
+  function initShaderProgram(gl, vsSource, fsSource) {
+    const vertexShader = createShader(gl, vsSource, gl.VERTEX_SHADER);
+    const fragmentShader = createShader(gl, fsSource, gl.FRAGMENT_SHADER);
+
+    // Create the shader program
+    const shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    // If creating the shader program failed, alert
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      alert(
+        "Unable to initialize the shader program: " +
+          gl.getProgramInfoLog(shaderProgram)
+      );
+      return null;
+    }
+
+    return shaderProgram;
+  }
+
+  function createShader(gl, sourceCode, type) {
+    // Compiles either a shader of type gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
+    var shader = gl.createShader(type);
+    gl.shaderSource(shader, sourceCode);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      var info = gl.getShaderInfoLog(shader);
+      throw "Could not compile WebGL program. \n\n" + info;
+    }
+
+    return shader;
+  }
+
+  function initBuffers(gl) {
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+    const positions = [-1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0];
+
+    gl.bufferData(
+      gl.ARRAY_BUFFER, 
+      new Float32Array(positions), 
+      gl.STATIC_DRAW
+    );
+
+    // Now set up the texture coordinates for the faces.
+    const textureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+
+    const textureCoordinates = [0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0];
+
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(textureCoordinates),
+      gl.STATIC_DRAW
+    );
+
+    // Build the element array buffer; this specifies the indices
+    // into the vertex arrays for each face's vertices.
+
+    const indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+    // This array defines each face as two triangles, using the
+    // indices into the vertex array to specify each triangle's
+    // position.
+    const indices = [
+      0,
+      1,
+      2,
+      0,
+      2,
+      3 // front
+    ];
+
+    // Now send the element array to GL
+
+    gl.bufferData(
+      gl.ELEMENT_ARRAY_BUFFER,
+      new Uint16Array(indices),
+      gl.STATIC_DRAW
+    );
+
+    return {
+      position: positionBuffer,
+      textureCoord: textureCoordBuffer,
+      indices: indexBuffer
+    };
+  }
+
+  function initTexture(gl) {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    // Because video has to be download over the internet
+    // they might take a moment until it's ready so
+    // put a single pixel in the texture so we can
+    // use it immediately.
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 1;
+    const height = 1;
+    const border = 0;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    const pixel = new Uint8Array([0, 0, 255, 255]); // opaque blue
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      level,
+      internalFormat,
+      width,
+      height,
+      border,
+      srcFormat,
+      srcType,
+      pixel
+    );
+
+    // Turn off mips and set  wrapping to clamp to edge so it
+    // will work regardless of the dimensions of the video.
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+    return texture;
+  }
+
+  function updateTexture(gl, texture, video) {
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      level,
+      internalFormat,
+      srcFormat,
+      srcType,
+      video
+    );
+  }
+
+  function drawScene(gl, programInfo, buffers, texture0, texture1) {
+    gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
+    gl.clearDepth(1.0); // Clear everything
+    gl.enable(gl.DEPTH_TEST); // Enable depth testing
+    gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    const fieldOfView = (45 * Math.PI) / 180; // in radians
+    const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    const zNear = 0.0;
+    const zFar = 100.0;
+    const projectionMatrix = mat4.create();
+
+    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+
+    // Set the drawing position to the "identity" point, which is
+    // the center of the scene.
+    const modelViewMatrix = mat4.create();
+
+    // // Now move the drawing position a bit to where we want to
+    // // start drawing the square.
+    // mat4.translate(
+    //   modelViewMatrix, // destination matrix
+    //   modelViewMatrix, // matrix to translate
+    //   [0.5, -0.5, -0.0]
+    // ); // amount to translate
+
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute.
+    {
+      const numComponents = 2; // pull out 2 values per iteration
+      const type = gl.FLOAT; // the data in the buffer is 32bit floats
+      const normalize = false; // don't normalize
+      const stride = 0; // how many bytes to get from one set of values to the next
+      // 0 = use type and numComponents above
+      const offset = 0; // how many bytes inside the buffer to start from
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+      gl.vertexAttribPointer(
+        programInfo.attribLocations.vertexPosition,
+        numComponents,
+        type,
+        normalize,
+        stride,
+        offset
+      );
+      gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+    }
+
+    // tell webgl how to pull out the texture coordinates from buffer
+    {
+      const num = 2; // every coordinate composed of 2 values
+      const type = gl.FLOAT; // the data in the buffer is 32 bit float
+      const normalize = false; // don't normalize
+      const stride = 0; // how many bytes to get from one set to the next
+      const offset = 0; // how many bytes inside the buffer to start from
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
+      gl.vertexAttribPointer(
+        programInfo.attribLocations.textureCoord,
+        num,
+        type,
+        normalize,
+        stride,
+        offset
+      );
+      gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+    }
+
+    // Tell WebGL which indices to use to index the vertices
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+
+    // Tell WebGL to use our program when drawing
+    gl.useProgram(programInfo.program);
+
+    // Tell WebGL we want to affect texture unit 0
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture0);
+    gl.uniform1i(programInfo.uniformLocations.tex0, 0);
+
+    // Tell WebGL we want to affect texture unit 1
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, texture1);
+    gl.uniform1i(programInfo.uniformLocations.tex1, 1);
+ 
+    const vertexCount = 6;
+    gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
+  }
   // Draw the scene repeatedly
   let then = 0;
   const drawMain = now => {
+    now *= 0.001; // convert to seconds
+    const deltaTime = now - then;
+    then = now;
+
     let v1 = document.querySelector("#local-composite");
     let v2 = document.querySelector("#peerRemote");
 
+    if (videos_loaded) {
+      updateTexture(mainGl, main_texture0, v1);
+      updateTexture(mainGl, main_texture1, v2);
+    }
+
+    drawSketch();
+    drawComposite();
+
+    drawScene(mainGl, mainInfo, mainBuffers, main_texture0, main_texture1);
+
+    requestAnimationFrame(drawMain);
   };
 
   const drawComposite = () => {
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
 
+    if (videos_loaded) {
+      updateTexture(compositeGl, composite_texture0, v1);
+      updateTexture(compositeGl, composite_texture1, v2);
+    }
+
+    drawScene(
+      compositeGl,
+      compositeInfo,
+      compositeBuffers,
+      composite_texture0,
+      composite_texture1
+    );
   };
 
   const drawSketch = () => {
@@ -339,6 +669,7 @@ if (localStorage.getItem("agreeToCC")) {
         compositeStream = cameraCanvas.captureStream();
         sketchStream = sketchCanvas.captureStream();
 
+        // initializeSketchCanvas();
         compositeStream.getTracks().forEach(track => {
           pc.addTrack(track, compositeStream);
         });
@@ -352,6 +683,20 @@ if (localStorage.getItem("agreeToCC")) {
         document.getElementById("local-composite").play();
         document.getElementById("peerRemote").play();
 
+        // setup gl
+        setupShaders();
+
+        // startup the main output loop
+        // if (main_update_loop) {
+        //   clearInterval(main_update_loop);
+        //   // main_update_loop = setInterval(updateMainCanvas, update_rate);
+        //   main_update_loop = setInterval(drawMain, update_rate);
+        // } else {
+        //   // main_update_loop = setInterval(updateMainCanvas, update_rate);
+        //   main_update_loop = setInterval(drawMain, update_rate);
+        // }
+
+        requestAnimationFrame(drawMain);
       })
       .catch(err => {
         console.error(err);
@@ -428,6 +773,8 @@ if (localStorage.getItem("agreeToCC")) {
             // WE ARE DONE CONNECTING!
             hideLoading();
             showControls();
+
+            videos_loaded = true;
           })
           .catch(error => console.error(error));
         break;
