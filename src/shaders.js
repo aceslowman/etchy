@@ -38,57 +38,39 @@ const screenFrag = `
     vec2 uv0 = vTextureCoord;
     vec2 uv1 = vTextureCoord;
     
-//     if(texdim0.x > texdim0.y) { // fit vertical
-//       float canvasAspect = resolution.x / resolution.y;
-//       float aspect0 = texdim0.x / texdim0.y;
-//       float aspect1 = texdim1.x / texdim1.y;
+    if(resolution.x > resolution.y) { // fit vertical
+      float canvasAspect = resolution.y / resolution.x;
+      float aspect0 = texdim0.x / texdim0.y;
+      float aspect1 = texdim1.x / texdim1.y;
       
-//       uv0.x *= resolution.x * aspect0;
-//       uv0.x -= (resolution.x * aspect0) / 2.0;
-//       uv0.x += 0.5;
+      if(texdim0.x > texdim0.y) {
+        uv0.x *= resolution.x * aspect0;
+        uv0.x -= (resolution.x * aspect0) / 2.0;
+        uv0.x += 0.5;
+      }
       
-//       uv1.x *= resolution.x * aspect1;
-//       uv1.x -= (resolution.x * aspect1) / 2.0;
-//       uv1.x += 0.5;
-//     } else {                            // fit horizontal
-//       float canvasAspect = resolution.y / resolution.x;
-//       float aspect0 = texdim0.y / texdim0.x;
-//       float aspect1 = texdim1.y / texdim1.x;
+      if(texdim1.x > texdim1.y) {      
+        uv1.x *= resolution.x * aspect1;
+        uv1.x -= (resolution.x * aspect1) / 2.0;
+        uv1.x += 0.5;
+      }
+    } else {                            // fit horizontal
+      float canvasAspect = resolution.x / resolution.y;
+      float aspect0 = texdim0.y / texdim0.x;
+      float aspect1 = texdim1.y / texdim1.x;
       
-//       uv0.y *= resolution.y * aspect0;
-//       uv0.y -= (resolution.y * aspect0) / 2.0;
-//       uv0.y += 0.5;
+      if(texdim0.x < texdim0.y) {
+        uv0.y *= resolution.y * aspect0;
+        uv0.y -= (resolution.y * aspect0) / 2.0;
+        uv0.y += 0.5;
+      }
       
-//       uv1.y *= resolution.y * aspect1;
-//       uv1.y -= (resolution.y * aspect1) / 2.0;
-//       uv1.y += 0.5;
-//     }
-
-//     if(texdim0.x > texdim0.y) { // fit vertical
-//       float canvasAspect = resolution.x / resolution.y;
-//       float aspect0 = texdim0.x / texdim0.y;
-//       float aspect1 = texdim1.x / texdim1.y;
-      
-//       uv0.x *= resolution.x * aspect0;
-//       uv0.x -= (resolution.x * aspect0) / 2.0;
-//       uv0.x += 0.5;
-      
-//       uv1.x *= resolution.x * aspect1;
-//       uv1.x -= (resolution.x * aspect1) / 2.0;
-//       uv1.x += 0.5;
-//     } else {                            // fit horizontal
-//       float canvasAspect = resolution.y / resolution.x;
-//       float aspect0 = texdim0.y / texdim0.x;
-//       float aspect1 = texdim1.y / texdim1.x;
-      
-//       uv0.y *= resolution.y * aspect0;
-//       uv0.y -= (resolution.y * aspect0) / 2.0;
-//       uv0.y += 0.5;
-      
-//       uv1.y *= resolution.y * aspect1;
-//       uv1.y -= (resolution.y * aspect1) / 2.0;
-//       uv1.y += 0.5;
-//     }
+      if(texdim1.x < texdim1.y) {
+        uv1.y *= resolution.y * aspect1;
+        uv1.y -= (resolution.y * aspect1) / 2.0;
+        uv1.y += 0.5;
+      }      
+    }
   
     vec3 v0 = texture2D(tex0, uv0).rgb;
     vec3 v1 = texture2D(tex1, uv1).rgb;
@@ -125,35 +107,43 @@ const multiplyFrag = `
     vec2 uv0 = vTextureCoord;
     vec2 uv1 = vTextureCoord;
     
-//     if(resolution.x > resolution.y) { // fit vertical
-//       float canvasAspect = resolution.x / resolution.y;
-//       float aspect0 = texdim0.x / texdim0.y;
-//       float aspect1 = texdim1.x / texdim1.y;
+    if(resolution.x > resolution.y) { // fit vertical
+      float canvasAspect = resolution.y / resolution.x;
+      float aspect0 = texdim0.x / texdim0.y;
+      float aspect1 = texdim1.x / texdim1.y;
       
-//       uv0.x *= resolution.x * aspect0;
-//       uv0.x -= (resolution.x * aspect0) / 2.0;
-//       uv0.x += 0.5;
+      if(texdim0.x > texdim0.y) {
+        uv0.x *= resolution.x * aspect0;
+        uv0.x -= (resolution.x * aspect0) / 2.0;
+        uv0.x += 0.5;
+      }
       
-//       uv1.x *= resolution.x * aspect1;
-//       uv1.x -= (resolution.x * aspect1) / 2.0;
-//       uv1.x += 0.5;
-//     } else {                            // fit horizontal
-//       float canvasAspect = resolution.y / resolution.x;
-//       float aspect0 = texdim0.y / texdim0.x;
-//       float aspect1 = texdim1.y / texdim1.x;
+      if(texdim1.x > texdim1.y) {      
+        uv1.x *= resolution.x * aspect1;
+        uv1.x -= (resolution.x * aspect1) / 2.0;
+        uv1.x += 0.5;
+      }
+    } else {                            // fit horizontal
+      float canvasAspect = resolution.x / resolution.y;
+      float aspect0 = texdim0.y / texdim0.x;
+      float aspect1 = texdim1.y / texdim1.x;
       
-//       uv0.y *= resolution.y * aspect0;
-//       uv0.y -= (resolution.y * aspect0) / 2.0;
-//       uv0.y += 0.5;
+      if(texdim0.x < texdim0.y) {
+        uv0.y *= resolution.y * aspect0;
+        uv0.y -= (resolution.y * aspect0) / 2.0;
+        uv0.y += 0.5;
+      }
       
-//       uv1.y *= resolution.y * aspect1;
-//       uv1.y -= (resolution.y * aspect1) / 2.0;
-//       uv1.y += 0.5;
-//     }
+      if(texdim1.x < texdim1.y) {
+        uv1.y *= resolution.y * aspect1;
+        uv1.y -= (resolution.y * aspect1) / 2.0;
+        uv1.y += 0.5;
+      }      
+    }
   
     vec3 v0 = texture2D(tex0, uv0).rgb;
     vec3 v1 = texture2D(tex1, uv1).rgb;
-    
+    //gl_FragColor = vec4(vec3(texdim1),1.0);
     gl_FragColor = vec4(v0 * v1,1.0);
   }
 `;
