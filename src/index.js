@@ -334,9 +334,9 @@ if (localStorage.getItem("agreeToCC")) {
       updateTexture(mainGl, main_texture0, v1);
       updateTexture(mainGl, main_texture1, v2);
       
-      mainGl.uniform2fv(mainInfo.uniformLocations.resolution, [640,480]);
-      mainGl.uniform2fv(mainInfo.uniformLocations.texdim0, [v1.width, v1.height]);
-      mainGl.uniform2fv(mainInfo.uniformLocations.texdim1, [v2.width, v2.height]);
+      // mainGl.uniform2fv(mainInfo.uniformLocations.resolution, [640,480]);
+      // mainGl.uniform2fv(mainInfo.uniformLocations.texdim0, [v1.width, v1.height]);
+      // mainGl.uniform2fv(mainInfo.uniformLocations.texdim1, [v2.width, v2.height]);
     }
 
     drawComposite();
@@ -354,9 +354,9 @@ if (localStorage.getItem("agreeToCC")) {
       updateTexture(compositeGl, composite_texture0, v1);
       updateTexture(compositeGl, composite_texture1, v2);
       
-      compositeGl.uniform2fv(compositeInfo.uniformLocations.resolution, [640,480]);
-      compositeGl.uniform2fv(compositeInfo.uniformLocations.texdim0, [v1.width, v1.height]);
-      compositeGl.uniform2fv(compositeInfo.uniformLocations.texdim1, [v2.width, v2.height]);
+      // compositeGl.uniform2fv(compositeInfo.uniformLocations.resolution, [640,480]);
+      // compositeGl.uniform2fv(compositeInfo.uniformLocations.texdim0, [v1.width, v1.height]);
+      // compositeGl.uniform2fv(compositeInfo.uniformLocations.texdim1, [v2.width, v2.height]);
     }
 
     drawScene(
