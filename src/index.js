@@ -73,7 +73,7 @@ if (localStorage.getItem("agreeToCC")) {
   let left_dragging = false;
   let right_dragging = false;
   let middle_dragging = false;
-  let current_message = "";
+  let current_message = "hello";
   let message_index = 0;
 
   let main_update_loop, camera_update_loop;
@@ -857,9 +857,9 @@ if (localStorage.getItem("agreeToCC")) {
     if (fadeAmount <= 0) fadeAmount = 0;
 
     document.getElementById("fadeAmount").value = fadeAmount;
-    document.querySelector("#fadeAmountValue").innerHTML = fadeAmount.toFixed(
+    document.querySelector("#fadeAmountValue").innerHTML = fadeAmount.toFixed ? fadeAmount.toFixed(
       2
-    );
+    ) : fadeAmount;
   };
 
   const showLobby = () => {
