@@ -216,16 +216,12 @@ if (localStorage.getItem("agreeToCC")) {
   }
 
   function initBuffers(gl) {
-    // Create a buffer for the cube's vertex positions.
-
+    // Create a buffer for the squares vertex positions.
     const positionBuffer = gl.createBuffer();
 
     // Select the positionBuffer as the one to apply buffer
     // operations to from here out.
-
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-    // Now create an array of positions for the cube.
 
     const positions = [
       -1.0,  1.0,
@@ -237,7 +233,6 @@ if (localStorage.getItem("agreeToCC")) {
     // Now pass the list of positions into WebGL to build the
     // shape. We do this by creating a Float32Array from the
     // JavaScript array, then use it to fill the current buffer.
-
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
     // Now set up the texture coordinates for the faces.
@@ -350,24 +345,14 @@ if (localStorage.getItem("agreeToCC")) {
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
 
-    // Clear the canvas before we start drawing on it.
-
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Create a perspective matrix, a special matrix that is
-    // used to simulate the distortion of perspective in a camera.
-    // Our field of view is 45 degrees, with a width/height
-    // ratio that matches the display size of the canvas
-    // and we only want to see objects between 0.1 units
-    // and 100 units away from the camera.
     const fieldOfView = (45 * Math.PI) / 180; // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.1;
     const zFar = 100.0;
     const projectionMatrix = mat4.create();
 
-    // note: glmatrix.js always has the first argument
-    // as the destination to receive the result.
     mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
     // Set the drawing position to the "identity" point, which is
@@ -376,11 +361,10 @@ if (localStorage.getItem("agreeToCC")) {
 
     // Now move the drawing position a bit to where we want to
     // start drawing the square.
-
     mat4.translate(
       modelViewMatrix, // destination matrix
       modelViewMatrix, // matrix to translate
-      [-0.0, 0.0, -6.0]
+      [-1.0, 0.0, -6.0]
     ); // amount to translate
 
     // Tell WebGL how to pull out the positions from the position
@@ -449,14 +433,14 @@ if (localStorage.getItem("agreeToCC")) {
     gl.uniform1i(programInfo.uniformLocations.tex0, 0);
 
     // // Tell WebGL we want to affect texture unit 1
-    // gl.activeTexture(gl.TEXTURE1);
-    // // Bind the texture to texture unit 1
-    // gl.bindTexture(gl.TEXTURE_2D, texture1);
-    // // Tell the shader we bound the texture to texture unit 1
-    // gl.uniform1i(programInfo.uniformLocations.tex1, 1);
+    gl.activeTexture(gl.TEXTURE1);
+    // Bind the texture to texture unit 1
+    gl.bindTexture(gl.TEXTURE_2D, texture1);
+    // Tell the shader we bound the texture to texture unit 1
+    gl.uniform1i(programInfo.uniformLocations.tex1, 1);
 
     {
-      const vertexCount = 9;
+      const vertexCount = 4;
       const type = gl.UNSIGNED_SHORT;
       const offset = 0;
       gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
@@ -473,7 +457,13 @@ if (localStorage.getItem("agreeToCC")) {
     drawSketch();
     drawComposite();
 
-    drawScene(mainGl, mainInfo, mainBuffers, main_texture0, main_texture1);
+    drawScene(
+      mainGl, 
+      mainInfo, 
+      mainBuffers, 
+      main_texture0, 
+      main_texture1
+    );
   };
 
   const drawComposite = () => {
