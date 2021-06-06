@@ -68,27 +68,18 @@ if (localStorage.getItem("agreeToCC")) {
 
   let canvas = document.getElementById("mainCanvas");
   let mainGl = canvas.getContext("webgl");
-  // let ctx = canvas.getContext("2d");
   canvas.width = 640;
   canvas.height = 480;
 
   let sketchCanvas = document.getElementById("sketchCanvas");
-  // let sketchGl = sketchCanvas.getContext("webgl");
   let sketchCtx = sketchCanvas.getContext("2d");
   sketchCanvas.width = 640;
   sketchCanvas.height = 480;
 
   let cameraCanvas = document.getElementById("cameraCanvas");
   let compositeGl = cameraCanvas.getContext("webgl");
-  // let cameraCtx = cameraCanvas.getContext("2d");
   cameraCanvas.width = 640;
   cameraCanvas.height = 480;
-
-  let extraCanvas = document.getElementById("extraCanvas");
-  let extraGl = extraCanvas.getContext("webgl");
-  // let extraCtx = extraCanvas.getContext("2d");
-  // extraCanvas.width = 640;
-  // extraCanvas.height = 480;
 
   let left_dragging = false;
   let right_dragging = false;
@@ -105,9 +96,6 @@ if (localStorage.getItem("agreeToCC")) {
 
   let message_index = 0;
   let current_message = "";
-
-  let main_blend_mode = "screen";
-  let local_blend_mode = "multiply";
 
   // SHADERS ----------------------------------------------------
   let compositeInfo, compositeProgram, compositeBuffers;
@@ -156,7 +144,10 @@ if (localStorage.getItem("agreeToCC")) {
           "aTextureCoord"
         )
       },
-      uniformLocations: {}
+      uniformLocations: {
+        tex0: compositeGl.getUniformLocation(compositeProgram, 'tex0'),
+        tex1: compositeGl.getUniformLocation(compositeProgram, 'tex1')
+      }
     };
 
     // set up main---------------------------------------------
@@ -172,7 +163,10 @@ if (localStorage.getItem("agreeToCC")) {
         ),
         textureCoord: mainGl.getAttribLocation(mainProgram, "aTextureCoord")
       },
-      uniformLocations: {}
+      uniformLocations: {
+        tex0: mainGl.getUniformLocation(mainProgram, 'tex0'),
+        tex1: mainGl.getUniformLocation(mainProgram, 'tex1')
+      }
     };
   };
 
@@ -218,24 +212,12 @@ if (localStorage.getItem("agreeToCC")) {
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([
-        -1.0,
-        -1.0,
-        0.0,
-        1.0,
-        -1.0,
-        0.0,
-        -1.0,
-        1.0,
-        0.0,
-        -1.0,
-        1.0,
-        0.0,
-        1.0,
-        -1.0,
-        0.0,
-        1.0,
-        1.0,
-        0.0
+        -1.0, -1.0, 0.0,
+         1.0, -1.0, 0.0,
+        -1.0,  1.0, 0.0,
+        -1.0,  1.0, 0.0,
+         1.0, -1.0, 0.0,
+         1.0,  1.0, 0.0
       ]),
       gl.STATIC_DRAW
     );
@@ -244,8 +226,13 @@ if (localStorage.getItem("agreeToCC")) {
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
 
-    const textureCoordinates = [0, 0, 1.0, 0, 0, 1.0, 0, 1.0, 1.0, 0, 1.0, 1.0];
-
+    const textureCoordinates = [
+      0,   0, 1.0, 
+      0,   0, 1.0, 
+      0, 1.0, 1.0, 
+      0, 1.0, 1.0
+    ];
+    
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array(textureCoordinates),
@@ -271,7 +258,7 @@ if (localStorage.getItem("agreeToCC")) {
       0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
-      new Uint8Array([0, 0, 255, 255]) // opaque blue
+      new Uint8Array([0, 0, 0, 255])
     );
 
     // Turn off mips and set  wrapping to clamp to edge so it
@@ -602,14 +589,14 @@ if (localStorage.getItem("agreeToCC")) {
         setupShaders();
 
         // startup the main output loop
-        // if (main_update_loop) {
-        //   clearInterval(main_update_loop);
-        //   // main_update_loop = setInterval(updateMainCanvas, update_rate);
+        if (main_update_loop) {
+          clearInterval(main_update_loop);
+          main_update_loop = setInterval(updateMainCanvas, update_rate);
+          // main_update_loop = setInterval(drawMain, update_rate);
+        } else {
+          main_update_loop = setInterval(updateMainCanvas, update_rate);
         //   main_update_loop = setInterval(drawMain, update_rate);
-        // } else {
-        //   // main_update_loop = setInterval(updateMainCanvas, update_rate);
-        //   main_update_loop = setInterval(drawMain, update_rate);
-        // }
+        }
 
         requestAnimationFrame(drawMain);
       })

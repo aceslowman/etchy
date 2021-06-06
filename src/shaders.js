@@ -35,7 +35,7 @@ const screenFrag = `
     vec3 v0 = texture2D(tex0, vTextureCoord).rgb;
     vec3 v1 = texture2D(tex1, vTextureCoord).rgb;
     //gl_FragColor = vec4(fract(gl_FragCoord.xy / vec2(16., 32.)),0,1);
-    gl_FragColor = vec4(blendScreen(v0,v1,0.5),1.0);
+    gl_FragColor = vec4(blendScreen(v0,v1,1.0),1.0);
   }
 `;
 
@@ -62,9 +62,9 @@ const multiplyFrag = `
   void main() {
     vec4 v0 = texture2D(tex0, vTextureCoord);
     vec4 v1 = texture2D(tex1, vTextureCoord);
-    //gl_FragColor = vec4(v0 * v1,1.0);
+    gl_FragColor = vec4(v0.rgb * v1.rgb,1.0);
     
-    gl_FragColor = v0;
+    //gl_FragColor = v0;
     // // gl_FragColor = vec4(1.0,0.0,0.0,1.0);
   }
 `;
