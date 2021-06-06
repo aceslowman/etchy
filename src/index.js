@@ -558,30 +558,6 @@ if (localStorage.getItem("agreeToCC")) {
     websocket.send(JSON.stringify(data));
   };
 
-  const showLobby = () => {
-    document.querySelector(".center").style.display = "flex";
-  };
-
-  const hideLobby = () => {
-    document.querySelector(".center").style.display = "none";
-  };
-
-  const showLoading = () => {
-    document.querySelector(".loading").style.display = "flex";
-  };
-
-  const hideLoading = () => {
-    document.querySelector(".loading").style.display = "none";
-  };
-
-  const showControls = () => {
-    document.querySelector("#controls").style.display = "flex";
-  };
-
-  const hideControls = () => {
-    document.querySelector("#controls").style.display = "none";
-  };
-
   // this fades away the sketch while drawing
   const updateSketchCanvas = () => {
     sketchCtx.save();
@@ -831,6 +807,31 @@ if (localStorage.getItem("agreeToCC")) {
     document.querySelector("#fadeAmountValue").innerHTML = fadeAmount.toFixed(
       2
     );
+  };
+  
+  
+  const showLobby = () => {
+    document.querySelector(".center").style.display = "flex";
+  };
+
+  const hideLobby = () => {
+    document.querySelector(".center").style.display = "none";
+  };
+
+  const showLoading = () => {
+    document.querySelector(".loading").style.display = "flex";
+  };
+
+  const hideLoading = () => {
+    document.querySelector(".loading").style.display = "none";
+  };
+
+  const showControls = () => {
+    document.querySelector("#controls").style.display = "flex";
+  };
+
+  const hideControls = () => {
+    document.querySelector("#controls").style.display = "none";
   };
 
   window.addEventListener("resize", e => {}, true);
