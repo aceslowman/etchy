@@ -9,33 +9,28 @@
   canvas (sketch + raw video) is then made into a stream and sent to the other 
   user.
   
-  Disconnections are frequent which I think is more of a webrtc problem,
-  if they occur it's best to just wait it out or refresh.
+  NOTES:
+  this could be done much easier with globalCompositeOperation on the videos
+  (which you can see in my blendmode_old.js copy at the root of the directory)
+  but iOS in particular doesn't support 'multiply' or 'screen' modes. 
   
-  TODO:
+  I attempted to make custom blend functions for the canvas but they were too
+  slow and inefficient. as a result I am using webgl shaders for the blending,
+  located in ./shaders.js.
   
-  fix on ios (works on everything but ios!)
-    video elements all have to be muted, playinline, and autoplay
-    
-    works on safari (atm) but not on chrome ios
-  
-  multiple peers
-  drawing customization
-  add image!
-  variable blend mode 
-  (connection-level) blend modes?
-  variable brushes (different types)
+  some misc helpers are also located in webrtc_utils.js, particularly for
+  recognizing disconnected peers. FriendlyWebSocket.js helps with websocket 
+  reconnects.
   
   HELPFUL LINKS:
-  recognizing temporary or full disconnects
+  recognizing temporary or full disconnects in webrtc
   https://stackoverflow.com/questions/63582725/webrtc-differentiate-between-temporary-disconnect-or-failure-and-permanant
   
-  NOTE: 
+  webgl textures
+  https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
   
-  this project makes use of context-blender
-                https://github.com/Phrogz/context-blender
-  the 'multiply' and 'screen' blend modes in particular don't seem to have good browser
-  compatibility, particularly on mobile.
+  fullscreen quads
+  https://stackoverflow.com/questions/24104939/rendering-a-fullscreen-quad-using-webgl
 */
 
 import FriendlyWebSocket from "./FriendlyWebSocket";
@@ -67,19 +62,11 @@ if (localStorage.getItem("agreeToCC")) {
   let peersElement = document.querySelector("#peers");
 
   let canvas = document.getElementById("mainCanvas");
-  let mainGl = canvas.getContext("webgl");
-  canvas.width = 640;
-  canvas.height = 480;
-
+  let mainGl = canvas.getContext("webgl"); 
   let sketchCanvas = document.getElementById("sketchCanvas");
-  let sketchCtx = sketchCanvas.getContext("2d");
-  sketchCanvas.width = 640;
-  sketchCanvas.height = 480;
-
+  let sketchCtx = sketchCanvas.getContext("2d"); // 2d only for the sketch
   let cameraCanvas = document.getElementById("cameraCanvas");
   let compositeGl = cameraCanvas.getContext("webgl");
-  cameraCanvas.width = 640;
-  cameraCanvas.height = 480;
 
   // interaction
   let mouse;
@@ -92,15 +79,9 @@ if (localStorage.getItem("agreeToCC")) {
   let main_update_loop, camera_update_loop;
 
   // sketch params
-  let fade = true;
   let fadeAmount = 0.1;
   let update_rate = 50;
   let brush_radius = 20;
-
-  
-
-  
-  
 
   // SHADERS ----------------------------------------------------
   let compositeInfo, compositeProgram, compositeBuffers;
@@ -110,6 +91,13 @@ if (localStorage.getItem("agreeToCC")) {
   let videos_loaded = false;
 
   const setupShaders = () => {
+    canvas.width = 640;
+    canvas.height = 480;
+    cameraCanvas.width = 640;
+    cameraCanvas.height = 480;
+    sketchCanvas.width = 640;
+    sketchCanvas.height = 480;    
+
     compositeGl.viewport(
       0,
       0,
@@ -129,7 +117,7 @@ if (localStorage.getItem("agreeToCC")) {
     main_texture0 = initTexture(mainGl);
     main_texture1 = initTexture(mainGl);
 
-    // set up composite    --------------------------------------
+    // set up composite render target (sketch * localvideo)  
     compositeProgram = initShaderProgram(
       compositeGl,
       multiplyVert,
@@ -151,11 +139,13 @@ if (localStorage.getItem("agreeToCC")) {
       },
       uniformLocations: {
         tex0: compositeGl.getUniformLocation(compositeProgram, 'tex0'),
-        tex1: compositeGl.getUniformLocation(compositeProgram, 'tex1')
+        tex1: compositeGl.getUniformLocation(compositeProgram, 'tex1'),
+        resolution0: compositeGl.getUniformLocation(compositeProgram, 'resolution0'),
+        resolution1: compositeGl.getUniformLocation(compositeProgram, 'resolution1'),
       }
     };
 
-    // set up main---------------------------------------------
+    // set up main render target (peervideo + compositevideo)
     mainProgram = initShaderProgram(mainGl, screenVert, screenFrag);
     mainBuffers = initBuffers(mainGl);
 
@@ -170,7 +160,9 @@ if (localStorage.getItem("agreeToCC")) {
       },
       uniformLocations: {
         tex0: mainGl.getUniformLocation(mainProgram, 'tex0'),
-        tex1: mainGl.getUniformLocation(mainProgram, 'tex1')
+        tex1: mainGl.getUniformLocation(mainProgram, 'tex1'),
+        resolution0: mainGl.getUniformLocation(mainProgram, 'resolution0'),
+        resolution1: mainGl.getUniformLocation(mainProgram, 'resolution1'),
       }
     };
   };
@@ -819,16 +811,6 @@ if (localStorage.getItem("agreeToCC")) {
     link.click();
   };
 
-  const handleLocalBlendMode = e => {
-    console.log("handleLocalBlendMode", e.target.value);
-    local_blend_mode = e.target.value;
-  };
-
-  const handleGlobalBlendMode = e => {
-    console.log("handleGlobalBlendMode", e.target.value);
-    main_blend_mode = e.target.value;
-  };
-
   const handleContextMenu = e => {
     e.preventDefault();
   };
@@ -915,9 +897,6 @@ if (localStorage.getItem("agreeToCC")) {
     .querySelector("#clearButton")
     .addEventListener("click", handleClearButton, false);
   document
-    .querySelector("#fadeToggle")
-    .addEventListener("click", handleToggleFade, false);
-  document
     .querySelector("#fadeAmount")
     .addEventListener("input", handleFadeAmountChange, false);
   document
@@ -928,23 +907,14 @@ if (localStorage.getItem("agreeToCC")) {
   document.querySelector("#fadeAmountValue").value = fadeAmount;
 
   document
-    .querySelector("#localBlendMode")
-    .addEventListener("change", handleLocalBlendMode, false);
-  document
-    .querySelector("#globalBlendMode")
-    .addEventListener("change", handleGlobalBlendMode, false);
-
-  document
     .querySelector("#brushMessage")
     .addEventListener("input", handleMessageChange, false);
 
   document.addEventListener("wheel", handleWheel, false);
 } else {
   // FOR CODE OF CONDUCT
-
   document.getElementById("CODEOFCONDUCT").style.display = "flex";
 
-  // CODE OF CONDUCT
   document.getElementById("agreeCC").addEventListener("click", () => {
     localStorage.setItem("agreeToCC", true);
     window.location.reload();
