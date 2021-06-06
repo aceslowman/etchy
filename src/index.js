@@ -81,21 +81,26 @@ if (localStorage.getItem("agreeToCC")) {
   cameraCanvas.width = 640;
   cameraCanvas.height = 480;
 
+  // interaction
+  let mouse;
   let left_dragging = false;
   let right_dragging = false;
   let middle_dragging = false;
+  let current_message = "";
+  let message_index = 0;
 
   let main_update_loop, camera_update_loop;
 
+  // sketch params
   let fade = true;
   let fadeAmount = 0.1;
   let update_rate = 50;
   let brush_radius = 20;
 
-  let mouse;
+  
 
-  let message_index = 0;
-  let current_message = "";
+  
+  
 
   // SHADERS ----------------------------------------------------
   let compositeInfo, compositeProgram, compositeBuffers;
@@ -789,13 +794,6 @@ if (localStorage.getItem("agreeToCC")) {
 
   const handleClearButton = () => {
     // initializeSketchCanvas();
-  };
-
-  const handleToggleFade = () => {
-    fade = !fade;
-    document.querySelector("#fadeToggle").innerHTML = fade
-      ? "dont fade away"
-      : "fade away";
   };
 
   const handleSnapButton = () => {
