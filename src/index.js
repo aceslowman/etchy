@@ -112,6 +112,7 @@ if (localStorage.getItem("agreeToCC")) {
   // SHADERS ----------------------------------------------------
   let compositeInfo, compositeProgram, compositeBuffers;
   let mainInfo, mainProgram, mainBuffers;
+  let composite_texture0, composite_texture1, main_texture0, main_texture1;
 
   const setupShaders = () => {
     // set up textures
@@ -389,12 +390,12 @@ if (localStorage.getItem("agreeToCC")) {
     // Tell the shader we bound the texture to texture unit 0
     gl.uniform1i(programInfo.uniformLocations.tex0, 0);
 
-    // Tell WebGL we want to affect texture unit 0
-    gl.activeTexture(gl.TEXTURE0);
-    // Bind the texture to texture unit 1
-    gl.bindTexture(gl.TEXTURE_2D, texture1);
-    // Tell the shader we bound the texture to texture unit 1
-    gl.uniform1i(programInfo.uniformLocations.tex1, 1);
+    // // Tell WebGL we want to affect texture unit 1
+    // gl.activeTexture(gl.TEXTURE1);
+    // // Bind the texture to texture unit 1
+    // gl.bindTexture(gl.TEXTURE_2D, texture1);
+    // // Tell the shader we bound the texture to texture unit 1
+    // gl.uniform1i(programInfo.uniformLocations.tex1, 1);
 
     {
       const offset = 0;
@@ -406,50 +407,56 @@ if (localStorage.getItem("agreeToCC")) {
   const drawMain = () => {
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
+    
+    updateTexture(mainGl, main_texture0, v1);
+    updateTexture(mainGl, main_texture1, v2);
 
-    mainInfo = {
-      ...mainInfo,
-      uniformLocations: {
-        tex0: mainGl.getUniformLocation(mainProgram, "tex0"),
-        tex1: mainGl.getUniformLocation(mainProgram, "tex1"),
-        projectionMatrix: mainGl.getUniformLocation(
-          mainProgram,
-          "uProjectionMatrix"
-        ),
-        modelViewMatrix: mainGl.getUniformLocation(
-          mainProgram,
-          "uModelViewMatrix"
-        )
-      }
-    };
+    // mainInfo = {
+    //   ...mainInfo,
+    //   uniformLocations: {
+    //     tex0: mainGl.getUniformLocation(mainProgram, "tex0"),
+    //     tex1: mainGl.getUniformLocation(mainProgram, "tex1"),
+    //     projectionMatrix: mainGl.getUniformLocation(
+    //       mainProgram,
+    //       "uProjectionMatrix"
+    //     ),
+    //     modelViewMatrix: mainGl.getUniformLocation(
+    //       mainProgram,
+    //       "uModelViewMatrix"
+    //     )
+    //   }
+    // };
 
     drawSketch();
     drawComposite();
 
-    drawScene(mainGl, mainInfo, mainBuffers, v1, v2);
+    drawScene(mainGl, mainInfo, mainBuffers, main_texture0, main_texture1);
   };
 
   const drawComposite = () => {
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
+    
+    updateTexture(compositeGl, composite_texture0, v1);
+    updateTexture(compositeGl, composite_texture1, v2);
 
-    compositeInfo = {
-      ...compositeInfo,
-      uniformLocations: {
-        tex0: compositeGl.getUniformLocation(compositeProgram, "tex0"),
-        tex1: compositeGl.getUniformLocation(compositeProgram, "tex1"),
-        projectionMatrix: compositeGl.getUniformLocation(
-          compositeProgram,
-          "uProjectionMatrix"
-        ),
-        modelViewMatrix: compositeGl.getUniformLocation(
-          compositeProgram,
-          "uModelViewMatrix"
-        )
-      }
-    };
+//     compositeInfo = {
+//       ...compositeInfo,
+//       uniformLocations: {
+//         tex0: compositeGl.getUniformLocation(compositeProgram, "tex0"),
+//         tex1: compositeGl.getUniformLocation(compositeProgram, "tex1"),
+//         projectionMatrix: compositeGl.getUniformLocation(
+//           compositeProgram,
+//           "uProjectionMatrix"
+//         ),
+//         modelViewMatrix: compositeGl.getUniformLocation(
+//           compositeProgram,
+//           "uModelViewMatrix"
+//         )
+//       }
+//     };
 
-    drawScene(compositeGl, compositeInfo, compositeBuffers, v1, v2);
+    drawScene(compositeGl, compositeInfo, compositeBuffers, composite_texture0, composite_texture1);
   };
 
   const drawSketch = () => {
