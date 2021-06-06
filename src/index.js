@@ -67,14 +67,14 @@ if (localStorage.getItem("agreeToCC")) {
   let peersElement = document.querySelector("#peers");
 
   let canvas = document.getElementById("mainCanvas");
-  let gl = canvas.getContext("webgl");
+  let mainGl = canvas.getContext("webgl");
   let ctx = canvas.getContext("2d");
   canvas.width = 640;
   canvas.height = 480;
 
   let sketchCanvas = document.getElementById("sketchCanvas");
-  let sketchGl = sketchCanvas.getContext("webgl");
-  // let sketchCtx = sketchCanvas.getContext("2d");
+  // let sketchGl = sketchCanvas.getContext("webgl");
+  let sketchCtx = sketchCanvas.getContext("2d");
   sketchCanvas.width = 640;
   sketchCanvas.height = 480;
 
@@ -98,7 +98,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   let fade = true;
   let fadeAmount = 0.1;
-  let update_rate = 50;
+  let update_rate = 500;
   let brush_radius = 20;
 
   let mouse;
@@ -114,56 +114,54 @@ if (localStorage.getItem("agreeToCC")) {
   let mainInfo, mainProgram, mainBuffers;
 
   const setupShaders = () => {
-    compositeInfo = {
-      program: compositeProgram,
-      attribLocations: {
-        vertexPosition: gl.getAttribLocation(
-          compositeProgram,
-          "aVertexPosition"
-        )
-      },
-      uniformLocations: {
-        projectionMatrix: gl.getUniformLocation(
-          compositeProgram,
-          "uProjectionMatrix"
-        ),
-        modelViewMatrix: gl.getUniformLocation(
-          compositeProgram,
-          "uModelViewMatrix"
-        )
-      }
-    };
-    
+    // set up composite    --------------------------------------
     compositeProgram = initShaderProgram(
       compositeGl,
       multiplyVert,
       multiplyFrag
     );
-    
     compositeBuffers = initBuffers(compositeGl);
-    
-    mainInfo = {
-      program: mainProgram,
+
+    compositeInfo = {
+      program: compositeProgram,
       attribLocations: {
-        vertexPosition: gl.getAttribLocation(
-          mainProgram,
+        vertexPosition: compositeGl.getAttribLocation(
+          compositeProgram,
           "aVertexPosition"
         )
       },
       uniformLocations: {
-        projectionMatrix: gl.getUniformLocation(
-          mainProgram,
+        projectionMatrix: compositeGl.getUniformLocation(
+          compositeProgram,
           "uProjectionMatrix"
         ),
-        modelViewMatrix: gl.getUniformLocation(
-          mainProgram,
+        modelViewMatrix: compositeGl.getUniformLocation(
+          compositeProgram,
           "uModelViewMatrix"
         )
       }
     };
 
-    mainProgram = initShaderProgram(gl, screenVert, screenFrag);
-    mainBuffers = initBuffers(gl);
+    // set up main---------------------------------------------
+    mainProgram = initShaderProgram(mainGl, screenVert, screenFrag);
+    mainBuffers = initBuffers(mainGl);
+
+    mainInfo = {
+      program: mainProgram,
+      attribLocations: {
+        vertexPosition: mainGl.getAttribLocation(mainProgram, "aVertexPosition")
+      },
+      uniformLocations: {
+        projectionMatrix: mainGl.getUniformLocation(
+          mainProgram,
+          "uProjectionMatrix"
+        ),
+        modelViewMatrix: mainGl.getUniformLocation(
+          mainProgram,
+          "uModelViewMatrix"
+        )
+      }
+    };
   };
 
   function initShaderProgram(gl, vsSource, fsSource) {
@@ -171,14 +169,12 @@ if (localStorage.getItem("agreeToCC")) {
     const fragmentShader = createShader(gl, fsSource, gl.FRAGMENT_SHADER);
 
     // Create the shader program
-
     const shaderProgram = gl.createProgram();
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
     gl.linkProgram(shaderProgram);
 
     // If creating the shader program failed, alert
-
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
       alert(
         "Unable to initialize the shader program: " +
@@ -206,22 +202,18 @@ if (localStorage.getItem("agreeToCC")) {
 
   function initBuffers(gl) {
     // Create a buffer for the square's positions.
-
     const positionBuffer = gl.createBuffer();
 
     // Select the positionBuffer as the one to apply buffer
     // operations to from here out.
-
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
     // Now create an array of positions for the square.
-
     const positions = [-1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0];
 
     // Now pass the list of positions into WebGL to build the
     // shape. We do this by creating a Float32Array from the
     // JavaScript array, then use it to fill the current buffer.
-
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
     return {
@@ -314,19 +306,81 @@ if (localStorage.getItem("agreeToCC")) {
     }
   }
 
+  const drawMain = () => {
+    drawSketch();
+    drawComposite();
+
+    drawScene(mainGl, mainInfo, mainBuffers);
+  };
+
   const drawComposite = () => {
     drawScene(compositeGl, compositeInfo, compositeBuffers);
   };
 
   const drawSketch = () => {
     // drawScene(cameraGl)
-  };
-
-  const drawMain = () => {
-    drawSketch();
-    drawComposite();
-    
-    drawScene(gl, mainInfo, mainBuffers);
+    sketchCtx.save();
+    // I can't decide what value this should be at
+    // a longer tail on the fade looks better but
+    // leaves the background with artifacts
+    sketchCtx.globalAlpha = fadeAmount;
+    sketchCtx.fillStyle = "black";
+    sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+    sketchCtx.fillStyle = "white";
+    sketchCtx.restore();
+    sketchCtx.globalAlpha = 1.0;
+    // draw circle
+    if (left_dragging) {
+      sketchCtx.fillStyle = "white";
+      sketchCtx.beginPath();
+      sketchCtx.ellipse(
+        mouse.x,
+        mouse.y,
+        brush_radius,
+        brush_radius,
+        Math.PI / 4,
+        0,
+        2 * Math.PI
+      );
+      sketchCtx.fill();
+      sketchCtx.closePath();
+    }
+    // erase
+    if (middle_dragging) {
+      sketchCtx.fillStyle = "black";
+      sketchCtx.beginPath();
+      sketchCtx.ellipse(
+        mouse.x,
+        mouse.y,
+        brush_radius,
+        brush_radius,
+        Math.PI / 4,
+        0,
+        2 * Math.PI
+      );
+      sketchCtx.fill();
+      sketchCtx.closePath();
+    }
+    // draw text
+    if (right_dragging) {
+      let current_symbol = current_message.split("")[message_index];
+      // space out message
+      if (current_frame % 4 === 0) {
+        // draw message
+        sketchCtx.font = brush_radius * 4 + "px Times New Roman";
+        sketchCtx.fillStyle = "white";
+        sketchCtx.fillText(
+          current_message.split("")[message_index],
+          mouse.x + brush_radius,
+          mouse.y + brush_radius
+        );
+        message_index++;
+        if (message_index >= current_message.split("").length) {
+          right_dragging = false;
+        }
+      }
+      current_frame++;
+    }
   };
 
   // ------------------------------------------------------------
@@ -492,6 +546,9 @@ if (localStorage.getItem("agreeToCC")) {
         // document.getElementById("local-composite").play();
         // document.getElementById("peerRemote").play();
 
+        // setup gl
+        setupShaders();
+
         // startup the main output loop
         if (main_update_loop) {
           clearInterval(main_update_loop);
@@ -501,10 +558,6 @@ if (localStorage.getItem("agreeToCC")) {
           // main_update_loop = setInterval(updateMainCanvas, update_rate);
           main_update_loop = setInterval(drawMain, update_rate);
         }
-
-        // setup gl
-
-        setupShaders();
       })
       .catch(err => {
         console.error(err);
