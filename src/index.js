@@ -202,6 +202,7 @@ if (localStorage.getItem("agreeToCC")) {
     return shader;
   }
 
+  // setup vertex position and texture coordinate buffers
   function initBuffers(gl) {
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -325,9 +326,11 @@ if (localStorage.getItem("agreeToCC")) {
     if (videos_loaded) {
       updateTexture(mainGl, main_texture0, v1);
       updateTexture(mainGl, main_texture1, v2);
+      
+      mainGl.uniform1fv(mainInfo.uniformLocations.resolution0, [v1.width, v1.height]);
+      mainGl.uniform1fv(mainInfo.uniformLocations.resolution1, [v2.width, v2.height]);
     }
 
-    // drawSketch();
     drawComposite();
 
     drawScene(mainGl, mainInfo, mainBuffers, main_texture0, main_texture1);
@@ -342,6 +345,9 @@ if (localStorage.getItem("agreeToCC")) {
     if (videos_loaded) {
       updateTexture(compositeGl, composite_texture0, v1);
       updateTexture(compositeGl, composite_texture1, v2);
+      
+      compositeGl.uniform1fv(compositeInfo.uniformLocations.resolution0, [v1.width, v1.height]);
+      compositeGl.uniform1fv(compositeInfo.uniformLocations.resolution1, [v2.width, v2.height]);
     }
 
     drawScene(
