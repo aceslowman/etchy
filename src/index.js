@@ -424,18 +424,18 @@ if (localStorage.getItem("agreeToCC")) {
 
     // draw text
     if (right_dragging) {
-      console.log('hello', current_frame)
+      // console.log('hello', current_frame)
       let current_symbol = current_message.split("")[message_index];
       // space out message
       if (current_frame % 4 === 0) {
-        console.log('sym', current_symbol)
-        console.log(mouse)
-        console.log(message_index)
+        // console.log('sym', current_symbol)
+        // console.log(mouse)
+        console.log(brush_radius * 4 + "px Times New Roman")
         // draw message
-        sketchCtx.font = brush_radius * 4 + "px Times New Roman";
+        sketchCtx.font = brush_radius * 4 + "80px Times New Roman";
         sketchCtx.fillStyle = "white";
         sketchCtx.fillText(
-          current_message.split("")[message_index],
+          current_symbol,
           mouse.x + brush_radius,
           mouse.y + brush_radius
         );
@@ -755,6 +755,10 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleMouseDown = e => {
+    left_dragging = false;
+    middle_dragging = false;
+    right_dragging = false;
+    
     if (e.button === 0) {
       left_dragging = true;
     } else if (e.button === 1) {
@@ -782,13 +786,13 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleMouseUp = e => {
-    if (e.button === 0) {
+    // if (e.button === 0) {
       left_dragging = false;
-    } else if (e.button === 1) {
+    // } else if (e.button === 1) {
       middle_dragging = false;
-    } else if (e.button === 2) {
+    // } else if (e.button === 2) {
       right_dragging = false;
-    }
+    // }
 
     if (e.touches) {
       if (e.touches.length === 1) {
