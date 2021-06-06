@@ -155,6 +155,8 @@ if (localStorage.getItem("agreeToCC")) {
     
     cameraCtx.attachShader(compositeProgram, compositeVertShader);
     cameraCtx.attachShader(compositeProgram, compositeFragShader);
+    
+    cameraCtx.linkProgram(compositeProgram);
   }
 
   // ------------------------------------------------------------
