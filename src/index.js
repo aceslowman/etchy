@@ -218,18 +218,11 @@ if (localStorage.getItem("agreeToCC")) {
   }
 
   function initBuffers(gl) {
-    // Create a buffer for the squares vertex positions.
     const positionBuffer = gl.createBuffer();
-
-    // Select the positionBuffer as the one to apply buffer
-    // operations to from here out.
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
     const positions = [-1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0];
 
-    // Now pass the list of positions into WebGL to build the
-    // shape. We do this by creating a Float32Array from the
-    // JavaScript array, then use it to fill the current buffer.
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
     // Now set up the texture coordinates for the faces.
@@ -353,11 +346,11 @@ if (localStorage.getItem("agreeToCC")) {
 
     // // Now move the drawing position a bit to where we want to
     // // start drawing the square.
-    mat4.translate(
-      modelViewMatrix, // destination matrix
-      modelViewMatrix, // matrix to translate
-      [0.5, 0.5, -0.0]
-    ); // amount to translate
+    // mat4.translate(
+    //   modelViewMatrix, // destination matrix
+    //   modelViewMatrix, // matrix to translate
+    //   [0.5, -0.5, -0.0]
+    // ); // amount to translate
 
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
@@ -405,38 +398,18 @@ if (localStorage.getItem("agreeToCC")) {
     // Tell WebGL to use our program when drawing
     gl.useProgram(programInfo.program);
 
-    // Set the shader uniforms
-    gl.uniformMatrix4fv(
-      programInfo.uniformLocations.projectionMatrix,
-      false,
-      projectionMatrix
-    );
-    gl.uniformMatrix4fv(
-      programInfo.uniformLocations.modelViewMatrix,
-      false,
-      modelViewMatrix
-    );
-
     // Tell WebGL we want to affect texture unit 0
     gl.activeTexture(gl.TEXTURE0);
-    // Bind the texture to texture unit 0
     gl.bindTexture(gl.TEXTURE_2D, texture0);
-    // Tell the shader we bound the texture to texture unit 0
     gl.uniform1i(programInfo.uniformLocations.tex0, 0);
 
-    // // Tell WebGL we want to affect texture unit 1
+    // Tell WebGL we want to affect texture unit 1
     gl.activeTexture(gl.TEXTURE1);
-    // Bind the texture to texture unit 1
     gl.bindTexture(gl.TEXTURE_2D, texture1);
-    // Tell the shader we bound the texture to texture unit 1
     gl.uniform1i(programInfo.uniformLocations.tex1, 1);
-
-    {
-      const vertexCount = 6;
-      const type = gl.UNSIGNED_SHORT;
-      const offset = 0;
-      gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
-    }
+ 
+    const vertexCount = 6;
+    gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
   }
   // Draw the scene repeatedly
   let then = 0;
