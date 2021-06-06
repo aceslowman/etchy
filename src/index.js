@@ -302,19 +302,19 @@ if (localStorage.getItem("agreeToCC")) {
     // Tell WebGL to use our program when drawing
     gl.useProgram(programInfo.program);
 
-    gl.uniform2fv(programInfo.uniformLocations.resolution, [640,480]);
+    gl.uniform2fv(programInfo.uniformLocations.resolution, [gl.canvas.width, gl.canvas.height]);
     
     // Tell WebGL we want to affect texture unit 0
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture0);
     gl.uniform1i(programInfo.uniformLocations.tex0, 0);
-    gl.uniform2fv(programInfo.uniformLocations.texdim0, [640, 480]);
+    // gl.uniform2fv(programInfo.uniformLocations.texdim0, [640, 480]);
 
     // Tell WebGL we want to affect texture unit 1
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, texture1);
     gl.uniform1i(programInfo.uniformLocations.tex1, 1);
-    gl.uniform2fv(programInfo.uniformLocations.texdim1, [640, 480]);
+    // gl.uniform2fv(programInfo.uniformLocations.texdim1, [640, 480]);
     
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -334,9 +334,9 @@ if (localStorage.getItem("agreeToCC")) {
       updateTexture(mainGl, main_texture0, v1);
       updateTexture(mainGl, main_texture1, v2);
       
-      // mainGl.uniform2fv(mainInfo.uniformLocations.resolution, [640,480]);
-      // mainGl.uniform2fv(mainInfo.uniformLocations.texdim0, [v1.width, v1.height]);
-      // mainGl.uniform2fv(mainInfo.uniformLocations.texdim1, [v2.width, v2.height]);
+      mainGl.uniform2fv(mainInfo.uniformLocations.resolution, [640,480]);
+      mainGl.uniform2fv(mainInfo.uniformLocations.texdim0, [v1.videoWidth, v1.videoHeight]);
+      mainGl.uniform2fv(mainInfo.uniformLocations.texdim1, [v2.videoWidth, v2.videoHeight]);
     }
 
     drawComposite();
@@ -354,9 +354,11 @@ if (localStorage.getItem("agreeToCC")) {
       updateTexture(compositeGl, composite_texture0, v1);
       updateTexture(compositeGl, composite_texture1, v2);
       
-      // compositeGl.uniform2fv(compositeInfo.uniformLocations.resolution, [640,480]);
-      // compositeGl.uniform2fv(compositeInfo.uniformLocations.texdim0, [v1.width, v1.height]);
-      // compositeGl.uniform2fv(compositeInfo.uniformLocations.texdim1, [v2.width, v2.height]);
+      // console.log(v1.videoWidth)
+      
+      compositeGl.uniform2fv(compositeInfo.uniformLocations.resolution, [640,480]);
+      compositeGl.uniform2fv(compositeInfo.uniformLocations.texdim0, [v1.videoWidth, v1.videoHeight]);
+      compositeGl.uniform2fv(compositeInfo.uniformLocations.texdim1, [v2.videoWidth, v2.videoHeight]);
     }
 
     drawScene(

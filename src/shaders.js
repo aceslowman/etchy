@@ -45,14 +45,14 @@ const screenFrag = `
       
       if(texdim0.x > texdim0.y) {
         uv0.x *= canvasAspect * aspect0;
-        uv0.x -= (canvasAspect * aspect0) / 2.0;
-        uv0.x += 0.5;
+        // uv0.x -= (canvasAspect * aspect0) / 2.0;
+        // uv0.x += 0.5;
       }
       
       if(texdim1.x > texdim1.y) {      
         uv1.x *= canvasAspect * aspect1;
-        uv1.x -= (canvasAspect * aspect1) / 2.0;
-        uv1.x += 0.5;
+        // uv1.x -= (canvasAspect * aspect1) / 2.0;
+        // uv1.x += 0.5;
       }
     } else {                            // fit horizontal
       float canvasAspect = resolution.x / resolution.y;
@@ -61,14 +61,14 @@ const screenFrag = `
       
       if(texdim0.x < texdim0.y) {
         uv0.y *= canvasAspect * aspect0;
-        uv0.y -= (canvasAspect * aspect0) / 2.0;
-        uv0.y += 0.5;
+        // uv0.y -= (canvasAspect * aspect0) / 2.0;
+        // uv0.y += 0.5;
       }
       
       if(texdim1.x < texdim1.y) {
         uv1.y *= canvasAspect * aspect1;
-        uv1.y -= (canvasAspect * aspect1) / 2.0;
-        uv1.y += 0.5;
+        // uv1.y -= (canvasAspect * aspect1) / 2.0;
+        // uv1.y += 0.5;
       }      
     }
   
@@ -114,14 +114,14 @@ const multiplyFrag = `
       
       if(texdim0.x > texdim0.y) {
         uv0.x *= canvasAspect * aspect0;
-        uv0.x -= (canvasAspect * aspect0) / 2.0;
-        uv0.x += 0.5;
+        // uv0.x -= (canvasAspect * aspect0) / 2.0;
+        // uv0.x += 0.5;
       }
       
       if(texdim1.x > texdim1.y) {      
         uv1.x *= canvasAspect * aspect1;
-        uv1.x -= (canvasAspect * aspect1) / 2.0;
-        uv1.x += 0.5;
+        // uv1.x -= (canvasAspect * aspect1) / 2.0;
+        // uv1.x += 0.5;
       }
     } else {                            // fit horizontal
       float canvasAspect = resolution.x / resolution.y;
@@ -130,14 +130,14 @@ const multiplyFrag = `
       
       if(texdim0.x < texdim0.y) {
         uv0.y *= canvasAspect * aspect0;
-        uv0.y -= (canvasAspect * aspect0) / 2.0;
-        uv0.y += 0.5;
+        // uv0.y -= (canvasAspect * aspect0) / 2.0;
+        // uv0.y += 0.5;
       }
       
       if(texdim1.x < texdim1.y) {
         uv1.y *= canvasAspect * aspect1;
-        uv1.y -= (canvasAspect * aspect1) / 2.0;
-        uv1.y += 0.5;
+        // uv1.y -= (canvasAspect * aspect1) / 2.0;
+        // uv1.y += 0.5;
       }      
     }
   
