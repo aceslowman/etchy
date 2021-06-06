@@ -125,20 +125,20 @@ if (localStorage.getItem("agreeToCC")) {
     compositeInfo = {
       program: compositeProgram,
       attribLocations: {
-        vertexPosition: compositeGl.getAttribLocation(
-          compositeProgram,
-          "aVertexPosition"
-        )
+        // vertexPosition: compositeGl.getAttribLocation(
+        //   compositeProgram,
+        //   "aVertexPosition"
+        // )
       },
       uniformLocations: {
-        projectionMatrix: compositeGl.getUniformLocation(
-          compositeProgram,
-          "uProjectionMatrix"
-        ),
-        modelViewMatrix: compositeGl.getUniformLocation(
-          compositeProgram,
-          "uModelViewMatrix"
-        )
+        // projectionMatrix: compositeGl.getUniformLocation(
+        //   compositeProgram,
+        //   "uProjectionMatrix"
+        // ),
+        // modelViewMatrix: compositeGl.getUniformLocation(
+        //   compositeProgram,
+        //   "uModelViewMatrix"
+        // )
       }
     };
 
@@ -149,17 +149,17 @@ if (localStorage.getItem("agreeToCC")) {
     mainInfo = {
       program: mainProgram,
       attribLocations: {
-        vertexPosition: mainGl.getAttribLocation(mainProgram, "aVertexPosition")
+        // vertexPosition: mainGl.getAttribLocation(mainProgram, "aVertexPosition")
       },
       uniformLocations: {
-        projectionMatrix: mainGl.getUniformLocation(
-          mainProgram,
-          "uProjectionMatrix"
-        ),
-        modelViewMatrix: mainGl.getUniformLocation(
-          mainProgram,
-          "uModelViewMatrix"
-        )
+        // projectionMatrix: mainGl.getUniformLocation(
+        //   mainProgram,
+        //   "uProjectionMatrix"
+        // ),
+        // modelViewMatrix: mainGl.getUniformLocation(
+        //   mainProgram,
+        //   "uModelViewMatrix"
+        // )
       }
     };
   };
@@ -237,7 +237,6 @@ if (localStorage.getItem("agreeToCC")) {
     // ratio that matches the display size of the canvas
     // and we only want to see objects between 0.1 units
     // and 100 units away from the camera.
-
     const fieldOfView = (45 * Math.PI) / 180; // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.1;
@@ -283,11 +282,9 @@ if (localStorage.getItem("agreeToCC")) {
     }
 
     // Tell WebGL to use our program when drawing
-
     gl.useProgram(programInfo.program);
 
     // Set the shader uniforms
-
     gl.uniformMatrix4fv(
       programInfo.uniformLocations.projectionMatrix,
       false,
@@ -307,6 +304,26 @@ if (localStorage.getItem("agreeToCC")) {
   }
 
   const drawMain = () => {
+    compositeInfo = {
+      program: compositeProgram,
+      attribLocations: {
+        // vertexPosition: compositeGl.getAttribLocation(
+        //   compositeProgram,
+        //   "aVertexPosition"
+        // )
+      },
+      uniformLocations: {
+        // projectionMatrix: compositeGl.getUniformLocation(
+        //   compositeProgram,
+        //   "uProjectionMatrix"
+        // ),
+        // modelViewMatrix: compositeGl.getUniformLocation(
+        //   compositeProgram,
+        //   "uModelViewMatrix"
+        // )
+      }
+    };
+    
     drawSketch();
     drawComposite();
 
