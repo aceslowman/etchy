@@ -489,8 +489,8 @@ if (localStorage.getItem("agreeToCC")) {
       );
 
       if (isDisconnectPermanent) {
-        alert("the person you were connected to has disappeared");
-        reset();
+        // alert("the person you were connected to has disappeared");
+        // reset();
       }
     };
 

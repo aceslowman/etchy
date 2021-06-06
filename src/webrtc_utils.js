@@ -10,14 +10,21 @@ async function checkStatePermanent(_con, iceState) {
 
   let firstFlag = await isPermanentDisconnect();
 
-  await customdelay(2000);
+  await customdelay(6000);
 
-  let secondFlag = await isPermanentDisconnect(); //Call this func again after 2 seconds to check whether data is still coming in.
+  let secondFlag = await isPermanentDisconnect(); //Call this func again after 6 seconds to check whether data is still coming in.
 
   if (secondFlag) {
     //If permanent disconnect then we hangup i.e no audio/video is fllowing
     if (iceState == "disconnected") {
       console.log('permanent disconnect')
+      
+    // TEMP: shouldn't restart ice here, but need to for a test
+    //If temp failure then restart ice i.e audio/video is still flowing
+    if (iceState == "failed") {
+      con.restartIce();
+    }
+    
       
       return true;
       // hangUpCall(); //Hangup instead of closevideo() because we want to record call end in db
