@@ -117,9 +117,19 @@ if (localStorage.getItem("agreeToCC")) {
   let videos_loaded = false;
 
   const setupShaders = () => {
-    compositeGl.viewport(0,0,compositeGl.drawingBufferWidth, compositeGl.drawingBufferHeight);
-    mainGl.viewport(0,0,mainGl.drawingBufferWidth, mainGl.drawingBufferHeight);
-    
+    compositeGl.viewport(
+      0,
+      0,
+      compositeGl.drawingBufferWidth,
+      compositeGl.drawingBufferHeight
+    );
+    mainGl.viewport(
+      0,
+      0,
+      mainGl.drawingBufferWidth,
+      mainGl.drawingBufferHeight
+    );
+
     // set up textures
     composite_texture0 = initTexture(compositeGl);
     composite_texture1 = initTexture(compositeGl);
@@ -206,15 +216,27 @@ if (localStorage.getItem("agreeToCC")) {
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
     gl.bufferData(
-      gl.ARRAY_BUFFER, 
-      new Float32Array([ 
-        -1.0, -1.0, 0.0,
-         1.0, -1.0, 0.0,
-        -1.0,  1.0, 0.0,
-        -1.0,  1.0, 0.0,
-         1.0, -1.0, 0.0,
-         1.0,  1.0, 0.0
-      ]), 
+      gl.ARRAY_BUFFER,
+      new Float32Array([
+        -1.0,
+        -1.0,
+        0.0,
+        1.0,
+        -1.0,
+        0.0,
+        -1.0,
+        1.0,
+        0.0,
+        -1.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0
+      ]),
       gl.STATIC_DRAW
     );
 
@@ -222,14 +244,7 @@ if (localStorage.getItem("agreeToCC")) {
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
 
-    const textureCoordinates = [
-      -1.0, -1.0,
-       1.0, -1.0,
-      -1.0,  1.0,
-      -1.0,  1.0,
-       1.0, -1.0,
-       1.0,  1.0,
-    ];
+    const textureCoordinates = [0, 0, 1.0, 0, 0, 1.0, 0, 1.0, 1.0, 0, 1.0, 1.0];
 
     gl.bufferData(
       gl.ARRAY_BUFFER,
@@ -270,14 +285,7 @@ if (localStorage.getItem("agreeToCC")) {
 
   function updateTexture(gl, texture, video) {
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      video
-    );
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
   }
 
   function drawScene(gl, programInfo, buffers, texture0, texture1) {
@@ -316,10 +324,10 @@ if (localStorage.getItem("agreeToCC")) {
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, texture1);
     gl.uniform1i(programInfo.uniformLocations.tex1, 1);
- 
+
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
-  
+
   // Draw the scene repeatedly
   let then = 0;
   const drawMain = now => {
@@ -363,14 +371,14 @@ if (localStorage.getItem("agreeToCC")) {
 
   const drawSketch = () => {
     sketchCtx.save();
-    
+
     sketchCtx.globalAlpha = fadeAmount;
     sketchCtx.fillStyle = "black";
     sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
     sketchCtx.fillStyle = "white";
     sketchCtx.restore();
     sketchCtx.globalAlpha = 1.0;
-    
+
     // draw circle
     if (left_dragging) {
       sketchCtx.fillStyle = "white";
@@ -387,7 +395,7 @@ if (localStorage.getItem("agreeToCC")) {
       sketchCtx.fill();
       sketchCtx.closePath();
     }
-    
+
     // erase
     if (middle_dragging) {
       sketchCtx.fillStyle = "black";
@@ -404,7 +412,7 @@ if (localStorage.getItem("agreeToCC")) {
       sketchCtx.fill();
       sketchCtx.closePath();
     }
-    
+
     // draw text
     if (right_dragging) {
       let current_symbol = current_message.split("")[message_index];
