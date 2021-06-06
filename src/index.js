@@ -424,10 +424,13 @@ if (localStorage.getItem("agreeToCC")) {
 
     // draw text
     if (right_dragging) {
-      // console.log('hello')
+      console.log('hello', current_frame)
       let current_symbol = current_message.split("")[message_index];
       // space out message
       if (current_frame % 4 === 0) {
+        console.log('sym', current_symbol)
+        console.log(mouse)
+        console.log(message_index)
         // draw message
         sketchCtx.font = brush_radius * 4 + "px Times New Roman";
         sketchCtx.fillStyle = "white";
@@ -436,10 +439,12 @@ if (localStorage.getItem("agreeToCC")) {
           mouse.x + brush_radius,
           mouse.y + brush_radius
         );
+                
         message_index++;
+        
         if (message_index >= current_message.split("").length) {
           right_dragging = false;
-        }
+        }        
       }
       current_frame++;
     }
