@@ -68,21 +68,21 @@ if (localStorage.getItem("agreeToCC")) {
 
   let canvas = document.getElementById("mainCanvas");
   let mainGl = canvas.getContext("webgl");
-  let ctx = canvas.getContext("2d");
-  // canvas.width = 640;
-  // canvas.height = 480;
+  // let ctx = canvas.getContext("2d");
+  canvas.width = 640;
+  canvas.height = 480;
 
   let sketchCanvas = document.getElementById("sketchCanvas");
   // let sketchGl = sketchCanvas.getContext("webgl");
   let sketchCtx = sketchCanvas.getContext("2d");
-  // sketchCanvas.width = 640;
-  // sketchCanvas.height = 480;
+  sketchCanvas.width = 640;
+  sketchCanvas.height = 480;
 
   let cameraCanvas = document.getElementById("cameraCanvas");
   let compositeGl = cameraCanvas.getContext("webgl");
   // let cameraCtx = cameraCanvas.getContext("2d");
-  // cameraCanvas.width = 640;
-  // cameraCanvas.height = 480;
+  cameraCanvas.width = 640;
+  cameraCanvas.height = 480;
 
   let extraCanvas = document.getElementById("extraCanvas");
   let extraGl = extraCanvas.getContext("webgl");
@@ -117,6 +117,9 @@ if (localStorage.getItem("agreeToCC")) {
   let videos_loaded = false;
 
   const setupShaders = () => {
+    compositeGl.viewport(0,0,compositeGl.drawingBufferWidth, compositeGl.drawingBufferHeight);
+    mainGl.viewport(0,0,mainGl.drawingBufferWidth, mainGl.drawingBufferHeight);
+    
     // set up textures
     composite_texture0 = initTexture(compositeGl);
     composite_texture1 = initTexture(compositeGl);
@@ -143,8 +146,7 @@ if (localStorage.getItem("agreeToCC")) {
           "aTextureCoord"
         )
       },
-      uniformLocations: {
-      }
+      uniformLocations: {}
     };
 
     // set up main---------------------------------------------
@@ -160,9 +162,7 @@ if (localStorage.getItem("agreeToCC")) {
         ),
         textureCoord: mainGl.getAttribLocation(mainProgram, "aTextureCoord")
       },
-      uniformLocations: {
-
-      }
+      uniformLocations: {}
     };
   };
 
@@ -362,15 +362,14 @@ if (localStorage.getItem("agreeToCC")) {
 
   const drawSketch = () => {
     sketchCtx.save();
-    // I can't decide what value this should be at
-    // a longer tail on the fade looks better but
-    // leaves the background with artifacts
+    
     sketchCtx.globalAlpha = fadeAmount;
     sketchCtx.fillStyle = "black";
     sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
     sketchCtx.fillStyle = "white";
     sketchCtx.restore();
     sketchCtx.globalAlpha = 1.0;
+    
     // draw circle
     if (left_dragging) {
       sketchCtx.fillStyle = "white";
@@ -387,6 +386,7 @@ if (localStorage.getItem("agreeToCC")) {
       sketchCtx.fill();
       sketchCtx.closePath();
     }
+    
     // erase
     if (middle_dragging) {
       sketchCtx.fillStyle = "black";
@@ -403,6 +403,7 @@ if (localStorage.getItem("agreeToCC")) {
       sketchCtx.fill();
       sketchCtx.closePath();
     }
+    
     // draw text
     if (right_dragging) {
       let current_symbol = current_message.split("")[message_index];

@@ -3,6 +3,11 @@
   overscroll-behavior-y: contain;
 }
 
+canvas {
+  width: 640px;
+  height: 480px;
+}
+
 html,
 body,
 #APP {
