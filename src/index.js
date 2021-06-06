@@ -322,12 +322,12 @@ if (localStorage.getItem("agreeToCC")) {
   }
 
   function drawScene(gl, programInfo, buffers, texture0, texture1) {
-    gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
-    gl.clearDepth(1.0); // Clear everything
-    gl.enable(gl.DEPTH_TEST); // Enable depth testing
-    gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+//     gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
+//     gl.clearDepth(1.0); // Clear everything
+//     gl.enable(gl.DEPTH_TEST); // Enable depth testing
+//     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
 
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+//     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
