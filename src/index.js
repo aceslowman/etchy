@@ -337,6 +337,8 @@ if (localStorage.getItem("agreeToCC")) {
       // mainGl.uniform2fv(mainInfo.uniformLocations.resolution, [640,480]);
 //       console.log('dims',[[v1.videoWidth, v1.videoHeight],
 // [v2.videoWidth, v2.videoHeight]])
+      mainGl.uniform2fv(mainInfo.uniformLocations.resolution, [mainGl.canvas.width, mainGl.canvas.height]);
+
       mainGl.uniform2fv(mainInfo.uniformLocations.texdim0, [v1.videoWidth, v1.videoHeight]);
       mainGl.uniform2fv(mainInfo.uniformLocations.texdim1, [v2.videoWidth, v2.videoHeight]);
     }
@@ -361,6 +363,8 @@ if (localStorage.getItem("agreeToCC")) {
       // compositeGl.uniform2fv(compositeInfo.uniformLocations.resolution, [640,480]);
 //       console.log('dims',[[v1.videoWidth, v1.videoHeight],
 // [v2.videoWidth, v2.videoHeight]])
+            compositeGl.uniform2fv(compositeInfo.uniformLocations.resolution, [compositeGl.canvas.width, compositeGl.canvas.height]);
+
       compositeGl.uniform2fv(compositeInfo.uniformLocations.texdim0, [v1.videoWidth, v1.videoHeight]);
       compositeGl.uniform2fv(compositeInfo.uniformLocations.texdim1, [v2.videoWidth, v2.videoHeight]);
     }
@@ -806,7 +810,11 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleClearButton = () => {
-    // initializeSketchCanvas();
+    sketchCtx.save();
+    sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+    sketchCtx.fillStyle = "black";
+    sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+    sketchCtx.restore();
   };
 
   const handleSnapButton = () => {
@@ -878,7 +886,20 @@ if (localStorage.getItem("agreeToCC")) {
     document.querySelector("#controls").style.display = "none";
   };
 
-  window.addEventListener("resize", e => {}, true);
+  window.addEventListener("resize", e => {
+    compositeGl.viewport(
+      0,
+      0,
+      compositeGl.canvas.width,
+      compositeGl.canvas.height
+    );
+    mainGl.viewport(
+      0,
+      0,
+      mainGl.canvas.width,
+      mainGl.canvas.height
+    );
+  }, true);
 
   document.addEventListener("contextmenu", handleContextMenu, false);
   document.addEventListener("mousedown", handleMouseDown, false);

@@ -39,15 +39,19 @@ const screenFrag = `
     vec2 uv1 = vTextureCoord;
    
     if(texdim0.x < texdim0.y) {
-      float windowAspect = resolution.x / resolution.y;
-      float aspect = resolution.x / resolution.y;
-      uv0.y /= ;
+      float windowAspect = resolution.y / resolution.x;
+      float aspect = texdim0.y / texdim0.x;
+      uv0.y /= aspect;
+      // uv0.y -= (windowAspect * aspect) / 2.0;
+      // uv0.y += 0.5;
     }
     
     if(texdim1.x < texdim1.y) {
-      float windowAspect = resolution.x / resolution.y;
-      float aspect = resolution.x / resolution.y;
-      uv1.y /= ;
+      float windowAspect = resolution.y / resolution.x;
+      float aspect = texdim1.y / texdim1.x;
+      uv1.y /= aspect;
+      // uv1.y -= (windowAspect * aspect) / 2.0;
+      // uv1.y += 0.5;
     }
     
     vec3 v0 = texture2D(tex0, uv0).rgb;
@@ -86,13 +90,21 @@ const multiplyFrag = `
     vec2 uv1 = vTextureCoord;
    
     if(texdim0.x < texdim0.y) {
-      uv0.y /= texdim0.y / texdim0.x;
+      float windowAspect = resolution.y / resolution.x;
+      float aspect = texdim0.y / texdim0.x;
+      uv0.y /= aspect;
+      // uv0.y -= (windowAspect * aspect) / 2.0;
+      // uv0.y += 0.5;
     }
     
     if(texdim1.x < texdim1.y) {
-      uv1.y /= texdim1.y / texdim1.x;
+      float windowAspect = resolution.y / resolution.x;
+      float aspect = texdim1.y / texdim1.x;
+      uv1.y /= aspect;
+      // uv1.y -= (windowAspect * aspect) / 2.0;
+      // uv1.y += 0.5;
     }
- 
+    
     vec3 v0 = texture2D(tex0, uv0).rgb;
     vec3 v1 = texture2D(tex1, uv1).rgb;
     //gl_FragColor = vec4(vec3(texdim1),1.0);
