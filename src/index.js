@@ -114,6 +114,12 @@ if (localStorage.getItem("agreeToCC")) {
   let mainInfo, mainProgram, mainBuffers;
 
   const setupShaders = () => {
+    // set up textures
+    composite_texture0 = initTexture(compositeGl);
+    composite_texture1 = initTexture(compositeGl);
+    main_texture0 = initTexture(mainGl);
+    main_texture1 = initTexture(mainGl);
+
     // set up composite    --------------------------------------
     compositeProgram = initShaderProgram(
       compositeGl,
@@ -125,8 +131,14 @@ if (localStorage.getItem("agreeToCC")) {
     compositeInfo = {
       program: compositeProgram,
       attribLocations: {
-        vertexPosition: compositeGl.getAttribLocation(compositeProgram, 'aVertexPosition'),
-        textureCoord: compositeGl.getAttribLocation(compositeProgram, 'aTextureCoord'),
+        vertexPosition: compositeGl.getAttribLocation(
+          compositeProgram,
+          "aVertexPosition"
+        ),
+        textureCoord: compositeGl.getAttribLocation(
+          compositeProgram,
+          "aTextureCoord"
+        )
       },
       uniformLocations: {
         projectionMatrix: compositeGl.getUniformLocation(
@@ -147,8 +159,11 @@ if (localStorage.getItem("agreeToCC")) {
     mainInfo = {
       program: mainProgram,
       attribLocations: {
-        vertexPosition: mainGl.getAttribLocation(mainProgram, 'aVertexPosition'),
-        textureCoord: mainGl.getAttribLocation(mainProgram, 'aTextureCoord'),
+        vertexPosition: mainGl.getAttribLocation(
+          mainProgram,
+          "aVertexPosition"
+        ),
+        textureCoord: mainGl.getAttribLocation(mainProgram, "aTextureCoord")
       },
       uniformLocations: {
         projectionMatrix: mainGl.getUniformLocation(
@@ -220,7 +235,60 @@ if (localStorage.getItem("agreeToCC")) {
     };
   }
 
-  function drawScene(gl, programInfo, buffers) {
+  function initTexture(gl) {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    // Because video has to be download over the internet
+    // they might take a moment until it's ready so
+    // put a single pixel in the texture so we can
+    // use it immediately.
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 1;
+    const height = 1;
+    const border = 0;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    const pixel = new Uint8Array([0, 0, 255, 255]); // opaque blue
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      level,
+      internalFormat,
+      width,
+      height,
+      border,
+      srcFormat,
+      srcType,
+      pixel
+    );
+
+    // Turn off mips and set  wrapping to clamp to edge so it
+    // will work regardless of the dimensions of the video.
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+    return texture;
+  }
+
+  function updateTexture(gl, texture, video) {
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      level,
+      internalFormat,
+      srcFormat,
+      srcType,
+      video
+    );
+  }
+
+  function drawScene(gl, programInfo, buffers, texture0, texture1) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
     gl.clearDepth(1.0); // Clear everything
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
@@ -280,6 +348,25 @@ if (localStorage.getItem("agreeToCC")) {
       gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
     }
 
+    // tell webgl how to pull out the texture coordinates from buffer
+    {
+      const num = 2; // every coordinate composed of 2 values
+      const type = gl.FLOAT; // the data in the buffer is 32 bit float
+      const normalize = false; // don't normalize
+      const stride = 0; // how many bytes to get from one set to the next
+      const offset = 0; // how many bytes inside the buffer to start from
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
+      gl.vertexAttribPointer(
+        programInfo.attribLocations.textureCoord,
+        num,
+        type,
+        normalize,
+        stride,
+        offset
+      );
+      gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+    }
+
     // Tell WebGL to use our program when drawing
     gl.useProgram(programInfo.program);
 
@@ -295,6 +382,20 @@ if (localStorage.getItem("agreeToCC")) {
       modelViewMatrix
     );
 
+    // Tell WebGL we want to affect texture unit 0
+    gl.activeTexture(gl.TEXTURE0);
+    // Bind the texture to texture unit 0
+    gl.bindTexture(gl.TEXTURE_2D, texture0);
+    // Tell the shader we bound the texture to texture unit 0
+    gl.uniform1i(programInfo.uniformLocations.tex0, 0);
+
+    // Tell WebGL we want to affect texture unit 0
+    gl.activeTexture(gl.TEXTURE0);
+    // Bind the texture to texture unit 1
+    gl.bindTexture(gl.TEXTURE_2D, texture1);
+    // Tell the shader we bound the texture to texture unit 1
+    gl.uniform1i(programInfo.uniformLocations.tex1, 1);
+
     {
       const offset = 0;
       const vertexCount = 4;
@@ -309,8 +410,8 @@ if (localStorage.getItem("agreeToCC")) {
     mainInfo = {
       ...mainInfo,
       uniformLocations: {
-        tex0: compositeGl.getUniformLocation(compositeProgram, 'tex0'),
-        tex1: compositeGl.getUniformLocation(compositeProgram, 'tex1'),        
+        tex0: mainGl.getUniformLocation(mainProgram, "tex0"),
+        tex1: mainGl.getUniformLocation(mainProgram, "tex1"),
         projectionMatrix: mainGl.getUniformLocation(
           mainProgram,
           "uProjectionMatrix"
@@ -325,7 +426,7 @@ if (localStorage.getItem("agreeToCC")) {
     drawSketch();
     drawComposite();
 
-    drawScene(mainGl, mainInfo, mainBuffers);
+    drawScene(mainGl, mainInfo, mainBuffers, v1, v2);
   };
 
   const drawComposite = () => {
@@ -335,8 +436,8 @@ if (localStorage.getItem("agreeToCC")) {
     compositeInfo = {
       ...compositeInfo,
       uniformLocations: {
-        tex0: compositeGl.getUniformLocation(compositeProgram, 'tex0'),
-        tex1: compositeGl.getUniformLocation(compositeProgram, 'tex1'),        
+        tex0: compositeGl.getUniformLocation(compositeProgram, "tex0"),
+        tex1: compositeGl.getUniformLocation(compositeProgram, "tex1"),
         projectionMatrix: compositeGl.getUniformLocation(
           compositeProgram,
           "uProjectionMatrix"
@@ -348,7 +449,7 @@ if (localStorage.getItem("agreeToCC")) {
       }
     };
 
-    drawScene(compositeGl, compositeInfo, compositeBuffers);
+    drawScene(compositeGl, compositeInfo, compositeBuffers, v1, v2);
   };
 
   const drawSketch = () => {
