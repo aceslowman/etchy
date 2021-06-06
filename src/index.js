@@ -424,6 +424,7 @@ if (localStorage.getItem("agreeToCC")) {
 
     // draw text
     if (right_dragging) {
+      // console.log('hello')
       let current_symbol = current_message.split("")[message_index];
       // space out message
       if (current_frame % 4 === 0) {
