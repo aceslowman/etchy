@@ -125,20 +125,18 @@ if (localStorage.getItem("agreeToCC")) {
     compositeInfo = {
       program: compositeProgram,
       attribLocations: {
-        // vertexPosition: compositeGl.getAttribLocation(
-        //   compositeProgram,
-        //   "aVertexPosition"
-        // )
+        vertexPosition: mainGl.getAttribLocation(mainProgram, 'aVertexPosition'),
+        textureCoord: mainGl.getAttribLocation(mainProgram, 'aTextureCoord'),
       },
       uniformLocations: {
-        // projectionMatrix: compositeGl.getUniformLocation(
-        //   compositeProgram,
-        //   "uProjectionMatrix"
-        // ),
-        // modelViewMatrix: compositeGl.getUniformLocation(
-        //   compositeProgram,
-        //   "uModelViewMatrix"
-        // )
+        projectionMatrix: compositeGl.getUniformLocation(
+          compositeProgram,
+          "uProjectionMatrix"
+        ),
+        modelViewMatrix: compositeGl.getUniformLocation(
+          compositeProgram,
+          "uModelViewMatrix"
+        )
       }
     };
 
@@ -149,17 +147,18 @@ if (localStorage.getItem("agreeToCC")) {
     mainInfo = {
       program: mainProgram,
       attribLocations: {
-        // vertexPosition: mainGl.getAttribLocation(mainProgram, "aVertexPosition")
+        vertexPosition: mainGl.getAttribLocation(mainProgram, 'aVertexPosition'),
+        textureCoord: mainGl.getAttribLocation(mainProgram, 'aTextureCoord'),
       },
       uniformLocations: {
-        // projectionMatrix: mainGl.getUniformLocation(
-        //   mainProgram,
-        //   "uProjectionMatrix"
-        // ),
-        // modelViewMatrix: mainGl.getUniformLocation(
-        //   mainProgram,
-        //   "uModelViewMatrix"
-        // )
+        projectionMatrix: mainGl.getUniformLocation(
+          mainProgram,
+          "uProjectionMatrix"
+        ),
+        modelViewMatrix: mainGl.getUniformLocation(
+          mainProgram,
+          "uModelViewMatrix"
+        )
       }
     };
   };
@@ -304,26 +303,25 @@ if (localStorage.getItem("agreeToCC")) {
   }
 
   const drawMain = () => {
-    compositeInfo = {
-      program: compositeProgram,
-      attribLocations: {
-        // vertexPosition: compositeGl.getAttribLocation(
-        //   compositeProgram,
-        //   "aVertexPosition"
-        // )
-      },
+    let v1 = document.querySelector("#local-video");
+    let v2 = document.querySelector("#local-sketch");
+
+    mainInfo = {
+      ...mainInfo,
       uniformLocations: {
-        // projectionMatrix: compositeGl.getUniformLocation(
-        //   compositeProgram,
-        //   "uProjectionMatrix"
-        // ),
-        // modelViewMatrix: compositeGl.getUniformLocation(
-        //   compositeProgram,
-        //   "uModelViewMatrix"
-        // )
+        tex0: v1,
+        tex1: v2,
+        projectionMatrix: compositeGl.getUniformLocation(
+          compositeProgram,
+          "uProjectionMatrix"
+        ),
+        modelViewMatrix: compositeGl.getUniformLocation(
+          compositeProgram,
+          "uModelViewMatrix"
+        )
       }
     };
-    
+
     drawSketch();
     drawComposite();
 
@@ -331,6 +329,25 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const drawComposite = () => {
+    let v1 = document.querySelector("#local-video");
+    let v2 = document.querySelector("#local-sketch");
+
+    compositeInfo = {
+      ...compositeInfo,
+      uniformLocations: {
+        tex0: v1,
+        tex1: v2,
+        projectionMatrix: compositeGl.getUniformLocation(
+          compositeProgram,
+          "uProjectionMatrix"
+        ),
+        modelViewMatrix: compositeGl.getUniformLocation(
+          compositeProgram,
+          "uModelViewMatrix"
+        )
+      }
+    };
+
     drawScene(compositeGl, compositeInfo, compositeBuffers);
   };
 
@@ -549,7 +566,7 @@ if (localStorage.getItem("agreeToCC")) {
         compositeStream = cameraCanvas.captureStream();
         sketchStream = sketchCanvas.captureStream();
 
-        initializeSketchCanvas();
+        // initializeSketchCanvas();
         compositeStream.getTracks().forEach(track => {
           pc.addTrack(track, compositeStream);
         });
@@ -690,109 +707,6 @@ if (localStorage.getItem("agreeToCC")) {
     websocket.send(JSON.stringify(data));
   };
 
-  // this fades away the sketch while drawing
-  const updateSketchCanvas = () => {
-    //     sketchCtx.save();
-    //     // I can't decide what value this should be at
-    //     // a longer tail on the fade looks better but
-    //     // leaves the background with artifacts
-    //     sketchCtx.globalAlpha = fadeAmount;
-    //     sketchCtx.fillStyle = "black";
-    //     sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-    //     sketchCtx.fillStyle = "white";
-    //     sketchCtx.restore();
-    //     sketchCtx.globalAlpha = 1.0;
-    //     // draw circle
-    //     if (left_dragging) {
-    //       sketchCtx.fillStyle = "white";
-    //       sketchCtx.beginPath();
-    //       sketchCtx.ellipse(
-    //         mouse.x,
-    //         mouse.y,
-    //         brush_radius,
-    //         brush_radius,
-    //         Math.PI / 4,
-    //         0,
-    //         2 * Math.PI
-    //       );
-    //       sketchCtx.fill();
-    //       sketchCtx.closePath();
-    //     }
-    //     // erase
-    //     if (middle_dragging) {
-    //       sketchCtx.fillStyle = "black";
-    //       sketchCtx.beginPath();
-    //       sketchCtx.ellipse(
-    //         mouse.x,
-    //         mouse.y,
-    //         brush_radius,
-    //         brush_radius,
-    //         Math.PI / 4,
-    //         0,
-    //         2 * Math.PI
-    //       );
-    //       sketchCtx.fill();
-    //       sketchCtx.closePath();
-    //     }
-    //     // draw text
-    //     if (right_dragging) {
-    //       let current_symbol = current_message.split("")[message_index];
-    //       // space out message
-    //       if (current_frame % 4 === 0) {
-    //         // draw message
-    //         sketchCtx.font = brush_radius * 4 + "px Times New Roman";
-    //         sketchCtx.fillStyle = "white";
-    //         sketchCtx.fillText(
-    //           current_message.split("")[message_index],
-    //           mouse.x + brush_radius,
-    //           mouse.y + brush_radius
-    //         );
-    //         message_index++;
-    //         if (message_index >= current_message.split("").length) {
-    //           right_dragging = false;
-    //         }
-    //       }
-    //       current_frame++;
-    //     }
-  };
-
-  // composite final output
-  const updateMainCanvas = () => {
-    //     if (fade) updateSketchCanvas();
-    //     updateCameraCanvas();
-    //     let v1 = document.querySelector("#local-composite");
-    //     let v2 = document.querySelector("#peerRemote");
-    //     extraCtx.drawImage(v2, 0, 0);
-    //     ctx.drawImage(v1, 0, 0);
-    //     // lighter(canvas, extraCanvas);
-    //         ctx.globalCompositeOperation = "source-over";
-    //         ctx.drawImage(v1, 0, 0);
-    //         ctx.globalCompositeOperation = main_blend_mode;
-    //         ctx.drawImage(v2, 0, 0);
-  };
-
-  // here I am masking out the video with the sketch (composite)
-  const updateCameraCanvas = () => {
-    //     let v1 = document.querySelector("#local-video");
-    //     let v2 = document.querySelector("#local-sketch");
-    //     extraCtx.drawImage(v2, 0, 0);
-    //     cameraCtx.drawImage(v1, 0, 0);
-    //     // multiply(cameraCanvas, extraCanvas);
-    //     cameraCtx.globalCompositeOperation = "source-over";
-    //     cameraCtx.drawImage(v1, 0, 0);
-    //     cameraCtx.globalCompositeOperation = local_blend_mode;
-    //     cameraCtx.drawImage(v2, 0, 0);
-  };
-
-  // draw sketch that can be later be used as a mask
-  const initializeSketchCanvas = () => {
-    //   sketchCtx.save();
-    //   sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-    //   sketchCtx.fillStyle = "black";
-    //   sketchCtx.fillRect(0, 0, sketchCanvas.width, sketchCanvas.height);
-    //   sketchCtx.restore();
-  };
-
   let current_frame = 0;
   const handleMouseMove = e => {
     if (right_dragging || left_dragging || middle_dragging) {
@@ -864,7 +778,7 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const handleClearButton = () => {
-    initializeSketchCanvas();
+    // initializeSketchCanvas();
   };
 
   const handleToggleFade = () => {
