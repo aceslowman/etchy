@@ -223,10 +223,12 @@ if (localStorage.getItem("agreeToCC")) {
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
 
     const textureCoordinates = [
-      0.0, 0.0, 
-      1.0, 0.0, 
-      1.0, 1.0, 
-      0.0, 1.0
+      -1.0, -1.0,
+       1.0, -1.0,
+      -1.0,  1.0,
+      -1.0,  1.0,
+       1.0, -1.0,
+       1.0,  1.0,
     ];
 
     gl.bufferData(
@@ -242,6 +244,7 @@ if (localStorage.getItem("agreeToCC")) {
   }
 
   function initTexture(gl) {
+    // initializes single pixel texture
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(
@@ -278,6 +281,7 @@ if (localStorage.getItem("agreeToCC")) {
   }
 
   function drawScene(gl, programInfo, buffers, texture0, texture1) {
+    // gl.disable( gl.DEPTH_TEST );
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
     gl.vertexAttribPointer(
       programInfo.attribLocations.vertexPosition,
