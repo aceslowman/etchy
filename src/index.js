@@ -113,7 +113,7 @@ if (localStorage.getItem("agreeToCC")) {
   let compositeInfo, compositeProgram, compositeBuffers;
   let mainInfo, mainProgram, mainBuffers;
   let composite_texture0, composite_texture1, main_texture0, main_texture1;
-  
+
   let videos_loaded = false;
 
   const setupShaders = () => {
@@ -225,12 +225,7 @@ if (localStorage.getItem("agreeToCC")) {
     // operations to from here out.
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-    const positions = [
-      -1.0,  1.0,
-       1.0,  1.0,
-      -1.0, -1.0,
-       1.0, -1.0,
-    ];
+    const positions = [-1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0];
 
     // Now pass the list of positions into WebGL to build the
     // shape. We do this by creating a Float32Array from the
@@ -242,12 +237,7 @@ if (localStorage.getItem("agreeToCC")) {
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
 
-    const textureCoordinates = [
-      0.0,  0.0,
-      1.0,  0.0,
-      1.0,  1.0,
-      0.0,  1.0,
-    ];
+    const textureCoordinates = [0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0];
 
     gl.bufferData(
       gl.ARRAY_BUFFER,
@@ -363,11 +353,11 @@ if (localStorage.getItem("agreeToCC")) {
 
     // // Now move the drawing position a bit to where we want to
     // // start drawing the square.
-    // mat4.translate(
-    //   modelViewMatrix, // destination matrix
-    //   modelViewMatrix, // matrix to translate
-    //   [-1.0, 0.0, -6.0]
-    // ); // amount to translate
+    mat4.translate(
+      modelViewMatrix, // destination matrix
+      modelViewMatrix, // matrix to translate
+      [-0.0, 0.0, -6.0]
+    ); // amount to translate
 
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
@@ -408,7 +398,7 @@ if (localStorage.getItem("agreeToCC")) {
       );
       gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
     }
-    
+
     // Tell WebGL which indices to use to index the vertices
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
 
@@ -448,12 +438,17 @@ if (localStorage.getItem("agreeToCC")) {
       gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
     }
   }
+  // Draw the scene repeatedly
+  let then = 0;
+  const drawMain = now => {
+    now *= 0.001; // convert to seconds
+    const deltaTime = now - then;
+    then = now;
 
-  const drawMain = () => {
     let v1 = document.querySelector("#local-composite");
     let v2 = document.querySelector("#peerRemote");
 
-    if(videos_loaded) {          
+    if (videos_loaded) {
       updateTexture(mainGl, main_texture0, v1);
       updateTexture(mainGl, main_texture1, v2);
     }
@@ -468,15 +463,17 @@ if (localStorage.getItem("agreeToCC")) {
       main_texture0, 
       main_texture1
     );
-  };
+
+    requestAnimationFrame(drawMain);
+  };  
 
   const drawComposite = () => {
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
 
-    if(videos_loaded) {
+    if (videos_loaded) {
       updateTexture(compositeGl, composite_texture0, v1);
-      updateTexture(compositeGl, composite_texture1, v2); 
+      updateTexture(compositeGl, composite_texture1, v2);
     }
 
     drawScene(
@@ -489,7 +486,6 @@ if (localStorage.getItem("agreeToCC")) {
   };
 
   const drawSketch = () => {
-    // drawScene(cameraGl)
     sketchCtx.save();
     // I can't decide what value this should be at
     // a longer tail on the fade looks better but
@@ -712,23 +708,25 @@ if (localStorage.getItem("agreeToCC")) {
         document.getElementById("local-sketch").srcObject = sketchStream;
         document.getElementById("local-composite").srcObject = compositeStream;
 
-        // document.getElementById("local-video").play();
-        // document.getElementById("local-sketch").play();
-        // document.getElementById("local-composite").play();
-        // document.getElementById("peerRemote").play();
+        document.getElementById("local-video").play();
+        document.getElementById("local-sketch").play();
+        document.getElementById("local-composite").play();
+        document.getElementById("peerRemote").play();
 
         // setup gl
         setupShaders();
 
         // startup the main output loop
-        if (main_update_loop) {
-          clearInterval(main_update_loop);
-          // main_update_loop = setInterval(updateMainCanvas, update_rate);
-          main_update_loop = setInterval(drawMain, update_rate);
-        } else {
-          // main_update_loop = setInterval(updateMainCanvas, update_rate);
-          main_update_loop = setInterval(drawMain, update_rate);
-        }
+        // if (main_update_loop) {
+        //   clearInterval(main_update_loop);
+        //   // main_update_loop = setInterval(updateMainCanvas, update_rate);
+        //   main_update_loop = setInterval(drawMain, update_rate);
+        // } else {
+        //   // main_update_loop = setInterval(updateMainCanvas, update_rate);
+        //   main_update_loop = setInterval(drawMain, update_rate);
+        // }
+      
+        requestAnimationFrame(drawMain);
       })
       .catch(err => {
         console.error(err);
@@ -805,7 +803,7 @@ if (localStorage.getItem("agreeToCC")) {
             // WE ARE DONE CONNECTING!
             hideLoading();
             showControls();
-          
+
             videos_loaded = true;
           })
           .catch(error => console.error(error));
