@@ -484,22 +484,6 @@ if (localStorage.getItem("agreeToCC")) {
     updateTexture(mainGl, main_texture0, v1);
     updateTexture(mainGl, main_texture1, v2);
 
-    // mainInfo = {
-    //   ...mainInfo,
-    //   uniformLocations: {
-    //     tex0: mainGl.getUniformLocation(mainProgram, "tex0"),
-    //     tex1: mainGl.getUniformLocation(mainProgram, "tex1"),
-    //     projectionMatrix: mainGl.getUniformLocation(
-    //       mainProgram,
-    //       "uProjectionMatrix"
-    //     ),
-    //     modelViewMatrix: mainGl.getUniformLocation(
-    //       mainProgram,
-    //       "uModelViewMatrix"
-    //     )
-    //   }
-    // };
-
     drawSketch();
     drawComposite();
 
@@ -512,22 +496,6 @@ if (localStorage.getItem("agreeToCC")) {
 
     updateTexture(compositeGl, composite_texture0, v1);
     updateTexture(compositeGl, composite_texture1, v2);
-
-    //     compositeInfo = {
-    //       ...compositeInfo,
-    //       uniformLocations: {
-    //         tex0: compositeGl.getUniformLocation(compositeProgram, "tex0"),
-    //         tex1: compositeGl.getUniformLocation(compositeProgram, "tex1"),
-    //         projectionMatrix: compositeGl.getUniformLocation(
-    //           compositeProgram,
-    //           "uProjectionMatrix"
-    //         ),
-    //         modelViewMatrix: compositeGl.getUniformLocation(
-    //           compositeProgram,
-    //           "uModelViewMatrix"
-    //         )
-    //       }
-    //     };
 
     drawScene(
       compositeGl,
