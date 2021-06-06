@@ -113,6 +113,8 @@ if (localStorage.getItem("agreeToCC")) {
   let compositeInfo, compositeProgram, compositeBuffers;
   let mainInfo, mainProgram, mainBuffers;
   let composite_texture0, composite_texture1, main_texture0, main_texture1;
+  
+  let videos_loaded = false;
 
   const setupShaders = () => {
     // set up textures
@@ -359,13 +361,13 @@ if (localStorage.getItem("agreeToCC")) {
     // the center of the scene.
     const modelViewMatrix = mat4.create();
 
-    // Now move the drawing position a bit to where we want to
-    // start drawing the square.
-    mat4.translate(
-      modelViewMatrix, // destination matrix
-      modelViewMatrix, // matrix to translate
-      [-1.0, 0.0, -6.0]
-    ); // amount to translate
+    // // Now move the drawing position a bit to where we want to
+    // // start drawing the square.
+    // mat4.translate(
+    //   modelViewMatrix, // destination matrix
+    //   modelViewMatrix, // matrix to translate
+    //   [-1.0, 0.0, -6.0]
+    // ); // amount to translate
 
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
@@ -451,8 +453,10 @@ if (localStorage.getItem("agreeToCC")) {
     let v1 = document.querySelector("#local-composite");
     let v2 = document.querySelector("#peerRemote");
 
-    updateTexture(mainGl, main_texture0, v1);
-    updateTexture(mainGl, main_texture1, v2);
+    if(videos_loaded) {          
+      updateTexture(mainGl, main_texture0, v1);
+      updateTexture(mainGl, main_texture1, v2);
+    }
 
     drawSketch();
     drawComposite();
@@ -470,8 +474,10 @@ if (localStorage.getItem("agreeToCC")) {
     let v1 = document.querySelector("#local-video");
     let v2 = document.querySelector("#local-sketch");
 
-    updateTexture(compositeGl, composite_texture0, v1);
-    updateTexture(compositeGl, composite_texture1, v2);
+    if(videos_loaded) {
+      updateTexture(compositeGl, composite_texture0, v1);
+      updateTexture(compositeGl, composite_texture1, v2); 
+    }
 
     drawScene(
       compositeGl,
@@ -796,8 +802,11 @@ if (localStorage.getItem("agreeToCC")) {
         pc.setRemoteDescription(data.sdp)
           .then(addCamera)
           .then(() => {
+            // WE ARE DONE CONNECTING!
             hideLoading();
             showControls();
+          
+            videos_loaded = true;
           })
           .catch(error => console.error(error));
         break;

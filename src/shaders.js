@@ -25,7 +25,7 @@ const screenFrag = `
     vec4 v0 = texture2D(tex0, vTextureCoord);
     vec4 v1 = texture2D(tex1, vTextureCoord);
     // gl_FragColor = v0;
-    gl_FragColor = vec4(0.0,0.0,1.0,1.0);
+    gl_FragColor = vec4(0.0,1.0,1.0,1.0);
   }
 `;
 
