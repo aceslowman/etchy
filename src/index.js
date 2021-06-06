@@ -244,29 +244,16 @@ if (localStorage.getItem("agreeToCC")) {
   function initTexture(gl) {
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    // Because video has to be download over the internet
-    // they might take a moment until it's ready so
-    // put a single pixel in the texture so we can
-    // use it immediately.
-    const level = 0;
-    const internalFormat = gl.RGBA;
-    const width = 1;
-    const height = 1;
-    const border = 0;
-    const srcFormat = gl.RGBA;
-    const srcType = gl.UNSIGNED_BYTE;
-    const pixel = new Uint8Array([0, 0, 255, 255]); // opaque blue
     gl.texImage2D(
       gl.TEXTURE_2D,
-      level,
-      internalFormat,
-      width,
-      height,
-      border,
-      srcFormat,
-      srcType,
-      pixel
+      0,
+      gl.RGBA,
+      1,
+      1,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      new Uint8Array([0, 0, 255, 255]) // opaque blue
     );
 
     // Turn off mips and set  wrapping to clamp to edge so it
